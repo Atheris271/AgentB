@@ -1,0 +1,26 @@
+# Tool / skill configuration — which skills are enabled and their settings.
+
+tools:
+  # Only tools listed here will be loaded and available to the agent.
+  enabled:
+    - calculator
+    - file_reader
+    - local_file_search
+    - table_analyzer
+    - format_converter
+
+  # Per-tool settings (optional — tools use defaults when omitted).
+  settings:
+    workspace_root: "./data/tool_inputs"
+    file_reader:
+      max_file_size_kb: 512
+    local_file_search:
+      max_depth: 3
+      exclude_patterns:
+        - "__pycache__"
+        - ".git"
+        - "*.pyc"
+    table_analyzer:
+      max_rows: 10000
+    format_converter:
+      indent: 2

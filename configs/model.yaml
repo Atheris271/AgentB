@@ -1,0 +1,13 @@
+# Model configuration — used by b1_agent_runtime to create the LLM instance.
+# Real model weights (if local) go in ../models/; this file only specifies
+# which model to use and its parameters.
+
+model:
+  provider: anthropic          # anthropic | openai
+  model_name: claude-sonnet-4-6
+  temperature: 0
+  max_tokens: 4096
+
+# API credentials are read from environment variables:
+#   ANTHROPIC_API_KEY   for anthropic
+#   OPENAI_API_KEY      for openai

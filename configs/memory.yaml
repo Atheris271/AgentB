@@ -1,0 +1,14 @@
+# Memory configuration — controls how conversation history is managed.
+
+memory:
+  # Type of memory backend:
+  #   simple    - in-memory list, cleared per session (default)
+  #   buffer    - sliding window of the last N messages
+  #   summary   - progressively summarizes older messages
+  type: simple
+
+  # Maximum number of messages to retain (for buffer / summary).
+  max_messages: 100
+
+  # When true, the system prompt is always prepended even after truncation.
+  retain_system_prompt: true
