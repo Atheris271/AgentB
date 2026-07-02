@@ -1,0 +1,134 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "calculator",
+      "description": "Evaluate a mathematical expression safely.\n\nSupports: +, -, *, /, //, %, **, abs, round, min, max, sqrt, log, log10,\nsin, cos, tan. Constants: pi, e.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "expression": {
+            "type": "string",
+            "description": "A math expression to evaluate, e.g.   or  ."
+          }
+        },
+        "required": [
+          "expression"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "file_reader",
+      "description": "Read the contents of a file in the workspace.\n\nReturns the file text or an error message if the file cannot be read.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file, relative to the workspace root."
+          },
+          "max_size_kb": {
+            "type": "integer",
+            "description": "Maximum file size in KB to read. Defaults to 512."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "local_file_search",
+      "description": "Search for files matching a pattern, or list directory contents.\n\nReturns matching file paths (one per line) or an empty result message.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "array",
+            "description": "Filename pattern to search for (glob, e.g.   or  ). Omit to list all files."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory to search in, relative to workspace root. Defaults to root."
+          },
+          "max_depth": {
+            "type": "integer",
+            "description": "Maximum recursion depth for search. Defaults to 3."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "table_analyzer",
+      "description": "Analyze tabular data from a file or inline text.\n\nSupports CSV and TSV. Call with action='summary' for an overview,\naction='head:10' for first 10 rows, or action='columns' for column names.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Path to a CSV/TSV file (relative to workspace), or inline CSV/TSV text."
+          },
+          "action": {
+            "type": "array",
+            "description": "What to do:   (row count, columns, types),   (first N rows, N defaults to 5),   (list column names), or   (filter rows, e.g.  )."
+          },
+          "max_rows": {
+            "type": "integer",
+            "description": "Maximum rows to process. Defaults to 1000."
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "format_converter",
+      "description": "Convert data between common formats.\n\nFormats supported: json, csv, yaml, txt.\nFor CSV conversion, the data must be tabular (list of dicts, or\nlist-of-lists with a header row).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "input_data": {
+            "type": "string",
+            "description": "The data to convert (inline text, or a path relative to the workspace)."
+          },
+          "from_format": {
+            "type": "string",
+            "description": "Source format: json, csv, yaml, or txt."
+          },
+          "to_format": {
+            "type": "string",
+            "description": "Target format: json, csv, yaml, or txt."
+          },
+          "indent": {
+            "type": "integer",
+            "description": "Indentation for JSON/YAML output. Defaults to 2."
+          }
+        },
+        "required": [
+          "input_data",
+          "from_format",
+          "to_format"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+]
