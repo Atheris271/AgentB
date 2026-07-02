@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "mode": "mock",
+  "raw_text": "{\"role\": \"assistant\", \"content\": \"根据工具返回结果，结论如下：\\n- file_reader 调用失败：Error: file not found - docs/missing.txt\", \"tool_calls\": []}",
+  "parsed": {
+    "role": "assistant",
+    "content": "根据工具返回结果，结论如下：\n- file_reader 调用失败：Error: file not found - docs/missing.txt",
+    "tool_calls": []
+  },
+  "error": null,
+  "latency_ms": 0.109
+}
