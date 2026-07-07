@@ -1,0 +1,12 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "code/b2_run_skill.py",
+    "code/b3_tool_layer.py",
+    "code/b4_local_agent_llm.py",
+    "code/common/path_utils.py",
+    "code/common/schemas.py"
+  ],
+  "results": []
+}

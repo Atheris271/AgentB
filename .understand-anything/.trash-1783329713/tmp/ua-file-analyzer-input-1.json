@@ -1,0 +1,17 @@
+{
+  "projectRoot": "D:/Desktop/agent",
+  "batchFiles": [
+    {"path": "code/b1_agent_runtime.py", "language": "python", "sizeLines": 371, "fileCategory": "code"},
+    {"path": "code/b5_memory.py", "language": "python", "sizeLines": 282, "fileCategory": "code"},
+    {"path": "code/common/io_utils.py", "language": "python", "sizeLines": 61, "fileCategory": "code"},
+    {"path": "code/common/logging_utils.py", "language": "python", "sizeLines": 27, "fileCategory": "code"},
+    {"path": "code/run_full_demo.py", "language": "python", "sizeLines": 68, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "code/b1_agent_runtime.py": ["code/common/io_utils.py", "code/common/logging_utils.py", "code/common/path_utils.py", "code/common/schemas.py"],
+    "code/b5_memory.py": ["code/common/io_utils.py", "code/common/logging_utils.py", "code/common/path_utils.py"],
+    "code/common/io_utils.py": [],
+    "code/common/logging_utils.py": ["code/common/io_utils.py"],
+    "code/run_full_demo.py": ["code/b1_agent_runtime.py", "code/common/io_utils.py", "code/common/path_utils.py"]
+  }
+}

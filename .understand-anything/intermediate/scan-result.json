@@ -1,0 +1,532 @@
+{
+  "name": "agent",
+  "description": "一个基于 Python 3.10 实现的本地文件驱动 Agent 框架，使用 Qwen3.5-4B 模型进行本地推理。项目包含五个独立模块（B1-B5）：Agent 总控与消息管理、Skill 独立运行、工具层 schema 生成与校验、本地 LLM 推理（支持 mock 与真实模式）、以及记忆文档的查找与索引维护。",
+  "languages": ["csv", "json", "markdown", "python", "txt", "unknown", "yaml"],
+  "frameworks": ["HuggingFace Transformers", "PyTorch"],
+  "files": [
+    {
+      "path": ".claude/settings.local.json",
+      "language": "json",
+      "sizeLines": 29,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".understand-anything/.understandignore",
+      "language": "unknown",
+      "sizeLines": 35,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".understand-anything/config.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "code/b1_agent_runtime.py",
+      "language": "python",
+      "sizeLines": 371,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/b2_run_skill.py",
+      "language": "python",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/b3_tool_layer.py",
+      "language": "python",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/b4_local_agent_llm.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/b5_memory.py",
+      "language": "python",
+      "sizeLines": 282,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/common/__init__.py",
+      "language": "python",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/common/io_utils.py",
+      "language": "python",
+      "sizeLines": 61,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/common/logging_utils.py",
+      "language": "python",
+      "sizeLines": 27,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/common/path_utils.py",
+      "language": "python",
+      "sizeLines": 40,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/common/schemas.py",
+      "language": "python",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "code/run_full_demo.py",
+      "language": "python",
+      "sizeLines": 68,
+      "fileCategory": "code"
+    },
+    {
+      "path": "configs/memory_small_limit.yaml",
+      "language": "yaml",
+      "sizeLines": 6,
+      "fileCategory": "config"
+    },
+    {
+      "path": "configs/memory.yaml",
+      "language": "yaml",
+      "sizeLines": 6,
+      "fileCategory": "config"
+    },
+    {
+      "path": "configs/model.yaml",
+      "language": "yaml",
+      "sizeLines": 28,
+      "fileCategory": "config"
+    },
+    {
+      "path": "configs/tools.yaml",
+      "language": "yaml",
+      "sizeLines": 90,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/b1_fixtures/b1_fixture_input.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/b1_fixtures/preset_ai_messages.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/b1_fixtures/preset_memory.json",
+      "language": "json",
+      "sizeLines": 20,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/b1_fixtures/preset_tool_messages.json",
+      "language": "json",
+      "sizeLines": 9,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/docs/agent_intro.txt",
+      "language": "txt",
+      "sizeLines": 3,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "data/docs/search_skill_demo.md",
+      "language": "markdown",
+      "sizeLines": 5,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "data/docs/tool_calling.md",
+      "language": "markdown",
+      "sizeLines": 3,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "data/llm_input.json",
+      "language": "json",
+      "sizeLines": 5,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/memory_inputs/memory_save_global_input.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/memory_inputs/memory_save_input.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/memory_inputs/sample_final_answer.md",
+      "language": "markdown",
+      "sizeLines": 1,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "data/memory_inputs/sample_messages.json",
+      "language": "json",
+      "sizeLines": 5,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/memory_inputs/sample_trace.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/ai_message_with_tool_calls.json",
+      "language": "json",
+      "sizeLines": 11,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/b3_tool_call_format_converter_valid.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/b3_tool_call_missing_required.json",
+      "language": "json",
+      "sizeLines": 9,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/b3_tool_call_unknown_tool.json",
+      "language": "json",
+      "sizeLines": 9,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/messages_no_tool.json",
+      "language": "json",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/messages_with_error_tool.json",
+      "language": "json",
+      "sizeLines": 31,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/messages_with_tool.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/messages/tools_schema_basic.json",
+      "language": "json",
+      "sizeLines": 130,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input_0.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input_2.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input_3.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input_4.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input_5.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/runtime_input.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tables/results.csv",
+      "language": "csv",
+      "sizeLines": 4,
+      "fileCategory": "data"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_calculator_error.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_calculator.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_file_reader_error.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_file_reader.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_file_search_error.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_file_search.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_format_converter_error.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_format_converter.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_table_analyzer_error.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tool_inputs/tool_input_table_analyzer.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "memory/conversations/conv_000.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "memory/global/mem_course_001.md",
+      "language": "markdown",
+      "sizeLines": 3,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "memory/memory_index.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": "models/.gitkeep",
+      "language": "unknown",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "prompts/local_tool_agent.txt",
+      "language": "txt",
+      "sizeLines": 1,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 514,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "requirements.txt",
+      "language": "txt",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "skills/__init__.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills/calculator.py",
+      "language": "python",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills/file_reader.py",
+      "language": "python",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills/format_converter.py",
+      "language": "python",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills/local_file_search.py",
+      "language": "python",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills/table_analyzer.py",
+      "language": "python",
+      "sizeLines": 53,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 69,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "moderate",
+  "importMap": {
+    ".claude/settings.local.json": [],
+    ".understand-anything/.understandignore": [],
+    ".understand-anything/config.json": [],
+    "code/b1_agent_runtime.py": [
+      "code/common/io_utils.py",
+      "code/common/logging_utils.py",
+      "code/common/path_utils.py",
+      "code/common/schemas.py"
+    ],
+    "code/b2_run_skill.py": [
+      "code/common/io_utils.py",
+      "code/common/logging_utils.py",
+      "code/common/path_utils.py",
+      "code/common/schemas.py"
+    ],
+    "code/b3_tool_layer.py": [
+      "code/common/io_utils.py",
+      "code/common/logging_utils.py",
+      "code/common/path_utils.py",
+      "code/common/schemas.py"
+    ],
+    "code/b4_local_agent_llm.py": [
+      "code/common/io_utils.py",
+      "code/common/logging_utils.py",
+      "code/common/path_utils.py",
+      "code/common/schemas.py"
+    ],
+    "code/b5_memory.py": [
+      "code/common/io_utils.py",
+      "code/common/logging_utils.py",
+      "code/common/path_utils.py"
+    ],
+    "code/common/__init__.py": [],
+    "code/common/io_utils.py": [],
+    "code/common/logging_utils.py": [
+      "code/common/io_utils.py"
+    ],
+    "code/common/path_utils.py": [],
+    "code/common/schemas.py": [],
+    "code/run_full_demo.py": [
+      "code/b1_agent_runtime.py",
+      "code/common/io_utils.py",
+      "code/common/path_utils.py"
+    ],
+    "configs/memory_small_limit.yaml": [],
+    "configs/memory.yaml": [],
+    "configs/model.yaml": [],
+    "configs/tools.yaml": [],
+    "data/b1_fixtures/b1_fixture_input.json": [],
+    "data/b1_fixtures/preset_ai_messages.json": [],
+    "data/b1_fixtures/preset_memory.json": [],
+    "data/b1_fixtures/preset_tool_messages.json": [],
+    "data/docs/agent_intro.txt": [],
+    "data/docs/search_skill_demo.md": [],
+    "data/docs/tool_calling.md": [],
+    "data/llm_input.json": [],
+    "data/memory_inputs/memory_save_global_input.json": [],
+    "data/memory_inputs/memory_save_input.json": [],
+    "data/memory_inputs/sample_final_answer.md": [],
+    "data/memory_inputs/sample_messages.json": [],
+    "data/memory_inputs/sample_trace.json": [],
+    "data/messages/ai_message_with_tool_calls.json": [],
+    "data/messages/b3_tool_call_format_converter_valid.json": [],
+    "data/messages/b3_tool_call_missing_required.json": [],
+    "data/messages/b3_tool_call_unknown_tool.json": [],
+    "data/messages/messages_no_tool.json": [],
+    "data/messages/messages_with_error_tool.json": [],
+    "data/messages/messages_with_tool.json": [],
+    "data/messages/tools_schema_basic.json": [],
+    "data/runtime_input_0.json": [],
+    "data/runtime_input_2.json": [],
+    "data/runtime_input_3.json": [],
+    "data/runtime_input_4.json": [],
+    "data/runtime_input_5.json": [],
+    "data/runtime_input.json": [],
+    "data/tables/results.csv": [],
+    "data/tool_inputs/tool_input_calculator_error.json": [],
+    "data/tool_inputs/tool_input_calculator.json": [],
+    "data/tool_inputs/tool_input_file_reader_error.json": [],
+    "data/tool_inputs/tool_input_file_reader.json": [],
+    "data/tool_inputs/tool_input_file_search_error.json": [],
+    "data/tool_inputs/tool_input_file_search.json": [],
+    "data/tool_inputs/tool_input_format_converter_error.json": [],
+    "data/tool_inputs/tool_input_format_converter.json": [],
+    "data/tool_inputs/tool_input_table_analyzer_error.json": [],
+    "data/tool_inputs/tool_input_table_analyzer.json": [],
+    "memory/conversations/conv_000.md": [],
+    "memory/global/mem_course_001.md": [],
+    "memory/memory_index.json": [],
+    "models/.gitkeep": [],
+    "prompts/local_tool_agent.txt": [],
+    "README.md": [],
+    "requirements.txt": [],
+    "skills/__init__.py": [],
+    "skills/calculator.py": [],
+    "skills/file_reader.py": [
+      "skills/__init__.py"
+    ],
+    "skills/format_converter.py": [],
+    "skills/local_file_search.py": [
+      "skills/__init__.py"
+    ],
+    "skills/table_analyzer.py": [
+      "skills/__init__.py"
+    ]
+  }
+}

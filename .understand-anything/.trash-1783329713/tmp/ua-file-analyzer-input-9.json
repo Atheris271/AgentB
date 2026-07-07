@@ -1,0 +1,23 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/messages/ai_message_with_tool_calls.json", "language": "json", "sizeLines": 11, "fileCategory": "config"},
+    {"path": "data/messages/b3_tool_call_format_converter_valid.json", "language": "json", "sizeLines": 13, "fileCategory": "config"},
+    {"path": "data/messages/b3_tool_call_missing_required.json", "language": "json", "sizeLines": 9, "fileCategory": "config"},
+    {"path": "data/messages/b3_tool_call_unknown_tool.json", "language": "json", "sizeLines": 9, "fileCategory": "config"},
+    {"path": "data/messages/messages_no_tool.json", "language": "json", "sizeLines": 4, "fileCategory": "config"},
+    {"path": "data/messages/messages_with_error_tool.json", "language": "json", "sizeLines": 31, "fileCategory": "config"},
+    {"path": "data/messages/messages_with_tool.json", "language": "json", "sizeLines": 18, "fileCategory": "config"},
+    {"path": "data/messages/tools_schema_basic.json", "language": "json", "sizeLines": 130, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "data/messages/ai_message_with_tool_calls.json": [],
+    "data/messages/b3_tool_call_format_converter_valid.json": [],
+    "data/messages/b3_tool_call_missing_required.json": [],
+    "data/messages/b3_tool_call_unknown_tool.json": [],
+    "data/messages/messages_no_tool.json": [],
+    "data/messages/messages_with_error_tool.json": [],
+    "data/messages/messages_with_tool.json": [],
+    "data/messages/tools_schema_basic.json": []
+  }
+}

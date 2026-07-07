@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "config:configs/memory.yaml",
+      "type": "config",
+      "name": "memory.yaml",
+      "filePath": "configs/memory.yaml",
+      "summary": "定义 Agent 记忆系统的存储配置，包括记忆根目录（../memory）、全局记忆目录、对话记忆目录、索引路径（memory_index.json）和单次记忆最大字符数（2000 字符）。",
+      "tags": ["configuration", "memory", "agent-config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:configs/memory_small_limit.yaml",
+      "type": "config",
+      "name": "memory_small_limit.yaml",
+      "filePath": "configs/memory_small_limit.yaml",
+      "summary": "记忆配置的测试变体，与 memory.yaml 结构完全相同但将 max_memory_chars 限制为仅 20 字符，用于验证记忆截断和容量限制边界行为。",
+      "tags": ["configuration", "memory", "test-config", "agent-config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:configs/model.yaml",
+      "type": "config",
+      "name": "model.yaml",
+      "filePath": "configs/model.yaml",
+      "summary": "定义 Agent 运行时的模型与推理配置，使用 transformers 后端加载本地 Qwen3.5-4B 模型（bfloat16 精度、auto device_map），采用确定性解码（temperature=0、do_sample=false），上下文窗口 4096 token，生成上限 1024 token，并启用输出保存。",
+      "tags": ["configuration", "model", "inference", "agent-config", "transformers"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:configs/tools.yaml",
+      "type": "config",
+      "name": "tools.yaml",
+      "filePath": "configs/tools.yaml",
+      "summary": "定义 Agent 可用工具集（basic_tools）及五个工具的完整声明——计算器、文件读取、本地文件搜索、表格分析（CSV/TSV）、格式转换（markdown/JSON），每个工具声明了模块路径、函数名、输入参数 schema 和返回值结构。",
+      "tags": ["configuration", "tools", "agent-config", "schema-definition"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:configs/memory_small_limit.yaml",
+      "target": "config:configs/memory.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/calculator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/file_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/local_file_search.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/table_analyzer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/format_converter.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/model.yaml",
+      "target": "config:configs/tools.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

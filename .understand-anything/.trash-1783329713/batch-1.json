@@ -1,0 +1,873 @@
+{
+  "nodes": [
+    {
+      "id": "file:code/b1_agent_runtime.py",
+      "type": "file",
+      "name": "b1_agent_runtime.py",
+      "filePath": "code/b1_agent_runtime.py",
+      "summary": "Agent 运行时的核心编排模块，负责解析用户输入、加载记忆上下文、协调 LLM 推理与工具调用，并将完整的交互链路记录为 JSONL 审计日志。",
+      "tags": ["entry-point", "orchestrator", "agent-runtime", "llm-integration", "audit-logging"],
+      "complexity": "complex",
+      "languageNotes": "使用 contextlib.contextmanager 实现延迟测量装饰器；通过惰性 import 解耦跨模块依赖（B3 工具层、B4 推理引擎、B5 记忆管理）。"
+    },
+    {
+      "id": "file:code/b5_memory.py",
+      "type": "file",
+      "name": "b5_memory.py",
+      "filePath": "code/b5_memory.py",
+      "summary": "记忆文档管理模块，提供加载/保存记忆文档的功能，支持基于索引的文档检索、对话归档和增量索引更新。",
+      "tags": ["memory-management", "document-indexing", "cli-tool", "data-persistence"],
+      "complexity": "complex",
+      "languageNotes": "基于 JSON 索引文件实现文档元数据管理；save_memory 支持 full/incremental 两种归档模式，按 conversation_id 组织存储。"
+    },
+    {
+      "id": "file:code/common/io_utils.py",
+      "type": "file",
+      "name": "io_utils.py",
+      "filePath": "code/common/io_utils.py",
+      "summary": "通用 I/O 工具库，封装文本、JSON、YAML、JSONL 的读写操作，提供原子写入和目录自动创建功能。",
+      "tags": ["utility", "io-operations", "serialization", "file-system"],
+      "complexity": "moderate",
+      "languageNotes": "使用 os.replace 实现原子写入（先写临时文件再重命名）；YAML 读取失败时抛出 RuntimeError 而非静默返回 None。"
+    },
+    {
+      "id": "file:code/common/logging_utils.py",
+      "type": "file",
+      "name": "logging_utils.py",
+      "filePath": "code/common/logging_utils.py",
+      "summary": "轻量级日志工具，提供 ISO 时间戳生成、延迟测量上下文管理器和 JSONL 运行日志追加功能。",
+      "tags": ["utility", "logging", "instrumentation", "latency-measurement"],
+      "complexity": "simple",
+      "languageNotes": "measure_latency 使用 contextlib.contextmanager + yield 实现非侵入式性能测量，配合 time.perf_counter 达到微秒级精度。"
+    },
+    {
+      "id": "file:code/run_full_demo.py",
+      "type": "file",
+      "name": "run_full_demo.py",
+      "filePath": "code/run_full_demo.py",
+      "summary": "端到端演示脚本，串联 Agent 运行时执行全流程并生成包含执行摘要和输出文件清单的可读报告。",
+      "tags": ["entry-point", "demo", "integration-test", "reporting"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "function",
+      "name": "_validate_runtime_input",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [15, 55],
+      "summary": "校验并标准化 Agent 运行时输入载荷，包括 user_input 非空检查、messages 列表结构和 fixtures 可选字段的默认值填充。",
+      "tags": ["validation", "input-sanitization", "runtime-config"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "function",
+      "name": "_memory_context",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [58, 65],
+      "summary": "将选中的记忆文档拼接为单个文本块，按类型分组并以双换行分隔，作为 LLM 对话的上下文注入。",
+      "tags": ["memory-context", "document-aggregation", "llm-prompt"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "function",
+      "name": "generate_ai_message",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [73, 77],
+      "summary": "LLM 推理的入口包装函数，通过惰性 import 将调用委托给 B4 本地推理引擎（b4_local_agent_llm.generate_ai_message）。",
+      "tags": ["llm-inference", "delegation", "lazy-import"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "function",
+      "name": "_load_fixture_inputs",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [80, 101],
+      "summary": "从 JSON fixture 文件中加载预设的 system prompt、user messages、tool calls 和 tool messages，并进行类型校验。",
+      "tags": ["fixture-loading", "test-data", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "function",
+      "name": "_fixture_tool_messages",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [104, 116],
+      "summary": "根据工具调用列表和预设消息模板，生成对应的 tool message 序列，确保消息中的 tool_call_id 匹配。",
+      "tags": ["tool-message", "fixture-matching", "message-generation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "function",
+      "name": "run_agent",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [119, 338],
+      "summary": "Agent 主循环：加载输入载荷、初始化工具 schema 和记忆上下文、进入 LLM 推理-工具调用循环，生成最终答案并持久化完整追踪。",
+      "tags": ["agent-loop", "orchestrator", "tool-execution", "trace-persistence", "llm-orchestration"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [352, 367],
+      "summary": "CLI 入口点，解析命令行参数（input、tools_config、memory_config、model_config、outdir、llm_mode）并调用 run_agent。",
+      "tags": ["entry-point", "cli", "argparse"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b5_memory.py:_memory_paths",
+      "type": "function",
+      "name": "_memory_paths",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [14, 34],
+      "summary": "解析记忆配置文件（YAML），提取根目录路径、索引文件路径、全局记忆 ID 集合和文档目录列表。",
+      "tags": ["config-parsing", "path-resolution", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b5_memory.py:_read_index",
+      "type": "function",
+      "name": "_read_index",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [37, 43],
+      "summary": "读取记忆索引 JSON 文件并校验其格式为 dict，若文件不存在则返回空字典。",
+      "tags": ["index-reading", "json-parsing", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b5_memory.py:load_memory",
+      "type": "function",
+      "name": "load_memory",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [46, 131],
+      "summary": "根据配置和查询条件加载记忆文档：解析索引、筛选文档、按优先级排序、读取内容并返回结构化结果和统计信息。",
+      "tags": ["memory-loading", "document-retrieval", "index-management", "audit-logging"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b5_memory.py:save_memory",
+      "type": "function",
+      "name": "save_memory",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [140, 217],
+      "summary": "将对话记录（messages、trace、answer）归档为记忆文档，支持 full（完整备份）和 incremental（增量追加）两种模式。",
+      "tags": ["memory-persistence", "conversation-archiving", "index-update", "audit-logging"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b5_memory.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [241, 278],
+      "summary": "CLI 入口点，支持 load（加载记忆）和 save（保存记忆）两种子命令，解析参数后分发到 load_memory 或 save_memory。",
+      "tags": ["entry-point", "cli", "argparse"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/io_utils.py:ensure_dir",
+      "type": "function",
+      "name": "ensure_dir",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [9, 12],
+      "summary": "确保目标目录存在，若不存在则递归创建（exist_ok=True），等价于 mkdir -p。",
+      "tags": ["file-system", "directory-creation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "function",
+      "name": "_atomic_write_text",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [19, 25],
+      "summary": "原子写入文本文件：先写入临时文件再通过 os.replace 重命名，避免写入中断导致文件损坏。",
+      "tags": ["atomic-write", "file-system", "data-integrity"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:read_json",
+      "type": "function",
+      "name": "read_json",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [32, 34],
+      "summary": "从指定路径读取 JSON 文件并解析为 Python 对象。",
+      "tags": ["json-parsing", "file-io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:write_json",
+      "type": "function",
+      "name": "write_json",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [37, 39],
+      "summary": "将 Python 对象序列化为 JSON 并通过原子写入持久化到文件，使用 indent=2 格式化输出。",
+      "tags": ["json-serialization", "file-io", "atomic-write"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:read_yaml",
+      "type": "function",
+      "name": "read_yaml",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [42, 48],
+      "summary": "读取 YAML 文件并解析为 Python 对象，若 PyYAML 未安装则抛出 RuntimeError 并提示安装命令。",
+      "tags": ["yaml-parsing", "file-io", "error-handling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:write_jsonl",
+      "type": "function",
+      "name": "write_jsonl",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [51, 53],
+      "summary": "将记录列表写入 JSONL 文件，每条记录为一行 JSON，通过原子写入保证完整性。",
+      "tags": ["jsonl-serialization", "file-io", "atomic-write"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:append_jsonl",
+      "type": "function",
+      "name": "append_jsonl",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [56, 61],
+      "summary": "以追加模式向 JSONL 文件末尾写入一条记录，自动创建父目录，适用于流式审计日志场景。",
+      "tags": ["jsonl-append", "file-io", "audit-logging"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/logging_utils.py:measure_latency",
+      "type": "function",
+      "name": "measure_latency",
+      "filePath": "code/common/logging_utils.py",
+      "lineRange": [16, 22],
+      "summary": "上下文管理器，使用 time.perf_counter 测量代码块的执行耗时（秒），通过 yield 返回的字典在退出时自动填充 duration 字段。",
+      "tags": ["latency-measurement", "context-manager", "instrumentation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/logging_utils.py:append_run_log",
+      "type": "function",
+      "name": "append_run_log",
+      "filePath": "code/common/logging_utils.py",
+      "lineRange": [25, 27],
+      "summary": "向日志文件追加一条运行记录，自动填充 ISO 时间戳后委托给 io_utils.append_jsonl。",
+      "tags": ["logging", "jsonl-append", "timestamp"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/run_full_demo.py:_build_report",
+      "type": "function",
+      "name": "_build_report",
+      "filePath": "code/run_full_demo.py",
+      "lineRange": [12, 33],
+      "summary": "读取 Agent 运行产出的 messages/trace/answer/memory_report 文件，生成包含执行统计和输出文件清单的文本报告。",
+      "tags": ["reporting", "data-aggregation", "output-summary"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/run_full_demo.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/run_full_demo.py",
+      "lineRange": [47, 64],
+      "summary": "CLI 入口点，解析参数后调用 run_agent 执行全流程，最后生成报告文本并打印。",
+      "tags": ["entry-point", "cli", "demo-orchestrator"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/b1_agent_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_read_index",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/common/logging_utils.py:append_run_log",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:_build_report",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b5_memory.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b3_tool_layer.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b4_local_agent_llm.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

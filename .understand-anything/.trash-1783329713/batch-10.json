@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator.json",
+      "type": "config",
+      "name": "tool_input_calculator.json",
+      "filePath": "data/tool_inputs/tool_input_calculator.json",
+      "summary": "计算器工具的正常测试输入，包含数学表达式 \"23 * 17 + 9\"，用于验证表达式求值功能。",
+      "tags": ["test-fixture", "tool-input", "calculator", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "config",
+      "name": "tool_input_calculator_error.json",
+      "filePath": "data/tool_inputs/tool_input_calculator_error.json",
+      "summary": "计算器工具的异常测试输入，包含 Python 代码注入表达式，用于验证沙箱安全防护机制。",
+      "tags": ["test-fixture", "tool-input", "calculator", "security", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader.json",
+      "type": "config",
+      "name": "tool_input_file_reader.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader.json",
+      "summary": "文件读取工具的正常测试输入，指定存在的文档路径和最大字符数，用于验证文件读取功能。",
+      "tags": ["test-fixture", "tool-input", "file-reader", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "config",
+      "name": "tool_input_file_reader_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader_error.json",
+      "summary": "文件读取工具的异常测试输入，指定不存在的文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": ["test-fixture", "tool-input", "file-reader", "error-handling", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search.json",
+      "type": "config",
+      "name": "tool_input_file_search.json",
+      "filePath": "data/tool_inputs/tool_input_file_search.json",
+      "summary": "文件搜索工具的正常测试输入，指定查询关键词、目录范围和文件类型过滤条件，用于验证全文搜索功能。",
+      "tags": ["test-fixture", "tool-input", "file-search", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "config",
+      "name": "tool_input_file_search_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_search_error.json",
+      "summary": "文件搜索工具的异常测试输入，指定不存在的搜索目录，用于验证目录缺失时的错误处理逻辑。",
+      "tags": ["test-fixture", "tool-input", "file-search", "error-handling", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter.json",
+      "type": "config",
+      "name": "tool_input_format_converter.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter.json",
+      "summary": "格式转换工具的正常测试输入，将 YAML 文本转换为 Markdown 格式并指定输出文件名，用于验证格式转换功能。",
+      "tags": ["test-fixture", "tool-input", "format-converter", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "config",
+      "name": "tool_input_format_converter_error.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter_error.json",
+      "summary": "格式转换工具的异常测试输入，指定不支持的 XML 目标格式，用于验证格式校验和错误处理逻辑。",
+      "tags": ["test-fixture", "tool-input", "format-converter", "error-handling", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer.json",
+      "summary": "表格分析工具的正常测试输入，指定存在的 CSV 文件路径并启用统计描述功能，用于验证表格分析功能。",
+      "tags": ["test-fixture", "tool-input", "table-analyzer", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer_error.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer_error.json",
+      "summary": "表格分析工具的异常测试输入，指定不存在的 CSV 文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": ["test-fixture", "tool-input", "table-analyzer", "error-handling", "configuration"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:data/tool_inputs/tool_input_calculator.json",
+      "target": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_reader.json",
+      "target": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_search.json",
+      "target": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_format_converter.json",
+      "target": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "target": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

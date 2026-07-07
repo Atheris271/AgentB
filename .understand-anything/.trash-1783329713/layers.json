@@ -1,0 +1,120 @@
+[
+  {
+    "id": "layer:agent-core",
+    "name": "Agent 核心层",
+    "description": "Agent 运行时的核心编排模块（B1-B5），包含消息管理、Skill 独立运行、工具层 schema 生成与校验、本地 LLM 推理、记忆文档管理，以及端到端演示入口和包标记文件。",
+    "nodeIds": [
+      "file:code/b1_agent_runtime.py",
+      "file:code/b2_run_skill.py",
+      "file:code/b3_tool_layer.py",
+      "file:code/b4_local_agent_llm.py",
+      "file:code/b5_memory.py",
+      "file:code/run_full_demo.py",
+      "file:code/common/__init__.py"
+    ]
+  },
+  {
+    "id": "layer:utility",
+    "name": "公共工具层",
+    "description": "被所有核心模块依赖的共享基础设施，包含 I/O 读写封装（JSON/YAML/JSONL）、轻量级日志与延迟测量工具、项目路径推导与沙箱约束校验、以及 AIMessage/ToolMessage/SkillResult 等标准化数据契约定义。",
+    "nodeIds": [
+      "file:code/common/io_utils.py",
+      "file:code/common/logging_utils.py",
+      "file:code/common/path_utils.py",
+      "file:code/common/schemas.py"
+    ]
+  },
+  {
+    "id": "layer:skills",
+    "name": "技能层",
+    "description": "Agent 可调用的独立 Skill 实现集合，包括安全计算器（AST 求值）、文件读取、本地文件全文搜索、CSV/TSV 表格分析、以及文本到 Markdown/JSON 的格式转换器，由工具层（B3）通过动态导入进行运行时执行。",
+    "nodeIds": [
+      "file:skills/__init__.py",
+      "file:skills/calculator.py",
+      "file:skills/file_reader.py",
+      "file:skills/local_file_search.py",
+      "file:skills/table_analyzer.py",
+      "file:skills/format_converter.py"
+    ]
+  },
+  {
+    "id": "layer:config",
+    "name": "系统配置层",
+    "description": "Agent 框架的全局配置与提示词模板，包括模型推理参数（Qwen3.5-4B/transformers 后端）、记忆系统存储路径与容量限制、工具集声明（五个 Skill 的模块路径与参数 schema）、运行时 LLM 入口配置、记忆索引元数据、本地工具调用系统提示模板，以及 Claude Code 和 Understand-Anything 插件的本地权限与语言设置。",
+    "nodeIds": [
+      "config:configs/memory.yaml",
+      "config:configs/memory_small_limit.yaml",
+      "config:configs/model.yaml",
+      "config:configs/tools.yaml",
+      "config:.claude/settings.local.json",
+      "config:.understand-anything/config.json",
+      "file:.understand-anything/.understandignore",
+      "config:data/llm_input.json",
+      "document:prompts/local_tool_agent.txt",
+      "config:memory/memory_index.json",
+      "file:models/.gitkeep"
+    ]
+  },
+  {
+    "id": "layer:data",
+    "name": "测试固件与运行时数据层",
+    "description": "所有模块的集成测试固件、运行时对话输入配置（conv_000 至 conv_005 六个场景）、工具调用参数测试用例（正常与异常边界）、记忆保存功能的样本数据、消息对话预设序列、工具 Schema 定义，以及 Skill 执行基准测试结果数据。",
+    "nodeIds": [
+      "config:data/b1_fixtures/b1_fixture_input.json",
+      "config:data/b1_fixtures/preset_ai_messages.json",
+      "config:data/b1_fixtures/preset_memory.json",
+      "config:data/b1_fixtures/preset_tool_messages.json",
+      "config:data/runtime_input.json",
+      "config:data/runtime_input_0.json",
+      "config:data/runtime_input_2.json",
+      "config:data/runtime_input_3.json",
+      "config:data/runtime_input_4.json",
+      "config:data/runtime_input_5.json",
+      "config:data/memory_inputs/memory_save_global_input.json",
+      "config:data/memory_inputs/memory_save_input.json",
+      "config:data/memory_inputs/sample_messages.json",
+      "config:data/memory_inputs/sample_trace.json",
+      "document:data/memory_inputs/sample_final_answer.md",
+      "config:data/messages/ai_message_with_tool_calls.json",
+      "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "config:data/messages/b3_tool_call_missing_required.json",
+      "config:data/messages/b3_tool_call_unknown_tool.json",
+      "config:data/messages/messages_no_tool.json",
+      "config:data/messages/messages_with_error_tool.json",
+      "config:data/messages/messages_with_tool.json",
+      "config:data/messages/tools_schema_basic.json",
+      "config:data/tool_inputs/tool_input_calculator.json",
+      "config:data/tool_inputs/tool_input_calculator_error.json",
+      "config:data/tool_inputs/tool_input_file_reader.json",
+      "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "config:data/tool_inputs/tool_input_file_search.json",
+      "config:data/tool_inputs/tool_input_file_search_error.json",
+      "config:data/tool_inputs/tool_input_format_converter.json",
+      "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "file:data/tables/results.csv"
+    ]
+  },
+  {
+    "id": "layer:memory",
+    "name": "记忆存储层",
+    "description": "Agent 运行时产生的持久化记忆文档，包括全局知识记忆（Agent 系统四组件概念）和对话归档记录（含完整消息序列与执行轨迹），通过记忆索引（memory_index.json）进行检索管理。",
+    "nodeIds": [
+      "document:memory/conversations/conv_000.md",
+      "document:memory/global/mem_course_001.md"
+    ]
+  },
+  {
+    "id": "layer:documentation",
+    "name": "项目文档层",
+    "description": "面向开发者与用户的完整项目文档，涵盖 Agent 框架概述（B1-B5 架构、公共数据格式、CLI 退出码）、环境准备、各模块详细说明、完整演示流程指南、工具调用机制说明、检索演示说明，以及 Python 3.10 依赖清单。",
+    "nodeIds": [
+      "document:README.md",
+      "document:requirements.txt",
+      "document:data/docs/agent_intro.txt",
+      "document:data/docs/search_skill_demo.md",
+      "document:data/docs/tool_calling.md"
+    ]
+  }
+]

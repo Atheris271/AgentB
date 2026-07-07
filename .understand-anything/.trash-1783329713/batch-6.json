@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "document:data/docs/agent_intro.txt",
+      "type": "document",
+      "name": "agent_intro.txt",
+      "filePath": "data/docs/agent_intro.txt",
+      "summary": "Agent 系统入门文档，介绍 Agent 的四大核心组件：模型、工具、记忆和执行循环，并简述了工具调用与记忆模块的作用。",
+      "tags": ["documentation", "agent-system", "tool-calling", "memory", "architecture"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/docs/search_skill_demo.md",
+      "type": "document",
+      "name": "search_skill_demo.md",
+      "filePath": "data/docs/search_skill_demo.md",
+      "summary": "检索演示文档，用于验证 local_file_search 工具的功能。阐述了工具编排的工作流程：模型决策、运行时执行、结果回传的闭环。",
+      "tags": ["documentation", "search", "tool-orchestration", "demo", "retrieval"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/docs/tool_calling.md",
+      "type": "document",
+      "name": "tool_calling.md",
+      "filePath": "data/docs/tool_calling.md",
+      "summary": "工具调用机制的简要说明文档，明确划分了模型决策、工具层校验执行、运行时消息闭环三层职责。",
+      "tags": ["documentation", "tool-calling", "runtime", "message-loop"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/tool_calling.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/tool_calling.md",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

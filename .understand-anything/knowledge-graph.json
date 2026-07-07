@@ -1,0 +1,4130 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "agent",
+    "languages": [
+      "csv",
+      "json",
+      "markdown",
+      "python",
+      "txt",
+      "unknown",
+      "yaml"
+    ],
+    "frameworks": [
+      "HuggingFace Transformers",
+      "PyTorch"
+    ],
+    "description": "一个基于 Python 3.10 实现的本地文件驱动 Agent 框架，使用 Qwen3.5-4B 模型进行本地推理。项目包含五个独立模块（B1-B5）：Agent 总控与消息管理、Skill 独立运行、工具层 schema 生成与校验、本地 LLM 推理（支持 mock 与真实模式）、以及记忆文档的查找与索引维护。",
+    "analyzedAt": "2026-07-06T09:20:32.583659+00:00",
+    "gitCommitHash": "no-git-1783326601"
+  },
+  "nodes": [
+    {
+      "id": "file:code/b1_agent_runtime.py",
+      "type": "file",
+      "name": "b1_agent_runtime.py",
+      "filePath": "code/b1_agent_runtime.py",
+      "summary": "Agent 运行时的核心编排模块，负责解析用户输入、加载记忆上下文、协调 LLM 推理与工具调用，并将完整的交互链路记录为 JSONL 审计日志。",
+      "tags": [
+        "entry-point",
+        "orchestrator",
+        "agent-runtime",
+        "llm-integration",
+        "audit-logging"
+      ],
+      "complexity": "complex",
+      "languageNotes": "使用 contextlib.contextmanager 实现延迟测量装饰器；通过惰性 import 解耦跨模块依赖（B3 工具层、B4 推理引擎、B5 记忆管理）。"
+    },
+    {
+      "id": "file:code/b5_memory.py",
+      "type": "file",
+      "name": "b5_memory.py",
+      "filePath": "code/b5_memory.py",
+      "summary": "记忆文档管理模块，提供加载/保存记忆文档的功能，支持基于索引的文档检索、对话归档和增量索引更新。",
+      "tags": [
+        "memory-management",
+        "document-indexing",
+        "cli-tool",
+        "data-persistence"
+      ],
+      "complexity": "complex",
+      "languageNotes": "基于 JSON 索引文件实现文档元数据管理；save_memory 支持 full/incremental 两种归档模式，按 conversation_id 组织存储。"
+    },
+    {
+      "id": "file:code/common/io_utils.py",
+      "type": "file",
+      "name": "io_utils.py",
+      "filePath": "code/common/io_utils.py",
+      "summary": "通用 I/O 工具库，封装文本、JSON、YAML、JSONL 的读写操作，提供原子写入和目录自动创建功能。",
+      "tags": [
+        "utility",
+        "io-operations",
+        "serialization",
+        "file-system"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "使用 os.replace 实现原子写入（先写临时文件再重命名）；YAML 读取失败时抛出 RuntimeError 而非静默返回 None。"
+    },
+    {
+      "id": "file:code/common/logging_utils.py",
+      "type": "file",
+      "name": "logging_utils.py",
+      "filePath": "code/common/logging_utils.py",
+      "summary": "轻量级日志工具，提供 ISO 时间戳生成、延迟测量上下文管理器和 JSONL 运行日志追加功能。",
+      "tags": [
+        "utility",
+        "logging",
+        "instrumentation",
+        "latency-measurement"
+      ],
+      "complexity": "simple",
+      "languageNotes": "measure_latency 使用 contextlib.contextmanager + yield 实现非侵入式性能测量，配合 time.perf_counter 达到微秒级精度。"
+    },
+    {
+      "id": "file:code/run_full_demo.py",
+      "type": "file",
+      "name": "run_full_demo.py",
+      "filePath": "code/run_full_demo.py",
+      "summary": "端到端演示脚本，串联 Agent 运行时执行全流程并生成包含执行摘要和输出文件清单的可读报告。",
+      "tags": [
+        "entry-point",
+        "demo",
+        "integration-test",
+        "reporting"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "function",
+      "name": "_validate_runtime_input",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        15,
+        55
+      ],
+      "summary": "校验并标准化 Agent 运行时输入载荷，包括 user_input 非空检查、messages 列表结构和 fixtures 可选字段的默认值填充。",
+      "tags": [
+        "validation",
+        "input-sanitization",
+        "runtime-config"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "function",
+      "name": "_memory_context",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        58,
+        65
+      ],
+      "summary": "将选中的记忆文档拼接为单个文本块，按类型分组并以双换行分隔，作为 LLM 对话的上下文注入。",
+      "tags": [
+        "memory-context",
+        "document-aggregation",
+        "llm-prompt"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "function",
+      "name": "generate_ai_message",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        73,
+        77
+      ],
+      "summary": "LLM 推理的入口包装函数，通过惰性 import 将调用委托给 B4 本地推理引擎（b4_local_agent_llm.generate_ai_message）。",
+      "tags": [
+        "llm-inference",
+        "delegation",
+        "lazy-import"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "function",
+      "name": "_load_fixture_inputs",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        80,
+        101
+      ],
+      "summary": "从 JSON fixture 文件中加载预设的 system prompt、user messages、tool calls 和 tool messages，并进行类型校验。",
+      "tags": [
+        "fixture-loading",
+        "test-data",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "function",
+      "name": "_fixture_tool_messages",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        104,
+        116
+      ],
+      "summary": "根据工具调用列表和预设消息模板，生成对应的 tool message 序列，确保消息中的 tool_call_id 匹配。",
+      "tags": [
+        "tool-message",
+        "fixture-matching",
+        "message-generation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "function",
+      "name": "run_agent",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        119,
+        338
+      ],
+      "summary": "Agent 主循环：加载输入载荷、初始化工具 schema 和记忆上下文、进入 LLM 推理-工具调用循环，生成最终答案并持久化完整追踪。",
+      "tags": [
+        "agent-loop",
+        "orchestrator",
+        "tool-execution",
+        "trace-persistence",
+        "llm-orchestration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b1_agent_runtime.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b1_agent_runtime.py",
+      "lineRange": [
+        352,
+        367
+      ],
+      "summary": "CLI 入口点，解析命令行参数（input、tools_config、memory_config、model_config、outdir、llm_mode）并调用 run_agent。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "argparse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b5_memory.py:_memory_paths",
+      "type": "function",
+      "name": "_memory_paths",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [
+        14,
+        34
+      ],
+      "summary": "解析记忆配置文件（YAML），提取根目录路径、索引文件路径、全局记忆 ID 集合和文档目录列表。",
+      "tags": [
+        "config-parsing",
+        "path-resolution",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b5_memory.py:_read_index",
+      "type": "function",
+      "name": "_read_index",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [
+        37,
+        43
+      ],
+      "summary": "读取记忆索引 JSON 文件并校验其格式为 dict，若文件不存在则返回空字典。",
+      "tags": [
+        "index-reading",
+        "json-parsing",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b5_memory.py:load_memory",
+      "type": "function",
+      "name": "load_memory",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [
+        46,
+        131
+      ],
+      "summary": "根据配置和查询条件加载记忆文档：解析索引、筛选文档、按优先级排序、读取内容并返回结构化结果和统计信息。",
+      "tags": [
+        "memory-loading",
+        "document-retrieval",
+        "index-management",
+        "audit-logging"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b5_memory.py:save_memory",
+      "type": "function",
+      "name": "save_memory",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [
+        140,
+        217
+      ],
+      "summary": "将对话记录（messages、trace、answer）归档为记忆文档，支持 full（完整备份）和 incremental（增量追加）两种模式。",
+      "tags": [
+        "memory-persistence",
+        "conversation-archiving",
+        "index-update",
+        "audit-logging"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b5_memory.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b5_memory.py",
+      "lineRange": [
+        241,
+        278
+      ],
+      "summary": "CLI 入口点，支持 load（加载记忆）和 save（保存记忆）两种子命令，解析参数后分发到 load_memory 或 save_memory。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "argparse"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/io_utils.py:ensure_dir",
+      "type": "function",
+      "name": "ensure_dir",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        9,
+        12
+      ],
+      "summary": "确保目标目录存在，若不存在则递归创建（exist_ok=True），等价于 mkdir -p。",
+      "tags": [
+        "file-system",
+        "directory-creation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "function",
+      "name": "_atomic_write_text",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        19,
+        25
+      ],
+      "summary": "原子写入文本文件：先写入临时文件再通过 os.replace 重命名，避免写入中断导致文件损坏。",
+      "tags": [
+        "atomic-write",
+        "file-system",
+        "data-integrity"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:read_json",
+      "type": "function",
+      "name": "read_json",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        32,
+        34
+      ],
+      "summary": "从指定路径读取 JSON 文件并解析为 Python 对象。",
+      "tags": [
+        "json-parsing",
+        "file-io"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:write_json",
+      "type": "function",
+      "name": "write_json",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        37,
+        39
+      ],
+      "summary": "将 Python 对象序列化为 JSON 并通过原子写入持久化到文件，使用 indent=2 格式化输出。",
+      "tags": [
+        "json-serialization",
+        "file-io",
+        "atomic-write"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:read_yaml",
+      "type": "function",
+      "name": "read_yaml",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        42,
+        48
+      ],
+      "summary": "读取 YAML 文件并解析为 Python 对象，若 PyYAML 未安装则抛出 RuntimeError 并提示安装命令。",
+      "tags": [
+        "yaml-parsing",
+        "file-io",
+        "error-handling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:write_jsonl",
+      "type": "function",
+      "name": "write_jsonl",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        51,
+        53
+      ],
+      "summary": "将记录列表写入 JSONL 文件，每条记录为一行 JSON，通过原子写入保证完整性。",
+      "tags": [
+        "jsonl-serialization",
+        "file-io",
+        "atomic-write"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/io_utils.py:append_jsonl",
+      "type": "function",
+      "name": "append_jsonl",
+      "filePath": "code/common/io_utils.py",
+      "lineRange": [
+        56,
+        61
+      ],
+      "summary": "以追加模式向 JSONL 文件末尾写入一条记录，自动创建父目录，适用于流式审计日志场景。",
+      "tags": [
+        "jsonl-append",
+        "file-io",
+        "audit-logging"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/logging_utils.py:measure_latency",
+      "type": "function",
+      "name": "measure_latency",
+      "filePath": "code/common/logging_utils.py",
+      "lineRange": [
+        16,
+        22
+      ],
+      "summary": "上下文管理器，使用 time.perf_counter 测量代码块的执行耗时（秒），通过 yield 返回的字典在退出时自动填充 duration 字段。",
+      "tags": [
+        "latency-measurement",
+        "context-manager",
+        "instrumentation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/logging_utils.py:append_run_log",
+      "type": "function",
+      "name": "append_run_log",
+      "filePath": "code/common/logging_utils.py",
+      "lineRange": [
+        25,
+        27
+      ],
+      "summary": "向日志文件追加一条运行记录，自动填充 ISO 时间戳后委托给 io_utils.append_jsonl。",
+      "tags": [
+        "logging",
+        "jsonl-append",
+        "timestamp"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/logging_utils.py:now_iso",
+      "type": "function",
+      "name": "now_iso",
+      "filePath": "code/common/logging_utils.py",
+      "lineRange": [
+        11,
+        12
+      ],
+      "summary": "返回当前本地时间的 ISO 8601 格式字符串（精确到秒），用于统一日志时间戳。",
+      "tags": [
+        "utility",
+        "timestamp",
+        "datetime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/run_full_demo.py:_build_report",
+      "type": "function",
+      "name": "_build_report",
+      "filePath": "code/run_full_demo.py",
+      "lineRange": [
+        12,
+        33
+      ],
+      "summary": "读取 Agent 运行产出的 messages/trace/answer/memory_report 文件，生成包含执行统计和输出文件清单的文本报告。",
+      "tags": [
+        "reporting",
+        "data-aggregation",
+        "output-summary"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/run_full_demo.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/run_full_demo.py",
+      "lineRange": [
+        47,
+        64
+      ],
+      "summary": "CLI 入口点，解析参数后调用 run_agent 执行全流程，最后生成报告文本并打印。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "demo-orchestrator"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:code/b2_run_skill.py",
+      "type": "file",
+      "name": "b2_run_skill.py",
+      "filePath": "code/b2_run_skill.py",
+      "summary": "Skill独立运行的入口模块，通过动态导入（importlib）执行指定Skill函数，捕获异常并生成标准化SkillResult，支持CLI参数解析和JSONL运行日志记录。",
+      "tags": [
+        "entry-point",
+        "skill-executor",
+        "cli",
+        "dynamic-import"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "使用 importlib.import_module 和 inspect.signature 实现反射式动态函数调用，根据函数签名自动注入 data_root 和 output_dir 参数。"
+    },
+    {
+      "id": "file:code/b3_tool_layer.py",
+      "type": "file",
+      "name": "b3_tool_layer.py",
+      "filePath": "code/b3_tool_layer.py",
+      "summary": "工具层核心模块，从YAML配置加载工具定义、生成符合OpenAI风格的function-calling JSON Schema、校验工具调用参数类型，并通过动态导入执行具体Skill函数，是整个Agent工具调用链路的枢纽。",
+      "tags": [
+        "tool-layer",
+        "schema-generation",
+        "validation",
+        "cli",
+        "api-handler"
+      ],
+      "complexity": "complex",
+      "languageNotes": "生成与OpenAI function-calling兼容的JSON Schema（含 x-returns 扩展字段），支持integer/number类型严格校验（排除bool误判），根据函数签名自动注入 data_root 和 output_dir。"
+    },
+    {
+      "id": "file:code/b4_local_agent_llm.py",
+      "type": "file",
+      "name": "b4_local_agent_llm.py",
+      "filePath": "code/b4_local_agent_llm.py",
+      "summary": "本地LLM推理引擎模块，支持mock模式和真实transformers推理两种后端，负责构建含工具schema和格式指令的prompt messages、解析模型原始输出为标准化AIMessage，并缓存已加载的模型/分词器实例以减少重复加载开销。",
+      "tags": [
+        "llm-inference",
+        "prompt-engineering",
+        "model-cache",
+        "json-parsing",
+        "cli"
+      ],
+      "complexity": "complex",
+      "languageNotes": "实现多级JSON解析容错策略（标准解析→尾随反引号截断→tool_calls片段提取），模型缓存在模块级字典中使用可哈希元组键避免重复加载，支持bfloat16/float16/float32 dtype配置。"
+    },
+    {
+      "id": "file:code/common/path_utils.py",
+      "type": "file",
+      "name": "path_utils.py",
+      "filePath": "code/common/path_utils.py",
+      "summary": "项目全局路径工具模块，提供项目根路径推导与sys.path引导、相对路径解析（基于CWD或包含文件目录）、以及路径沙箱约束校验，被所有B模块和common模块依赖。",
+      "tags": [
+        "utility",
+        "path-resolution",
+        "sandbox",
+        "common"
+      ],
+      "complexity": "simple",
+      "languageNotes": "PROJECT_ROOT 通过 __file__ 向上两级推导，bootstrap_project_root 将项目根注入 sys.path 实现无安装导入。"
+    },
+    {
+      "id": "file:code/common/schemas.py",
+      "type": "file",
+      "name": "schemas.py",
+      "filePath": "code/common/schemas.py",
+      "summary": "Agent框架核心数据模型模块，定义并校验所有标准化消息结构——AIMessage、ToolMessage、SkillResult和ToolCall——这些schema是B1-B5模块之间数据交换的契约基础。",
+      "tags": [
+        "data-model",
+        "schema-definition",
+        "validation",
+        "message-contract",
+        "common"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "采用工厂函数模式（make_*）构造消息，配套 validate_* 函数进行严格校验，normalize_tool_call 同时兼容OpenAI标准格式（function.name/arguments）和简化格式（name/args）。"
+    },
+    {
+      "id": "function:code/b2_run_skill.py:run_skill",
+      "type": "function",
+      "name": "run_skill",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [
+        28,
+        51
+      ],
+      "summary": "动态导入并执行指定Skill函数，通过inspect.signature自动注入data_root和output_dir参数，捕获异常并返回标准化SkillResult。",
+      "tags": [
+        "skill-executor",
+        "dynamic-dispatch",
+        "error-handling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b2_run_skill.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [
+        54,
+        60
+      ],
+      "summary": "构建CLI参数解析器，定义--skill、--input、--outdir和--data_root四个参数。",
+      "tags": [
+        "cli",
+        "argparse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b2_run_skill.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [
+        63,
+        88
+      ],
+      "summary": "CLI入口函数，解析参数、读取输入JSON、执行Skill并将结果和运行日志写入输出目录。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "orchestrator"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:_parameter_schema",
+      "type": "function",
+      "name": "_parameter_schema",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        51,
+        68
+      ],
+      "summary": "将YAML工具参数定义转换为JSON Schema格式的properties/required对象，校验参数类型必须在JSON_TYPES映射中。",
+      "tags": [
+        "schema-generation",
+        "validation",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "function",
+      "name": "get_tools_schema",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        71,
+        107
+      ],
+      "summary": "从YAML配置加载指定toolset的所有工具定义，生成OpenAI兼容的function-calling JSON Schema数组，可选写入输出目录。",
+      "tags": [
+        "schema-generation",
+        "toolset",
+        "openai-compatible"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:_validate_args",
+      "type": "function",
+      "name": "_validate_args",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        110,
+        131
+      ],
+      "summary": "校验工具调用参数：检查必填字段、未知参数、类型匹配（含bool误判防护）及数组元素类型。",
+      "tags": [
+        "validation",
+        "type-checking",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "function",
+      "name": "execute_tool_calls",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        145,
+        211
+      ],
+      "summary": "批量执行工具调用：逐一校验参数、动态导入并调用Skill函数、收集结果并生成ToolMessage列表，同时记录JSONL运行日志。",
+      "tags": [
+        "tool-executor",
+        "batch-processing",
+        "logging"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        214,
+        223
+      ],
+      "summary": "构建CLI参数解析器，定义--tools_config、--toolset、--tool_calls及互斥的--export_schema/--execute动作参数。",
+      "tags": [
+        "cli",
+        "argparse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [
+        226,
+        247
+      ],
+      "summary": "CLI入口函数，根据--export_schema或--execute动作分流：导出工具Schema或执行工具调用并输出结果。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "orchestrator"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_three_points",
+      "type": "function",
+      "name": "_three_points",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        49,
+        59
+      ],
+      "summary": "将文本按句子和换行分割，提取最多三条去重要点，不足时用占位文本填充。",
+      "tags": [
+        "text-processing",
+        "summarization",
+        "internal"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "type": "function",
+      "name": "_mock_generate",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        62,
+        87
+      ],
+      "summary": "Mock模式生成器：无工具消息时返回默认file_reader调用，有工具消息时提取结果并生成三条中文要点回答。",
+      "tags": [
+        "mock",
+        "llm-simulation",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+      "type": "function",
+      "name": "_parse_tool_calls_fragment",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        90,
+        112
+      ],
+      "summary": "JSON解析容错策略之一：从原始文本中提取tool_calls数组片段并尝试解析，处理转义引号情况。",
+      "tags": [
+        "json-parsing",
+        "error-recovery",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "type": "function",
+      "name": "_candidate_to_message",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        127,
+        145
+      ],
+      "summary": "将解析后的候选字典转换为标准AIMessage格式，校验content和tool_calls互斥（必须有且仅有一个非空），并执行validate_ai_message。",
+      "tags": [
+        "validation",
+        "message-format",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_dtype_value",
+      "type": "function",
+      "name": "_dtype_value",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        159,
+        169
+      ],
+      "summary": "将配置中的torch dtype字符串（auto/bfloat16/float16/float32）映射为torch模块的实际dtype常量。",
+      "tags": [
+        "torch",
+        "type-mapping",
+        "internal"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_model_cache_key",
+      "type": "function",
+      "name": "_model_cache_key",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        172,
+        197
+      ],
+      "summary": "基于模型路径、分词器路径、加载参数和设备映射生成可哈希元组，用作模块级模型缓存的键。",
+      "tags": [
+        "caching",
+        "hash-key",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+      "type": "function",
+      "name": "_load_model_bundle",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        200,
+        240
+      ],
+      "summary": "加载或从缓存获取模型和分词器：命中缓存时直接返回，未命中时调用from_pretrained加载并写入_MODEL_CACHE。",
+      "tags": [
+        "model-loading",
+        "caching",
+        "transformers",
+        "internal"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+      "type": "function",
+      "name": "_build_prompt_messages",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        243,
+        298
+      ],
+      "summary": "构建发送给LLM的完整prompt消息列表：注入工具JSON Schema到system消息、追加严格的JSON输出格式指令、在最后一条user消息后添加输出格式提醒，处理tool角色消息的后续引导。",
+      "tags": [
+        "prompt-engineering",
+        "format-instruction",
+        "internal"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "type": "function",
+      "name": "_prompt_json_generate",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        301,
+        350
+      ],
+      "summary": "使用transformers库执行本地LLM推理：加载模型和分词器、应用chat template、执行generate并解码新生成的tokens为原始文本。",
+      "tags": [
+        "llm-inference",
+        "transformers",
+        "token-generation",
+        "internal"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "function",
+      "name": "generate_ai_message",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        353,
+        414
+      ],
+      "summary": "统一AI消息生成入口：校验输入messages、根据mode分发到mock或prompt_json后端、解析模型输出并写入artifact文件（原始输出和AI消息JSON），返回包含ai_message/status/error的结果字典。",
+      "tags": [
+        "orchestrator",
+        "multi-backend",
+        "artifact-writing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        417,
+        424
+      ],
+      "summary": "构建CLI参数解析器，定义--model_config、--messages、--tools_schema、--mode和--outdir五个参数。",
+      "tags": [
+        "cli",
+        "argparse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [
+        427,
+        442
+      ],
+      "summary": "CLI入口函数，解析参数、读取消息和工具schema JSON文件、调用generate_ai_message并输出ai_message.json路径。",
+      "tags": [
+        "entry-point",
+        "cli",
+        "orchestrator"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "function",
+      "name": "bootstrap_project_root",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [
+        11,
+        15
+      ],
+      "summary": "将PROJECT_ROOT注入sys.path首位，使所有模块无需安装即可相互导入，返回项目根路径。",
+      "tags": [
+        "path-setup",
+        "sys-path",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_path",
+      "type": "function",
+      "name": "resolve_path",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [
+        18,
+        22
+      ],
+      "summary": "通用路径解析：支持~展开和相对路径基于base_dir解析，返回绝对路径。",
+      "tags": [
+        "path-resolution",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "function",
+      "name": "resolve_cli_path",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [
+        25,
+        26
+      ],
+      "summary": "基于当前工作目录（CWD）解析CLI传入的路径参数。",
+      "tags": [
+        "path-resolution",
+        "cli",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "function",
+      "name": "resolve_from_file",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [
+        29,
+        30
+      ],
+      "summary": "基于包含文件的所在目录解析相对路径，用于配置文件中的相对路径引用。",
+      "tags": [
+        "path-resolution",
+        "config",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:require_within",
+      "type": "function",
+      "name": "require_within",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [
+        33,
+        40
+      ],
+      "summary": "路径沙箱校验：确保解析后的路径在指定root目录内，否则抛出ValueError，用于数据安全防护。",
+      "tags": [
+        "sandbox",
+        "security",
+        "path-validation",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:make_ai_message",
+      "type": "function",
+      "name": "make_ai_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        9,
+        16
+      ],
+      "summary": "构造标准化AIMessage字典（role=assistant），自动校验content和tool_calls字段合法性。",
+      "tags": [
+        "factory",
+        "message-construction",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:make_tool_message",
+      "type": "function",
+      "name": "make_tool_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        19,
+        33
+      ],
+      "summary": "构造标准化ToolMessage字典（role=tool），包含tool_call_id、name、content和status字段，校验status必须为success或error。",
+      "tags": [
+        "factory",
+        "message-construction",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:make_skill_result",
+      "type": "function",
+      "name": "make_skill_result",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        36,
+        53
+      ],
+      "summary": "构造标准化SkillResult字典，包含skill_name、status、input、output、error和latency_ms字段，校验status必须为success或error。",
+      "tags": [
+        "factory",
+        "result-structure",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "function",
+      "name": "normalize_tool_call",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        56,
+        77
+      ],
+      "summary": "标准化工具调用格式：兼容OpenAI标准格式（function.name/arguments）和简化格式（name/args），处理字符串args的JSON反序列化，生成统一id。",
+      "tags": [
+        "normalization",
+        "openai-compatible",
+        "tool-call"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/schemas.py:validate_ai_message",
+      "type": "function",
+      "name": "validate_ai_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        80,
+        91
+      ],
+      "summary": "校验AIMessage结构：role必须为assistant、content为字符串、tool_calls为列表且可规范化，content与tool_calls不能同时为空。",
+      "tags": [
+        "validation",
+        "message-contract"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/schemas.py:validate_messages",
+      "type": "function",
+      "name": "validate_messages",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [
+        94,
+        112
+      ],
+      "summary": "批量校验消息列表：检查每条消息的role合法性、content类型、assistant消息的tool_calls规范化、tool消息的必填字段完整性。",
+      "tags": [
+        "validation",
+        "message-contract",
+        "batch"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:skills/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "skills/__init__.py",
+      "summary": "Skills 包的入口模块，定义 DEFAULT_DATA_ROOT 常量并导出 resolve_data_path 工具函数，用于安全地将用户提供的路径限定在数据根目录内，防止路径穿越攻击。",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "utility",
+        "数据安全"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/__init__.py:resolve_data_path",
+      "type": "function",
+      "name": "resolve_data_path",
+      "filePath": "skills/__init__.py",
+      "lineRange": [
+        9,
+        19
+      ],
+      "summary": "将用户提供的路径安全地解析到 data_root 目录下，确保路径不逃逸出数据根目录，返回解析后的候选路径与根路径的元组。",
+      "tags": [
+        "utility",
+        "路径解析",
+        "数据安全",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/file_reader.py",
+      "type": "file",
+      "name": "file_reader.py",
+      "filePath": "skills/file_reader.py",
+      "summary": "文件读取 Skill，支持读取 .txt 和 .md 文本文件并以指定字符数截断返回，提供内容、字符数、截断标记等结构化输出。",
+      "tags": [
+        "skill",
+        "tool",
+        "文件读取",
+        "文本处理"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/file_reader.py:file_reader",
+      "type": "function",
+      "name": "file_reader",
+      "filePath": "skills/file_reader.py",
+      "lineRange": [
+        6,
+        21
+      ],
+      "summary": "读取指定路径的 .txt 或 .md 文本文件，按 max_chars 截断内容，返回包含 content、num_chars、source 和 truncated 标志的字典。",
+      "tags": [
+        "skill",
+        "tool",
+        "文件读取",
+        "文本处理",
+        "api-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/local_file_search.py",
+      "type": "file",
+      "name": "local_file_search.py",
+      "filePath": "skills/local_file_search.py",
+      "summary": "本地文件搜索 Skill，在指定目录下递归搜索文本文件（.txt/.md），按关键词匹配计分并返回 top-k 结果及上下文片段。",
+      "tags": [
+        "skill",
+        "tool",
+        "搜索",
+        "文本处理",
+        "全文检索"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/local_file_search.py:local_file_search",
+      "type": "function",
+      "name": "local_file_search",
+      "filePath": "skills/local_file_search.py",
+      "lineRange": [
+        19,
+        55
+      ],
+      "summary": "在 data_root 下的指定目录中递归搜索文本文件，对 query 分词后进行不区分大小写的关键词匹配计分，返回按分数降序排列的 top_k 结果，每个结果包含路径、分数和上下文片段。",
+      "tags": [
+        "skill",
+        "tool",
+        "搜索",
+        "全文检索",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:skills/table_analyzer.py",
+      "type": "file",
+      "name": "table_analyzer.py",
+      "filePath": "skills/table_analyzer.py",
+      "summary": "表格分析 Skill，读取 .csv 和 .tsv 文件并提取列名、行数、预览数据，可选择对数值列计算描述性统计量（count、min、max、mean）。",
+      "tags": [
+        "skill",
+        "tool",
+        "数据分析",
+        "csv-parser",
+        "统计"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "function",
+      "name": "table_analyzer",
+      "filePath": "skills/table_analyzer.py",
+      "lineRange": [
+        9,
+        53
+      ],
+      "summary": "读取 .csv 或 .tsv 表格文件，返回列名、行数、前 max_rows_preview 行预览数据，并可对数值列计算 count、min、max 和 mean 描述性统计量。",
+      "tags": [
+        "skill",
+        "tool",
+        "数据分析",
+        "csv-parser",
+        "统计"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:configs/memory.yaml",
+      "type": "config",
+      "name": "memory.yaml",
+      "filePath": "configs/memory.yaml",
+      "summary": "定义 Agent 记忆系统的存储配置，包括记忆根目录（../memory）、全局记忆目录、对话记忆目录、索引路径（memory_index.json）和单次记忆最大字符数（2000 字符）。",
+      "tags": [
+        "configuration",
+        "memory",
+        "agent-config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:configs/memory_small_limit.yaml",
+      "type": "config",
+      "name": "memory_small_limit.yaml",
+      "filePath": "configs/memory_small_limit.yaml",
+      "summary": "记忆配置的测试变体，与 memory.yaml 结构完全相同但将 max_memory_chars 限制为仅 20 字符，用于验证记忆截断和容量限制边界行为。",
+      "tags": [
+        "configuration",
+        "memory",
+        "test-config",
+        "agent-config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:configs/model.yaml",
+      "type": "config",
+      "name": "model.yaml",
+      "filePath": "configs/model.yaml",
+      "summary": "定义 Agent 运行时的模型与推理配置，使用 transformers 后端加载本地 Qwen3.5-4B 模型（bfloat16 精度、auto device_map），采用确定性解码（temperature=0、do_sample=false），上下文窗口 4096 token，生成上限 1024 token，并启用输出保存。",
+      "tags": [
+        "configuration",
+        "model",
+        "inference",
+        "agent-config",
+        "transformers"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:configs/tools.yaml",
+      "type": "config",
+      "name": "tools.yaml",
+      "filePath": "configs/tools.yaml",
+      "summary": "定义 Agent 可用工具集（basic_tools）及五个工具的完整声明——计算器、文件读取、本地文件搜索、表格分析（CSV/TSV）、格式转换（markdown/JSON），每个工具声明了模块路径、函数名、输入参数 schema 和返回值结构。",
+      "tags": [
+        "configuration",
+        "tools",
+        "agent-config",
+        "schema-definition"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:data/b1_fixtures/b1_fixture_input.json",
+      "type": "config",
+      "name": "b1_fixture_input.json",
+      "filePath": "data/b1_fixtures/b1_fixture_input.json",
+      "summary": "B1 Agent 集成测试的固件入口配置，定义执行模式、对话参数、用户输入（要求阅读 docs/agent_intro.txt 并总结中文要点）、系统提示词路径、工具集及预设消息/记忆/工具结果文件的引用。",
+      "tags": [
+        "configuration",
+        "test-fixture",
+        "agent-testing",
+        "integration-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "config",
+      "name": "preset_ai_messages.json",
+      "filePath": "data/b1_fixtures/preset_ai_messages.json",
+      "summary": "预设的 AI 助手消息序列，模拟 B1 Agent 在集成测试中的两轮回复：第一轮发起 file_reader 工具调用读取 agent_intro.txt，第二轮返回三条中文要点总结（Agent 系统组成、工具调用能力、Memory 作用）。",
+      "tags": [
+        "test-fixture",
+        "ai-response",
+        "message-preset",
+        "tool-call"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_memory.json",
+      "type": "config",
+      "name": "preset_memory.json",
+      "filePath": "data/b1_fixtures/preset_memory.json",
+      "summary": "预设的 Memory 选择结果，包含一条 global 类型的记忆文档（标题「Fixture Agent 基础概念」），内容介绍 Agent 系统的模型-工具-记忆-执行循环组成，用于集成测试中模拟记忆检索的返回。",
+      "tags": [
+        "test-fixture",
+        "memory-preset",
+        "mock-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "config",
+      "name": "preset_tool_messages.json",
+      "filePath": "data/b1_fixtures/preset_tool_messages.json",
+      "summary": "预设的工具调用结果，以 call_fixture_001 为键模拟 file_reader 工具成功读取 docs/agent_intro.txt 后的返回内容（92 字符的 Agent 系统介绍文本），配合 preset_ai_messages.json 共同构成 B1 Agent 集成测试的完整对话模拟。",
+      "tags": [
+        "test-fixture",
+        "tool-result",
+        "mock-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/docs/agent_intro.txt",
+      "type": "document",
+      "name": "agent_intro.txt",
+      "filePath": "data/docs/agent_intro.txt",
+      "summary": "Agent 系统入门文档，介绍 Agent 的四大核心组件：模型、工具、记忆和执行循环，并简述了工具调用与记忆模块的作用。",
+      "tags": [
+        "documentation",
+        "agent-system",
+        "tool-calling",
+        "memory",
+        "architecture"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/docs/search_skill_demo.md",
+      "type": "document",
+      "name": "search_skill_demo.md",
+      "filePath": "data/docs/search_skill_demo.md",
+      "summary": "检索演示文档，用于验证 local_file_search 工具的功能。阐述了工具编排的工作流程：模型决策、运行时执行、结果回传的闭环。",
+      "tags": [
+        "documentation",
+        "search",
+        "tool-orchestration",
+        "demo",
+        "retrieval"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/docs/tool_calling.md",
+      "type": "document",
+      "name": "tool_calling.md",
+      "filePath": "data/docs/tool_calling.md",
+      "summary": "工具调用机制的简要说明文档，明确划分了模型决策、工具层校验执行、运行时消息闭环三层职责。",
+      "tags": [
+        "documentation",
+        "tool-calling",
+        "runtime",
+        "message-loop"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/llm_input.json",
+      "type": "config",
+      "name": "llm_input.json",
+      "filePath": "data/llm_input.json",
+      "summary": "LLM配置入口文件，指定模型配置文件路径、消息文件路径和工具Schema路径，为Agent系统提供LLM调用所需的基础参数。",
+      "tags": [
+        "configuration",
+        "llm",
+        "ai-agent",
+        "model-config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input.json",
+      "type": "config",
+      "name": "runtime_input.json",
+      "filePath": "data/runtime_input.json",
+      "summary": "会话conv_001的运行时输入配置，要求Agent阅读docs/agent_intro.txt并总结三条中文要点，启用全局记忆且保存对话记忆。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "memory-enabled",
+        "document-reading"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_0.json",
+      "type": "config",
+      "name": "runtime_input_0.json",
+      "filePath": "data/runtime_input_0.json",
+      "summary": "会话conv_000的运行时输入配置，要求Agent不使用工具简要说明Agent概念，为无工具调用的基础对话场景。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "no-tools",
+        "concept-explanation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_2.json",
+      "type": "config",
+      "name": "runtime_input_2.json",
+      "filePath": "data/runtime_input_2.json",
+      "summary": "会话conv_002的运行时输入配置，要求Agent调用计算Skill完成56*29+81的数学运算。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "calculation",
+        "skill-call"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_3.json",
+      "type": "config",
+      "name": "runtime_input_3.json",
+      "filePath": "data/runtime_input_3.json",
+      "summary": "会话conv_003的运行时输入配置，要求Agent调用local_file_search Skill在docs目录搜索文件并返回最相关结果及中文摘要。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "file-search",
+        "skill-call"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_4.json",
+      "type": "config",
+      "name": "runtime_input_4.json",
+      "filePath": "data/runtime_input_4.json",
+      "summary": "会话conv_004的运行时输入配置，要求Agent调用table_analyzer Skill分析CSV文件并计算score和latency的平均值。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "data-analysis",
+        "skill-call"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_5.json",
+      "type": "config",
+      "name": "runtime_input_5.json",
+      "filePath": "data/runtime_input_5.json",
+      "summary": "会话conv_005的运行时输入配置，要求Agent调用format_converter Skill将键值文本转换为真实JSON文件。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "format-conversion",
+        "skill-call"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/memory_save_global_input.json",
+      "type": "config",
+      "name": "memory_save_global_input.json",
+      "filePath": "data/memory_inputs/memory_save_global_input.json",
+      "summary": "全局记忆保存的输入配置，指定会话ID、保存类型为 global，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": [
+        "configuration",
+        "memory",
+        "input-data",
+        "global"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/memory_save_input.json",
+      "type": "config",
+      "name": "memory_save_input.json",
+      "filePath": "data/memory_inputs/memory_save_input.json",
+      "summary": "会话级记忆保存的输入配置，指定会话ID、保存类型为 conversation，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": [
+        "configuration",
+        "memory",
+        "input-data",
+        "conversation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "document",
+      "name": "sample_final_answer.md",
+      "filePath": "data/memory_inputs/sample_final_answer.md",
+      "summary": "示例最终答案文件，包含 Agent 的中文回复样本——「Agent 会结合模型、工具和记忆完成任务」，作为记忆保存功能的测试数据。",
+      "tags": [
+        "sample-data",
+        "documentation",
+        "memory",
+        "answer"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/sample_messages.json",
+      "type": "config",
+      "name": "sample_messages.json",
+      "filePath": "data/memory_inputs/sample_messages.json",
+      "summary": "示例对话消息数组，包含 system、user 和 assistant 角色的多轮对话样本，其中 assistant 消息内嵌空 tool_calls 字段，用于测试记忆保存的消息处理流程。",
+      "tags": [
+        "sample-data",
+        "memory",
+        "conversation",
+        "messages"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/sample_trace.json",
+      "type": "config",
+      "name": "sample_trace.json",
+      "filePath": "data/memory_inputs/sample_trace.json",
+      "summary": "示例会话追踪记录，包含会话ID、执行状态（success）、工具使用轮次和 LLM 调用次数统计，用于测试记忆保存的追踪数据处理流程。",
+      "tags": [
+        "sample-data",
+        "memory",
+        "trace",
+        "execution"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "config",
+      "name": "ai_message_with_tool_calls.json",
+      "filePath": "data/messages/ai_message_with_tool_calls.json",
+      "summary": "AI 助手消息测试固件，包含一条对 file_reader 工具的空内容调用及其参数，用于测试单工具调用场景。",
+      "tags": [
+        "测试固件",
+        "ai消息",
+        "工具调用",
+        "chat-completion"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "config",
+      "name": "b3_tool_call_format_converter_valid.json",
+      "filePath": "data/messages/b3_tool_call_format_converter_valid.json",
+      "summary": "format_converter 工具调用的有效测试固件，包含 text、target_format 和 output_filename 等完整转换参数。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "format-converter",
+        "有效输入"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "config",
+      "name": "b3_tool_call_missing_required.json",
+      "filePath": "data/messages/b3_tool_call_missing_required.json",
+      "summary": "calculator 工具调用测试固件，args 为空对象，缺失必填参数 expression，用于测试参数验证失败场景。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "参数验证",
+        "缺失参数",
+        "边界用例"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "config",
+      "name": "b3_tool_call_unknown_tool.json",
+      "filePath": "data/messages/b3_tool_call_unknown_tool.json",
+      "summary": "调用未定义工具 unknown_tool 的测试固件，用于验证 Agent 在遇到未知工具时的错误处理行为。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "未知工具",
+        "错误处理",
+        "边界用例"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/messages_no_tool.json",
+      "type": "config",
+      "name": "messages_no_tool.json",
+      "filePath": "data/messages/messages_no_tool.json",
+      "summary": "不含工具调用的基础对话消息测试固件，仅包含 system 提示和 user 请求，作为无工具场景的基线参考。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "无工具",
+        "基线"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/messages_with_error_tool.json",
+      "type": "config",
+      "name": "messages_with_error_tool.json",
+      "filePath": "data/messages/messages_with_error_tool.json",
+      "summary": "工具调用错误场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，tool 返回 max_chars 参数的 ValueError 错误。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "工具错误",
+        "错误处理",
+        "集成测试"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:data/messages/messages_with_tool.json",
+      "type": "config",
+      "name": "messages_with_tool.json",
+      "filePath": "data/messages/messages_with_tool.json",
+      "summary": "工具调用成功场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，file_reader 成功返回文件内容。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "工具调用",
+        "成功场景",
+        "集成测试"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/tools_schema_basic.json",
+      "type": "config",
+      "name": "tools_schema_basic.json",
+      "filePath": "data/messages/tools_schema_basic.json",
+      "summary": "Agent 工具定义测试固件，包含 5 个工具的 OpenAPI 风格 function schema 定义：calculator、file_reader、local_file_search、table_analyzer 和 format_converter，每个工具均定义了输入参数和 x-returns 输出 schema。",
+      "tags": [
+        "测试固件",
+        "工具schema",
+        "函数定义",
+        "openapi",
+        "agent工具"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "采用 OpenAI function-calling 规范定义工具，通过 x-returns 扩展字段补充输出结构，形成完整的输入/输出契约。"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator.json",
+      "type": "config",
+      "name": "tool_input_calculator.json",
+      "filePath": "data/tool_inputs/tool_input_calculator.json",
+      "summary": "计算器工具的正常测试输入，包含数学表达式 \"23 * 17 + 9\"，用于验证表达式求值功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "calculator",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "config",
+      "name": "tool_input_calculator_error.json",
+      "filePath": "data/tool_inputs/tool_input_calculator_error.json",
+      "summary": "计算器工具的异常测试输入，包含 Python 代码注入表达式，用于验证沙箱安全防护机制。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "calculator",
+        "security",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader.json",
+      "type": "config",
+      "name": "tool_input_file_reader.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader.json",
+      "summary": "文件读取工具的正常测试输入，指定存在的文档路径和最大字符数，用于验证文件读取功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-reader",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "config",
+      "name": "tool_input_file_reader_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader_error.json",
+      "summary": "文件读取工具的异常测试输入，指定不存在的文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-reader",
+        "error-handling",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search.json",
+      "type": "config",
+      "name": "tool_input_file_search.json",
+      "filePath": "data/tool_inputs/tool_input_file_search.json",
+      "summary": "文件搜索工具的正常测试输入，指定查询关键词、目录范围和文件类型过滤条件，用于验证全文搜索功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-search",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "config",
+      "name": "tool_input_file_search_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_search_error.json",
+      "summary": "文件搜索工具的异常测试输入，指定不存在的搜索目录，用于验证目录缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-search",
+        "error-handling",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter.json",
+      "type": "config",
+      "name": "tool_input_format_converter.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter.json",
+      "summary": "格式转换工具的正常测试输入，将 YAML 文本转换为 Markdown 格式并指定输出文件名，用于验证格式转换功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "format-converter",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "config",
+      "name": "tool_input_format_converter_error.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter_error.json",
+      "summary": "格式转换工具的异常测试输入，指定不支持的 XML 目标格式，用于验证格式校验和错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "format-converter",
+        "error-handling",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer.json",
+      "summary": "表格分析工具的正常测试输入，指定存在的 CSV 文件路径并启用统计描述功能，用于验证表格分析功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "table-analyzer",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer_error.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer_error.json",
+      "summary": "表格分析工具的异常测试输入，指定不存在的 CSV 文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "table-analyzer",
+        "error-handling",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.claude/settings.local.json",
+      "type": "config",
+      "name": "settings.local.json",
+      "filePath": ".claude/settings.local.json",
+      "summary": "Claude Code 本地权限配置，允许 Bash 和 Read 操作以支持 Understand-Anything 插件及 pnpm/node 工具链的运行。",
+      "tags": [
+        "configuration",
+        "permissions",
+        "claude-code",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Understand-Anything 分析忽略模式文件，采用 .gitignore 语法定义哪些文件/目录应从代码分析中排除。当前所有模式均为注释状态。",
+      "tags": [
+        "configuration",
+        "ignore-patterns",
+        "analysis-scope"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.understand-anything/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".understand-anything/config.json",
+      "summary": "Understand-Anything 插件配置，设置输出语言为中文（zh）。",
+      "tags": [
+        "configuration",
+        "language-setting",
+        "analysis"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:code/common/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "code/common/__init__.py",
+      "summary": "Python 包标记文件，声明 code/common 为共享工具模块，当前仅含一行 docstring，无实际导出。",
+      "tags": [
+        "package-marker",
+        "entry-point",
+        "python-package"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:data/tables/results.csv",
+      "type": "file",
+      "name": "results.csv",
+      "filePath": "data/tables/results.csv",
+      "summary": "Skill 执行基准测试数据，包含 task（任务名）、score（评分）、latency（延迟）三列，共三条记录。",
+      "tags": [
+        "benchmark-data",
+        "skill-results",
+        "tabular-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:memory/conversations/conv_000.md",
+      "type": "document",
+      "name": "conv_000.md",
+      "filePath": "memory/conversations/conv_000.md",
+      "summary": "对话记忆文档，记录了一次关于 Agent 概念的问答：用户要求简要定义 Agent，AI 在无工具调用的单轮对话中给出了中文回答，包含完整的消息序列和执行轨迹。",
+      "tags": [
+        "conversation-memory",
+        "agent-log",
+        "trace",
+        "example"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:memory/global/mem_course_001.md",
+      "type": "document",
+      "name": "mem_course_001.md",
+      "filePath": "memory/global/mem_course_001.md",
+      "summary": "全局记忆文档，介绍 Agent 基础概念：Agent 系统由模型、工具、记忆和执行循环四部分组成。",
+      "tags": [
+        "global-memory",
+        "knowledge-base",
+        "agent-concept"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:memory/memory_index.json",
+      "type": "config",
+      "name": "memory_index.json",
+      "filePath": "memory/memory_index.json",
+      "summary": "记忆索引文件，维护 memory_id 到元数据的映射，当前包含两条记录：全局记忆 mem_course_001 和对话记忆 mem_conversation_conv_000，记录类型、标题、摘要、路径和时间戳。",
+      "tags": [
+        "index",
+        "memory-management",
+        "metadata",
+        "json-database"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "models/.gitkeep",
+      "summary": "空占位文件，用于在 Git 仓库中保留空的 models/ 目录结构，供存放本地模型文件。",
+      "tags": [
+        "placeholder",
+        "directory-marker",
+        "git"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:prompts/local_tool_agent.txt",
+      "type": "document",
+      "name": "local_tool_agent.txt",
+      "filePath": "prompts/local_tool_agent.txt",
+      "summary": "本地工具调用 Agent 的系统提示模板，规定了工具使用原则：按需使用工具、不编造文件内容、一次只调用一个工具、等待 ToolMessage 后再决定下一步。被 B1 和 B4 模块引用。",
+      "tags": [
+        "system-prompt",
+        "agent-instruction",
+        "tool-use",
+        "template"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "项目完整文档，涵盖 Agent 框架概述（B1-B5 模块架构）、环境准备、公共数据格式（SkillResult/AIMessage/ToolMessage）、各模块详细说明（命令行、输入输出文件）、完整演示流程、CLI 退出码和输出文件附录，共 10 个章节。",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "project-overview",
+        "usage-guide",
+        "tutorial"
+      ],
+      "complexity": "complex",
+      "languageNotes": "文档以中文撰写，包含大量 Markdown 表格和代码块，系统地记录了从环境搭建到全流程演示的完整操作步骤。"
+    },
+    {
+      "id": "document:requirements.txt",
+      "type": "document",
+      "name": "requirements.txt",
+      "filePath": "requirements.txt",
+      "summary": "Python 项目依赖清单，基于 Python 3.10，包含 PyTorch 2.7.1（CUDA 11.8）、Transformers 5.12.1、Accelerate 等深度学习推理核心库及配套工具。",
+      "tags": [
+        "dependencies",
+        "python",
+        "machine-learning",
+        "environment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/calculator.py",
+      "type": "file",
+      "name": "calculator.py",
+      "filePath": "skills/calculator.py",
+      "summary": "计算器 Skill 实现，使用 Python AST 解析器安全地求值算术表达式，支持加减乘除、整除、取模、幂运算及一元正负号，内置指数幅度和结果范围安全检查。",
+      "tags": [
+        "skill",
+        "calculator",
+        "ast-evaluation",
+        "arithmetic",
+        "safe-computation"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "通过 ast.parse(mode='eval') + 递归 AST 遍历实现安全求值，避免 eval() 的代码注入风险。限制指数 <=12、结果绝对值 <=1e100、表达式长度 <=200 字符。"
+    },
+    {
+      "id": "file:skills/format_converter.py",
+      "type": "file",
+      "name": "format_converter.py",
+      "filePath": "skills/format_converter.py",
+      "summary": "格式转换 Skill 实现，将文本转换为 Markdown 无序列表或 JSON 格式。支持原生 JSON 解析和 key:value 行解析两种输入方式，自动生成输出文件并处理文件名冲突。",
+      "tags": [
+        "skill",
+        "format-conversion",
+        "markdown",
+        "json",
+        "file-output"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "使用 pathlib 进行跨平台路径处理，输出文件冲突时自动添加数字后缀避免覆盖。默认输出目录为 outputs/format_converter_files/。"
+    },
+    {
+      "id": "function:skills/calculator.py:_evaluate",
+      "type": "function",
+      "name": "_evaluate",
+      "filePath": "skills/calculator.py",
+      "lineRange": [
+        20,
+        36
+      ],
+      "summary": "递归遍历 AST 节点树求值算术表达式，处理 Expression、Constant、UnaryOp 和 BinOp 四种节点类型，内置安全范围检查。",
+      "tags": [
+        "utility",
+        "recursive",
+        "ast-evaluator",
+        "arithmetic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/calculator.py:calculator",
+      "type": "function",
+      "name": "calculator",
+      "filePath": "skills/calculator.py",
+      "lineRange": [
+        39,
+        48
+      ],
+      "summary": "计算器 Skill 入口函数，验证输入字符串后通过 AST 解析并调用 _evaluate 求值，返回包含 result 的字典。",
+      "tags": [
+        "entry-point",
+        "skill-function",
+        "safe-evaluation",
+        "arithmetic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:_parse_key_value_lines",
+      "type": "function",
+      "name": "_parse_key_value_lines",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [
+        12,
+        25
+      ],
+      "summary": "将文本按行解析为 key:value 字典，检测无效格式和重复键并抛出 ValueError。",
+      "tags": [
+        "utility",
+        "parser",
+        "key-value"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:_safe_output_path",
+      "type": "function",
+      "name": "_safe_output_path",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [
+        28,
+        40
+      ],
+      "summary": "根据输出目录、文件名和目标格式生成安全的输出路径，自动处理文件名冲突（添加递增数字后缀）。",
+      "tags": [
+        "utility",
+        "filesystem",
+        "path-resolution"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:format_converter",
+      "type": "function",
+      "name": "format_converter",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [
+        50,
+        71
+      ],
+      "summary": "格式转换 Skill 入口函数，将输入文本转换为 Markdown 无序列表或 JSON 格式，写入输出文件并返回格式化文本和文件路径。",
+      "tags": [
+        "entry-point",
+        "skill-function",
+        "format-conversion"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/b1_agent_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_read_index",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/common/logging_utils.py:append_run_log",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:_build_report",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b5_memory.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b3_tool_layer.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b4_local_agent_llm.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:run_skill",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_parameter_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_validate_args",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_three_points",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_dtype_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_model_cache_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/file_reader.py:file_reader",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/local_file_search.py:local_file_search",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/table_analyzer.py:table_analyzer",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:configs/memory_small_limit.yaml",
+      "target": "config:configs/memory.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/calculator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/file_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/local_file_search.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/table_analyzer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/format_converter.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/model.yaml",
+      "target": "config:configs/tools.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_memory.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/preset_ai_messages.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/tool_calling.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/tool_calling.md",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_0.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_2.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_3.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_4.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_5.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/memory_save_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_trace.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_messages.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_no_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/messages_with_tool.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_calculator.json",
+      "target": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_reader.json",
+      "target": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_search.json",
+      "target": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_format_converter.json",
+      "target": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "target": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:_evaluate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_parse_key_value_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_safe_output_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/global/mem_course_001.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/conversations/conv_000.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:requirements.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:prompts/local_tool_agent.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/calculator.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/format_converter.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:memory/memory_index.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.claude/settings.local.json",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:.understand-anything/.understandignore",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:agent-core",
+      "name": "Agent 核心层",
+      "description": "Agent 运行时的核心编排模块（B1-B5），包含消息管理、Skill 独立运行、工具层 schema 生成与校验、本地 LLM 推理、记忆文档管理，以及端到端演示入口和包标记文件。",
+      "nodeIds": [
+        "file:code/b1_agent_runtime.py",
+        "file:code/b2_run_skill.py",
+        "file:code/b3_tool_layer.py",
+        "file:code/b4_local_agent_llm.py",
+        "file:code/b5_memory.py",
+        "file:code/run_full_demo.py",
+        "file:code/common/__init__.py"
+      ]
+    },
+    {
+      "id": "layer:utility",
+      "name": "公共工具层",
+      "description": "被所有核心模块依赖的共享基础设施，包含 I/O 读写封装（JSON/YAML/JSONL）、轻量级日志与延迟测量工具、项目路径推导与沙箱约束校验、以及 AIMessage/ToolMessage/SkillResult 等标准化数据契约定义。",
+      "nodeIds": [
+        "file:code/common/io_utils.py",
+        "file:code/common/logging_utils.py",
+        "file:code/common/path_utils.py",
+        "file:code/common/schemas.py"
+      ]
+    },
+    {
+      "id": "layer:skills",
+      "name": "技能层",
+      "description": "Agent 可调用的独立 Skill 实现集合，包括安全计算器（AST 求值）、文件读取、本地文件全文搜索、CSV/TSV 表格分析、以及文本到 Markdown/JSON 的格式转换器，由工具层（B3）通过动态导入进行运行时执行。",
+      "nodeIds": [
+        "file:skills/__init__.py",
+        "file:skills/calculator.py",
+        "file:skills/file_reader.py",
+        "file:skills/local_file_search.py",
+        "file:skills/table_analyzer.py",
+        "file:skills/format_converter.py"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "系统配置层",
+      "description": "Agent 框架的全局配置与提示词模板，包括模型推理参数（Qwen3.5-4B/transformers 后端）、记忆系统存储路径与容量限制、工具集声明（五个 Skill 的模块路径与参数 schema）、运行时 LLM 入口配置、记忆索引元数据、本地工具调用系统提示模板，以及 Claude Code 和 Understand-Anything 插件的本地权限与语言设置。",
+      "nodeIds": [
+        "config:configs/memory.yaml",
+        "config:configs/memory_small_limit.yaml",
+        "config:configs/model.yaml",
+        "config:configs/tools.yaml",
+        "config:.claude/settings.local.json",
+        "config:.understand-anything/config.json",
+        "file:.understand-anything/.understandignore",
+        "config:data/llm_input.json",
+        "document:prompts/local_tool_agent.txt",
+        "config:memory/memory_index.json",
+        "file:models/.gitkeep"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "测试固件与运行时数据层",
+      "description": "所有模块的集成测试固件、运行时对话输入配置（conv_000 至 conv_005 六个场景）、工具调用参数测试用例（正常与异常边界）、记忆保存功能的样本数据、消息对话预设序列、工具 Schema 定义，以及 Skill 执行基准测试结果数据。",
+      "nodeIds": [
+        "config:data/b1_fixtures/b1_fixture_input.json",
+        "config:data/b1_fixtures/preset_ai_messages.json",
+        "config:data/b1_fixtures/preset_memory.json",
+        "config:data/b1_fixtures/preset_tool_messages.json",
+        "config:data/runtime_input.json",
+        "config:data/runtime_input_0.json",
+        "config:data/runtime_input_2.json",
+        "config:data/runtime_input_3.json",
+        "config:data/runtime_input_4.json",
+        "config:data/runtime_input_5.json",
+        "config:data/memory_inputs/memory_save_global_input.json",
+        "config:data/memory_inputs/memory_save_input.json",
+        "config:data/memory_inputs/sample_messages.json",
+        "config:data/memory_inputs/sample_trace.json",
+        "document:data/memory_inputs/sample_final_answer.md",
+        "config:data/messages/ai_message_with_tool_calls.json",
+        "config:data/messages/b3_tool_call_format_converter_valid.json",
+        "config:data/messages/b3_tool_call_missing_required.json",
+        "config:data/messages/b3_tool_call_unknown_tool.json",
+        "config:data/messages/messages_no_tool.json",
+        "config:data/messages/messages_with_error_tool.json",
+        "config:data/messages/messages_with_tool.json",
+        "config:data/messages/tools_schema_basic.json",
+        "config:data/tool_inputs/tool_input_calculator.json",
+        "config:data/tool_inputs/tool_input_calculator_error.json",
+        "config:data/tool_inputs/tool_input_file_reader.json",
+        "config:data/tool_inputs/tool_input_file_reader_error.json",
+        "config:data/tool_inputs/tool_input_file_search.json",
+        "config:data/tool_inputs/tool_input_file_search_error.json",
+        "config:data/tool_inputs/tool_input_format_converter.json",
+        "config:data/tool_inputs/tool_input_format_converter_error.json",
+        "config:data/tool_inputs/tool_input_table_analyzer.json",
+        "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+        "file:data/tables/results.csv"
+      ]
+    },
+    {
+      "id": "layer:memory",
+      "name": "记忆存储层",
+      "description": "Agent 运行时产生的持久化记忆文档，包括全局知识记忆（Agent 系统四组件概念）和对话归档记录（含完整消息序列与执行轨迹），通过记忆索引（memory_index.json）进行检索管理。",
+      "nodeIds": [
+        "document:memory/conversations/conv_000.md",
+        "document:memory/global/mem_course_001.md"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "项目文档层",
+      "description": "面向开发者与用户的完整项目文档，涵盖 Agent 框架概述（B1-B5 架构、公共数据格式、CLI 退出码）、环境准备、各模块详细说明、完整演示流程指南、工具调用机制说明、检索演示说明，以及 Python 3.10 依赖清单。",
+      "nodeIds": [
+        "document:README.md",
+        "document:requirements.txt",
+        "document:data/docs/agent_intro.txt",
+        "document:data/docs/search_skill_demo.md",
+        "document:data/docs/tool_calling.md"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "项目概览",
+      "description": "README.md 是整个项目的导航地图，涵盖 B1-B5 五大模块的架构总览、环境准备、公共数据格式规范（SkillResult、AIMessage、ToolMessage）以及完整的演示流程。从这里开始可以快速建立对项目目标与模块边界的整体认知，为后续深入各个模块的学习奠定基础。",
+      "nodeIds": [
+        "document:README.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "完整演示入口",
+      "description": "run_full_demo.py 是端到端演示的入口脚本，它调用 B1 Agent 运行时执行完整的 Agent 交互流程（用户输入 -> 记忆加载 -> LLM 推理 -> 工具调用 -> 结果汇总），最终生成包含执行摘要和输出文件清单的可读报告。这个文件展示了 B1-B5 模块如何在实际运行中串联工作，是先理解全局执行流程的最佳起点。",
+      "nodeIds": [
+        "file:code/run_full_demo.py"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Agent 运行时核心编排",
+      "description": "b1_agent_runtime.py 是 Agent 框架的中央调度器，它实现了从解析用户输入、加载记忆上下文、协调 LLM 推理（B4）到执行工具调用（B3）并保存记忆（B5）的完整主循环。run_agent() 函数是核心入口，每次循环生成 AIMessage，如需工具调用则交由 B3 执行并将结果反馈回消息链，直至模型返回纯文本回复。所有交互链路被完整记录为 JSONL 审计日志。",
+      "nodeIds": [
+        "file:code/b1_agent_runtime.py"
+      ],
+      "languageLesson": "Python 模块间的循环协调（orchestration loop）设计：B1 作为总控不直接实现 LLM 推理或工具执行，而是通过调用 B3/B4/B5 的导出函数来实现关注点分离。这种编排模式（Orchestrator Pattern）让每个模块可以独立测试和替换。"
+    },
+    {
+      "order": 4,
+      "title": "公共数据契约与基础设施",
+      "description": "common/schemas.py、path_utils.py 和 io_utils.py 构成了 Agent 框架的共享基础设施层，是所有 B 模块的共同依赖（fan-in 最高的三个模块）。schemas.py 定义了 AIMessage、ToolMessage、SkillResult 和 ToolCall 四类标准化消息结构及其校验逻辑，是整个系统模块间数据交换的契约基础；path_utils.py 提供项目根路径推导、sys.path 引导和路径沙箱约束（require_within），确保所有文件访问限定在项目范围内；io_utils.py 封装了 JSON、YAML、JSONL 的读写与原子写入操作。这三个模块共同支撑了 B1-B5 的正常运作。",
+      "nodeIds": [
+        "file:code/common/schemas.py",
+        "file:code/common/path_utils.py",
+        "file:code/common/io_utils.py"
+      ],
+      "languageLesson": "Python 中通过 dataclass 或 TypedDict 定义消息结构并用工厂函数（如 make_ai_message、make_skill_result）统一构造是构建模块间契约的常见实践。路径沙箱（path sandbox）通过 realpath 解析和前缀比对来防止路径穿越攻击，是文件驱动 Agent 的安全基础。"
+    },
+    {
+      "order": 5,
+      "title": "模型配置与 LLM 推理引擎",
+      "description": "configs/model.yaml 定义了 Agent 的模型推理参数——基于 transformers 后端加载本地 Qwen3.5-4B 模型（bfloat16 精度、auto device_map），上下文窗口 4096 token，生成上限 1024 token，采用确定性解码（temperature=0）。b4_local_agent_llm.py 依此配置实现了双后端推理引擎：mock 模式用于快速测试，真实 transformers 模式加载本地模型生成回复。该模块负责构建含工具 schema 和格式指令的 prompt、解析模型原始输出为标准化 AIMessage，并缓存已加载的模型和分词器以减少重复加载开销。",
+      "nodeIds": [
+        "config:configs/model.yaml",
+        "file:code/b4_local_agent_llm.py"
+      ],
+      "languageLesson": "transformers 库的 model.generate() 接收 tokenized inputs 并返回 token IDs，需要 tokenizer.decode() 还原为文本。确定性解码（temperature=0, do_sample=False）确保相同输入产生相同输出，适合 Agent 场景下的可复现性测试。模型缓存（model cache）通过维护全局变量来避免每次推理都重新加载数 GB 的模型权重，是本地 LLM 推理的性能关键。"
+    },
+    {
+      "order": 6,
+      "title": "工具层：Schema 生成与调用执行",
+      "description": "b3_tool_layer.py 是整个 Agent 工具调用链路的枢纽，承接 B1 传来的 tool_calls 请求并协调实际的 Skill 执行。它从 configs/tools.yaml 加载五个工具的完整声明（模块路径、函数名、参数 schema），通过 get_tools_schema() 生成符合 OpenAI function-calling 规范的 JSON Schema 供 LLM 使用，通过 _validate_args() 校验工具调用参数的类型完备性，最后由 execute_tool_calls() 通过动态导入（importlib）执行目标 Skill 函数并返回标准化 ToolMessage。",
+      "nodeIds": [
+        "file:code/b3_tool_layer.py",
+        "config:configs/tools.yaml"
+      ],
+      "languageLesson": "OpenAI function-calling JSON Schema 要求每个 function 定义包含 name、description 和 parameters（遵循 JSON Schema 规范），其中 parameters.properties 描述每个输入参数的类型和含义，required 列出必填参数。将工具声明从代码中分离到 YAML 配置文件，使得新增或修改工具无需改动 Python 代码，实现了声明式工具管理。"
+    },
+    {
+      "order": 7,
+      "title": "五个 Skill 实现",
+      "description": "skills/ 目录包含 Agent 可调用的五个独立 Skill，每个 Skill 都通过 skills/__init__.py 中的 resolve_data_path() 函数将用户提供的路径安全地限定在数据根目录内。calculator.py 使用 Python AST 解析器安全求值算术表达式（支持加减乘除、幂运算，含溢出保护）；file_reader.py 读取 .txt/.md 文件并按字符数截断返回；table_analyzer.py 解析 .csv/.tsv 文件并计算数值列的描述性统计（count、min、max、mean）。另外两个 Skill——local_file_search.py（全文关键词检索）和 format_converter.py（文本转 Markdown/JSON）——同样遵循统一的 SkillResult 返回格式。",
+      "nodeIds": [
+        "file:skills/__init__.py",
+        "file:skills/calculator.py",
+        "file:skills/file_reader.py",
+        "file:skills/table_analyzer.py"
+      ],
+      "languageLesson": "Python AST 模块（ast.parse + ast.NodeVisitor）可以实现安全的表达式求值，相比直接使用 eval() 避免了任意代码执行的安全风险。每个 Skill 返回统一的 SkillResult 结构（status、data、error 字段），使 B3 工具层能够以标准化方式处理执行结果，无论成功还是失败。"
+    },
+    {
+      "order": 8,
+      "title": "Skill 独立运行入口",
+      "description": "b2_run_skill.py 提供了在不启动完整 Agent 的情况下独立执行任意 Skill 的命令行入口。它通过 argparse 解析 CLI 参数，使用 importlib 动态导入目标 Skill 模块的指定函数，调用后将结果包装为标准化 SkillResult（借助 schemas.make_skill_result），并将执行过程记录到 JSONL 运行日志中。这一步展示了 Skill 层的可独立测试性——每个 Skill 都可以脱离 B1/B3/B4 的编排上下文独立验证。",
+      "nodeIds": [
+        "file:code/b2_run_skill.py"
+      ],
+      "languageLesson": "Python 的 importlib.import_module() 和 getattr() 组合实现了运行时动态函数调用，允许通过配置文件（而非硬编码 import）来决定执行哪个 Skill。argparse 的 add_argument 配合 choices 参数可以限制有效的 Skill 名称，提供清晰的 CLI 帮助信息。"
+    },
+    {
+      "order": 9,
+      "title": "记忆管理与存储",
+      "description": "b5_memory.py 实现了 Agent 的记忆持久化层，支持两种记忆类型：global（跨会话的全局知识）和 conversation（单次对话归档）。它从 configs/memory.yaml 读取存储路径与容量限制（单次最大 2000 字符），通过 load_memory() 根据关键词从 memory_index.json 索引中检索相关记忆并截断返回，通过 save_memory() 将对话内容、执行追踪和最终答案保存为 Markdown 文档并更新索引。B1 在执行循环的开始和结束时分别调用这两个函数，形成记忆的加载-利用-保存闭环。",
+      "nodeIds": [
+        "file:code/b5_memory.py",
+        "config:configs/memory.yaml",
+        "config:memory/memory_index.json"
+      ],
+      "languageLesson": "记忆索引（memory_index.json）采用 JSON 字典结构维护 memory_id 到元数据（标题、摘要、类型、路径、时间戳）的映射，实现了 O(1) 的 ID 查找。记忆截断（truncation）策略——保留开头上下文 + 截断中间 + 保留结尾——是一种常见的上下文窗口管理技术，确保记忆内容不会超出 LLM 的 token 限制。"
+    },
+    {
+      "order": 10,
+      "title": "系统提示词模板",
+      "description": "prompts/local_tool_agent.txt 是 Agent 的系统提示词（system prompt）模板，被 B1 和 B4 模块共同引用。它规定了 LLM 的四个行为准则：按需使用工具（不编造文件内容）、一次只调用一个工具、等待 ToolMessage 后再决定下一步、用中文回复。这个模板直接塑造了 Agent 在每一步推理中的决策行为，是理解 Agent 行为模式的关键。",
+      "nodeIds": [
+        "document:prompts/local_tool_agent.txt"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "项目文档与依赖",
+      "description": "data/docs/agent_intro.txt 介绍了 Agent 系统的四大核心组件（模型、工具、记忆、执行循环），是 B1 集成测试固件中 Agent 需要阅读并总结的素材；tool_calling.md 则明确了模型决策、工具层校验执行、运行时消息闭环的三层职责划分。requirements.txt 列出了项目运行所需的 Python 3.10 依赖——以 PyTorch 2.7.1（CUDA 11.8）和 Transformers 5.12.1 为核心的深度学习推理栈。这三份文件共同构成了项目的文档化知识基础。",
+      "nodeIds": [
+        "document:data/docs/agent_intro.txt",
+        "document:data/docs/tool_calling.md",
+        "document:requirements.txt"
+      ]
+    }
+  ]
+}

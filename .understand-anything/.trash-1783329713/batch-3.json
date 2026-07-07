@@ -1,0 +1,180 @@
+{
+  "nodes": [
+    {
+      "id": "file:skills/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "skills/__init__.py",
+      "summary": "Skills 包的入口模块，定义 DEFAULT_DATA_ROOT 常量并导出 resolve_data_path 工具函数，用于安全地将用户提供的路径限定在数据根目录内，防止路径穿越攻击。",
+      "tags": ["entry-point", "barrel", "utility", "数据安全"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/__init__.py:resolve_data_path",
+      "type": "function",
+      "name": "resolve_data_path",
+      "filePath": "skills/__init__.py",
+      "lineRange": [9, 19],
+      "summary": "将用户提供的路径安全地解析到 data_root 目录下，确保路径不逃逸出数据根目录，返回解析后的候选路径与根路径的元组。",
+      "tags": ["utility", "路径解析", "数据安全", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/file_reader.py",
+      "type": "file",
+      "name": "file_reader.py",
+      "filePath": "skills/file_reader.py",
+      "summary": "文件读取 Skill，支持读取 .txt 和 .md 文本文件并以指定字符数截断返回，提供内容、字符数、截断标记等结构化输出。",
+      "tags": ["skill", "tool", "文件读取", "文本处理"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/file_reader.py:file_reader",
+      "type": "function",
+      "name": "file_reader",
+      "filePath": "skills/file_reader.py",
+      "lineRange": [6, 21],
+      "summary": "读取指定路径的 .txt 或 .md 文本文件，按 max_chars 截断内容，返回包含 content、num_chars、source 和 truncated 标志的字典。",
+      "tags": ["skill", "tool", "文件读取", "文本处理", "api-handler"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/local_file_search.py",
+      "type": "file",
+      "name": "local_file_search.py",
+      "filePath": "skills/local_file_search.py",
+      "summary": "本地文件搜索 Skill，在指定目录下递归搜索文本文件（.txt/.md），按关键词匹配计分并返回 top-k 结果及上下文片段。",
+      "tags": ["skill", "tool", "搜索", "文本处理", "全文检索"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/local_file_search.py:local_file_search",
+      "type": "function",
+      "name": "local_file_search",
+      "filePath": "skills/local_file_search.py",
+      "lineRange": [19, 55],
+      "summary": "在 data_root 下的指定目录中递归搜索文本文件，对 query 分词后进行不区分大小写的关键词匹配计分，返回按分数降序排列的 top_k 结果，每个结果包含路径、分数和上下文片段。",
+      "tags": ["skill", "tool", "搜索", "全文检索", "api-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:skills/table_analyzer.py",
+      "type": "file",
+      "name": "table_analyzer.py",
+      "filePath": "skills/table_analyzer.py",
+      "summary": "表格分析 Skill，读取 .csv 和 .tsv 文件并提取列名、行数、预览数据，可选择对数值列计算描述性统计量（count、min、max、mean）。",
+      "tags": ["skill", "tool", "数据分析", "csv-parser", "统计"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "function",
+      "name": "table_analyzer",
+      "filePath": "skills/table_analyzer.py",
+      "lineRange": [9, 53],
+      "summary": "读取 .csv 或 .tsv 表格文件，返回列名、行数、前 max_rows_preview 行预览数据，并可对数值列计算 count、min、max 和 mean 描述性统计量。",
+      "tags": ["skill", "tool", "数据分析", "csv-parser", "统计"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/file_reader.py:file_reader",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/local_file_search.py:local_file_search",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/table_analyzer.py:table_analyzer",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

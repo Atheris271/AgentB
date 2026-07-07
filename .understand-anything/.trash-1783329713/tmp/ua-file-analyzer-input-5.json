@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/b1_fixtures/b1_fixture_input.json", "language": "json", "sizeLines": 15, "fileCategory": "config"},
+    {"path": "data/b1_fixtures/preset_ai_messages.json", "language": "json", "sizeLines": 21, "fileCategory": "config"},
+    {"path": "data/b1_fixtures/preset_memory.json", "language": "json", "sizeLines": 20, "fileCategory": "config"},
+    {"path": "data/b1_fixtures/preset_tool_messages.json", "language": "json", "sizeLines": 9, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "data/b1_fixtures/b1_fixture_input.json": [],
+    "data/b1_fixtures/preset_ai_messages.json": [],
+    "data/b1_fixtures/preset_memory.json": [],
+    "data/b1_fixtures/preset_tool_messages.json": []
+  }
+}

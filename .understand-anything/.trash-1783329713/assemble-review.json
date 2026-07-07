@@ -1,0 +1,15 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 1,
+  "edgesRestored": 3,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "The merge script report did not include a 'Fixed' section, so pattern group verification was skipped. No systemic prefix or complexity issues could be assessed from the provided output.",
+    "The function 'now_iso' in code/common/logging_utils.py was listed as a symbol to analyze (in batches.json) but was never produced as a node by the LLM. Only measure_latency and append_run_log were generated. This caused 3 calls edges targeting it to be dropped.",
+    "Created node function:code/common/logging_utils.py:now_iso with inferred metadata (simple complexity, utility/timestamp/datetime tags) based on the source code.",
+    "All 69 import-map entries were already covered by existing imports edges in the assembled graph; no cross-batch gaps were found.",
+    "Post-fix validation: 134 nodes, 252 edges, 0 dangling edges, 0 duplicates. Graph is structurally sound."
+  ]
+}

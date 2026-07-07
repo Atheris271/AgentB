@@ -1,0 +1,184 @@
+[
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/b1_agent_runtime.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:skills/file_reader.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:skills/local_file_search.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:skills/table_analyzer.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  }
+]

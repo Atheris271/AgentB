@@ -1,0 +1,11 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "skills/__init__.py",
+    "skills/file_reader.py",
+    "skills/local_file_search.py",
+    "skills/table_analyzer.py"
+  ],
+  "results": []
+}

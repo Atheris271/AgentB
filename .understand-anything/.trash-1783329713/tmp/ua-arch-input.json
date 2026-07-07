@@ -1,0 +1,2870 @@
+{
+  "fileNodes": [
+    {
+      "id": "file:code/b1_agent_runtime.py",
+      "type": "file",
+      "name": "b1_agent_runtime.py",
+      "filePath": "code/b1_agent_runtime.py",
+      "summary": "Agent 运行时的核心编排模块，负责解析用户输入、加载记忆上下文、协调 LLM 推理与工具调用，并将完整的交互链路记录为 JSONL 审计日志。",
+      "tags": [
+        "entry-point",
+        "orchestrator",
+        "agent-runtime",
+        "llm-integration",
+        "audit-logging"
+      ]
+    },
+    {
+      "id": "file:code/b5_memory.py",
+      "type": "file",
+      "name": "b5_memory.py",
+      "filePath": "code/b5_memory.py",
+      "summary": "记忆文档管理模块，提供加载/保存记忆文档的功能，支持基于索引的文档检索、对话归档和增量索引更新。",
+      "tags": [
+        "memory-management",
+        "document-indexing",
+        "cli-tool",
+        "data-persistence"
+      ]
+    },
+    {
+      "id": "file:code/common/io_utils.py",
+      "type": "file",
+      "name": "io_utils.py",
+      "filePath": "code/common/io_utils.py",
+      "summary": "通用 I/O 工具库，封装文本、JSON、YAML、JSONL 的读写操作，提供原子写入和目录自动创建功能。",
+      "tags": [
+        "utility",
+        "io-operations",
+        "serialization",
+        "file-system"
+      ]
+    },
+    {
+      "id": "file:code/common/logging_utils.py",
+      "type": "file",
+      "name": "logging_utils.py",
+      "filePath": "code/common/logging_utils.py",
+      "summary": "轻量级日志工具，提供 ISO 时间戳生成、延迟测量上下文管理器和 JSONL 运行日志追加功能。",
+      "tags": [
+        "utility",
+        "logging",
+        "instrumentation",
+        "latency-measurement"
+      ]
+    },
+    {
+      "id": "file:code/run_full_demo.py",
+      "type": "file",
+      "name": "run_full_demo.py",
+      "filePath": "code/run_full_demo.py",
+      "summary": "端到端演示脚本，串联 Agent 运行时执行全流程并生成包含执行摘要和输出文件清单的可读报告。",
+      "tags": [
+        "entry-point",
+        "demo",
+        "integration-test",
+        "reporting"
+      ]
+    },
+    {
+      "id": "file:code/b2_run_skill.py",
+      "type": "file",
+      "name": "b2_run_skill.py",
+      "filePath": "code/b2_run_skill.py",
+      "summary": "Skill独立运行的入口模块，通过动态导入（importlib）执行指定Skill函数，捕获异常并生成标准化SkillResult，支持CLI参数解析和JSONL运行日志记录。",
+      "tags": [
+        "entry-point",
+        "skill-executor",
+        "cli",
+        "dynamic-import"
+      ]
+    },
+    {
+      "id": "file:code/b3_tool_layer.py",
+      "type": "file",
+      "name": "b3_tool_layer.py",
+      "filePath": "code/b3_tool_layer.py",
+      "summary": "工具层核心模块，从YAML配置加载工具定义、生成符合OpenAI风格的function-calling JSON Schema、校验工具调用参数类型，并通过动态导入执行具体Skill函数，是整个Agent工具调用链路的枢纽。",
+      "tags": [
+        "tool-layer",
+        "schema-generation",
+        "validation",
+        "cli",
+        "api-handler"
+      ]
+    },
+    {
+      "id": "file:code/b4_local_agent_llm.py",
+      "type": "file",
+      "name": "b4_local_agent_llm.py",
+      "filePath": "code/b4_local_agent_llm.py",
+      "summary": "本地LLM推理引擎模块，支持mock模式和真实transformers推理两种后端，负责构建含工具schema和格式指令的prompt messages、解析模型原始输出为标准化AIMessage，并缓存已加载的模型/分词器实例以减少重复加载开销。",
+      "tags": [
+        "llm-inference",
+        "prompt-engineering",
+        "model-cache",
+        "json-parsing",
+        "cli"
+      ]
+    },
+    {
+      "id": "file:code/common/path_utils.py",
+      "type": "file",
+      "name": "path_utils.py",
+      "filePath": "code/common/path_utils.py",
+      "summary": "项目全局路径工具模块，提供项目根路径推导与sys.path引导、相对路径解析（基于CWD或包含文件目录）、以及路径沙箱约束校验，被所有B模块和common模块依赖。",
+      "tags": [
+        "utility",
+        "path-resolution",
+        "sandbox",
+        "common"
+      ]
+    },
+    {
+      "id": "file:code/common/schemas.py",
+      "type": "file",
+      "name": "schemas.py",
+      "filePath": "code/common/schemas.py",
+      "summary": "Agent框架核心数据模型模块，定义并校验所有标准化消息结构——AIMessage、ToolMessage、SkillResult和ToolCall——这些schema是B1-B5模块之间数据交换的契约基础。",
+      "tags": [
+        "data-model",
+        "schema-definition",
+        "validation",
+        "message-contract",
+        "common"
+      ]
+    },
+    {
+      "id": "file:skills/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "skills/__init__.py",
+      "summary": "Skills 包的入口模块，定义 DEFAULT_DATA_ROOT 常量并导出 resolve_data_path 工具函数，用于安全地将用户提供的路径限定在数据根目录内，防止路径穿越攻击。",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "utility",
+        "数据安全"
+      ]
+    },
+    {
+      "id": "file:skills/file_reader.py",
+      "type": "file",
+      "name": "file_reader.py",
+      "filePath": "skills/file_reader.py",
+      "summary": "文件读取 Skill，支持读取 .txt 和 .md 文本文件并以指定字符数截断返回，提供内容、字符数、截断标记等结构化输出。",
+      "tags": [
+        "skill",
+        "tool",
+        "文件读取",
+        "文本处理"
+      ]
+    },
+    {
+      "id": "file:skills/local_file_search.py",
+      "type": "file",
+      "name": "local_file_search.py",
+      "filePath": "skills/local_file_search.py",
+      "summary": "本地文件搜索 Skill，在指定目录下递归搜索文本文件（.txt/.md），按关键词匹配计分并返回 top-k 结果及上下文片段。",
+      "tags": [
+        "skill",
+        "tool",
+        "搜索",
+        "文本处理",
+        "全文检索"
+      ]
+    },
+    {
+      "id": "file:skills/table_analyzer.py",
+      "type": "file",
+      "name": "table_analyzer.py",
+      "filePath": "skills/table_analyzer.py",
+      "summary": "表格分析 Skill，读取 .csv 和 .tsv 文件并提取列名、行数、预览数据，可选择对数值列计算描述性统计量（count、min、max、mean）。",
+      "tags": [
+        "skill",
+        "tool",
+        "数据分析",
+        "csv-parser",
+        "统计"
+      ]
+    },
+    {
+      "id": "config:configs/memory.yaml",
+      "type": "config",
+      "name": "memory.yaml",
+      "filePath": "configs/memory.yaml",
+      "summary": "定义 Agent 记忆系统的存储配置，包括记忆根目录（../memory）、全局记忆目录、对话记忆目录、索引路径（memory_index.json）和单次记忆最大字符数（2000 字符）。",
+      "tags": [
+        "configuration",
+        "memory",
+        "agent-config"
+      ]
+    },
+    {
+      "id": "config:configs/memory_small_limit.yaml",
+      "type": "config",
+      "name": "memory_small_limit.yaml",
+      "filePath": "configs/memory_small_limit.yaml",
+      "summary": "记忆配置的测试变体，与 memory.yaml 结构完全相同但将 max_memory_chars 限制为仅 20 字符，用于验证记忆截断和容量限制边界行为。",
+      "tags": [
+        "configuration",
+        "memory",
+        "test-config",
+        "agent-config"
+      ]
+    },
+    {
+      "id": "config:configs/model.yaml",
+      "type": "config",
+      "name": "model.yaml",
+      "filePath": "configs/model.yaml",
+      "summary": "定义 Agent 运行时的模型与推理配置，使用 transformers 后端加载本地 Qwen3.5-4B 模型（bfloat16 精度、auto device_map），采用确定性解码（temperature=0、do_sample=false），上下文窗口 4096 token，生成上限 1024 token，并启用输出保存。",
+      "tags": [
+        "configuration",
+        "model",
+        "inference",
+        "agent-config",
+        "transformers"
+      ]
+    },
+    {
+      "id": "config:configs/tools.yaml",
+      "type": "config",
+      "name": "tools.yaml",
+      "filePath": "configs/tools.yaml",
+      "summary": "定义 Agent 可用工具集（basic_tools）及五个工具的完整声明——计算器、文件读取、本地文件搜索、表格分析（CSV/TSV）、格式转换（markdown/JSON），每个工具声明了模块路径、函数名、输入参数 schema 和返回值结构。",
+      "tags": [
+        "configuration",
+        "tools",
+        "agent-config",
+        "schema-definition"
+      ]
+    },
+    {
+      "id": "config:data/b1_fixtures/b1_fixture_input.json",
+      "type": "config",
+      "name": "b1_fixture_input.json",
+      "filePath": "data/b1_fixtures/b1_fixture_input.json",
+      "summary": "B1 Agent 集成测试的固件入口配置，定义执行模式、对话参数、用户输入（要求阅读 docs/agent_intro.txt 并总结中文要点）、系统提示词路径、工具集及预设消息/记忆/工具结果文件的引用。",
+      "tags": [
+        "configuration",
+        "test-fixture",
+        "agent-testing",
+        "integration-test"
+      ]
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "config",
+      "name": "preset_ai_messages.json",
+      "filePath": "data/b1_fixtures/preset_ai_messages.json",
+      "summary": "预设的 AI 助手消息序列，模拟 B1 Agent 在集成测试中的两轮回复：第一轮发起 file_reader 工具调用读取 agent_intro.txt，第二轮返回三条中文要点总结（Agent 系统组成、工具调用能力、Memory 作用）。",
+      "tags": [
+        "test-fixture",
+        "ai-response",
+        "message-preset",
+        "tool-call"
+      ]
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_memory.json",
+      "type": "config",
+      "name": "preset_memory.json",
+      "filePath": "data/b1_fixtures/preset_memory.json",
+      "summary": "预设的 Memory 选择结果，包含一条 global 类型的记忆文档（标题「Fixture Agent 基础概念」），内容介绍 Agent 系统的模型-工具-记忆-执行循环组成，用于集成测试中模拟记忆检索的返回。",
+      "tags": [
+        "test-fixture",
+        "memory-preset",
+        "mock-data"
+      ]
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "config",
+      "name": "preset_tool_messages.json",
+      "filePath": "data/b1_fixtures/preset_tool_messages.json",
+      "summary": "预设的工具调用结果，以 call_fixture_001 为键模拟 file_reader 工具成功读取 docs/agent_intro.txt 后的返回内容（92 字符的 Agent 系统介绍文本），配合 preset_ai_messages.json 共同构成 B1 Agent 集成测试的完整对话模拟。",
+      "tags": [
+        "test-fixture",
+        "tool-result",
+        "mock-data"
+      ]
+    },
+    {
+      "id": "document:data/docs/agent_intro.txt",
+      "type": "document",
+      "name": "agent_intro.txt",
+      "filePath": "data/docs/agent_intro.txt",
+      "summary": "Agent 系统入门文档，介绍 Agent 的四大核心组件：模型、工具、记忆和执行循环，并简述了工具调用与记忆模块的作用。",
+      "tags": [
+        "documentation",
+        "agent-system",
+        "tool-calling",
+        "memory",
+        "architecture"
+      ]
+    },
+    {
+      "id": "document:data/docs/search_skill_demo.md",
+      "type": "document",
+      "name": "search_skill_demo.md",
+      "filePath": "data/docs/search_skill_demo.md",
+      "summary": "检索演示文档，用于验证 local_file_search 工具的功能。阐述了工具编排的工作流程：模型决策、运行时执行、结果回传的闭环。",
+      "tags": [
+        "documentation",
+        "search",
+        "tool-orchestration",
+        "demo",
+        "retrieval"
+      ]
+    },
+    {
+      "id": "document:data/docs/tool_calling.md",
+      "type": "document",
+      "name": "tool_calling.md",
+      "filePath": "data/docs/tool_calling.md",
+      "summary": "工具调用机制的简要说明文档，明确划分了模型决策、工具层校验执行、运行时消息闭环三层职责。",
+      "tags": [
+        "documentation",
+        "tool-calling",
+        "runtime",
+        "message-loop"
+      ]
+    },
+    {
+      "id": "config:data/llm_input.json",
+      "type": "config",
+      "name": "llm_input.json",
+      "filePath": "data/llm_input.json",
+      "summary": "LLM配置入口文件，指定模型配置文件路径、消息文件路径和工具Schema路径，为Agent系统提供LLM调用所需的基础参数。",
+      "tags": [
+        "configuration",
+        "llm",
+        "ai-agent",
+        "model-config"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input.json",
+      "type": "config",
+      "name": "runtime_input.json",
+      "filePath": "data/runtime_input.json",
+      "summary": "会话conv_001的运行时输入配置，要求Agent阅读docs/agent_intro.txt并总结三条中文要点，启用全局记忆且保存对话记忆。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "memory-enabled",
+        "document-reading"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input_0.json",
+      "type": "config",
+      "name": "runtime_input_0.json",
+      "filePath": "data/runtime_input_0.json",
+      "summary": "会话conv_000的运行时输入配置，要求Agent不使用工具简要说明Agent概念，为无工具调用的基础对话场景。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "no-tools",
+        "concept-explanation"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input_2.json",
+      "type": "config",
+      "name": "runtime_input_2.json",
+      "filePath": "data/runtime_input_2.json",
+      "summary": "会话conv_002的运行时输入配置，要求Agent调用计算Skill完成56*29+81的数学运算。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "calculation",
+        "skill-call"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input_3.json",
+      "type": "config",
+      "name": "runtime_input_3.json",
+      "filePath": "data/runtime_input_3.json",
+      "summary": "会话conv_003的运行时输入配置，要求Agent调用local_file_search Skill在docs目录搜索文件并返回最相关结果及中文摘要。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "file-search",
+        "skill-call"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input_4.json",
+      "type": "config",
+      "name": "runtime_input_4.json",
+      "filePath": "data/runtime_input_4.json",
+      "summary": "会话conv_004的运行时输入配置，要求Agent调用table_analyzer Skill分析CSV文件并计算score和latency的平均值。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "data-analysis",
+        "skill-call"
+      ]
+    },
+    {
+      "id": "config:data/runtime_input_5.json",
+      "type": "config",
+      "name": "runtime_input_5.json",
+      "filePath": "data/runtime_input_5.json",
+      "summary": "会话conv_005的运行时输入配置，要求Agent调用format_converter Skill将键值文本转换为真实JSON文件。",
+      "tags": [
+        "configuration",
+        "agent",
+        "conversation",
+        "format-conversion",
+        "skill-call"
+      ]
+    },
+    {
+      "id": "config:data/memory_inputs/memory_save_global_input.json",
+      "type": "config",
+      "name": "memory_save_global_input.json",
+      "filePath": "data/memory_inputs/memory_save_global_input.json",
+      "summary": "全局记忆保存的输入配置，指定会话ID、保存类型为 global，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": [
+        "configuration",
+        "memory",
+        "input-data",
+        "global"
+      ]
+    },
+    {
+      "id": "config:data/memory_inputs/memory_save_input.json",
+      "type": "config",
+      "name": "memory_save_input.json",
+      "filePath": "data/memory_inputs/memory_save_input.json",
+      "summary": "会话级记忆保存的输入配置，指定会话ID、保存类型为 conversation，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": [
+        "configuration",
+        "memory",
+        "input-data",
+        "conversation"
+      ]
+    },
+    {
+      "id": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "document",
+      "name": "sample_final_answer.md",
+      "filePath": "data/memory_inputs/sample_final_answer.md",
+      "summary": "示例最终答案文件，包含 Agent 的中文回复样本——「Agent 会结合模型、工具和记忆完成任务」，作为记忆保存功能的测试数据。",
+      "tags": [
+        "sample-data",
+        "documentation",
+        "memory",
+        "answer"
+      ]
+    },
+    {
+      "id": "config:data/memory_inputs/sample_messages.json",
+      "type": "config",
+      "name": "sample_messages.json",
+      "filePath": "data/memory_inputs/sample_messages.json",
+      "summary": "示例对话消息数组，包含 system、user 和 assistant 角色的多轮对话样本，其中 assistant 消息内嵌空 tool_calls 字段，用于测试记忆保存的消息处理流程。",
+      "tags": [
+        "sample-data",
+        "memory",
+        "conversation",
+        "messages"
+      ]
+    },
+    {
+      "id": "config:data/memory_inputs/sample_trace.json",
+      "type": "config",
+      "name": "sample_trace.json",
+      "filePath": "data/memory_inputs/sample_trace.json",
+      "summary": "示例会话追踪记录，包含会话ID、执行状态（success）、工具使用轮次和 LLM 调用次数统计，用于测试记忆保存的追踪数据处理流程。",
+      "tags": [
+        "sample-data",
+        "memory",
+        "trace",
+        "execution"
+      ]
+    },
+    {
+      "id": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "config",
+      "name": "ai_message_with_tool_calls.json",
+      "filePath": "data/messages/ai_message_with_tool_calls.json",
+      "summary": "AI 助手消息测试固件，包含一条对 file_reader 工具的空内容调用及其参数，用于测试单工具调用场景。",
+      "tags": [
+        "测试固件",
+        "ai消息",
+        "工具调用",
+        "chat-completion"
+      ]
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "config",
+      "name": "b3_tool_call_format_converter_valid.json",
+      "filePath": "data/messages/b3_tool_call_format_converter_valid.json",
+      "summary": "format_converter 工具调用的有效测试固件，包含 text、target_format 和 output_filename 等完整转换参数。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "format-converter",
+        "有效输入"
+      ]
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "config",
+      "name": "b3_tool_call_missing_required.json",
+      "filePath": "data/messages/b3_tool_call_missing_required.json",
+      "summary": "calculator 工具调用测试固件，args 为空对象，缺失必填参数 expression，用于测试参数验证失败场景。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "参数验证",
+        "缺失参数",
+        "边界用例"
+      ]
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "config",
+      "name": "b3_tool_call_unknown_tool.json",
+      "filePath": "data/messages/b3_tool_call_unknown_tool.json",
+      "summary": "调用未定义工具 unknown_tool 的测试固件，用于验证 Agent 在遇到未知工具时的错误处理行为。",
+      "tags": [
+        "测试固件",
+        "工具调用",
+        "未知工具",
+        "错误处理",
+        "边界用例"
+      ]
+    },
+    {
+      "id": "config:data/messages/messages_no_tool.json",
+      "type": "config",
+      "name": "messages_no_tool.json",
+      "filePath": "data/messages/messages_no_tool.json",
+      "summary": "不含工具调用的基础对话消息测试固件，仅包含 system 提示和 user 请求，作为无工具场景的基线参考。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "无工具",
+        "基线"
+      ]
+    },
+    {
+      "id": "config:data/messages/messages_with_error_tool.json",
+      "type": "config",
+      "name": "messages_with_error_tool.json",
+      "filePath": "data/messages/messages_with_error_tool.json",
+      "summary": "工具调用错误场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，tool 返回 max_chars 参数的 ValueError 错误。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "工具错误",
+        "错误处理",
+        "集成测试"
+      ]
+    },
+    {
+      "id": "config:data/messages/messages_with_tool.json",
+      "type": "config",
+      "name": "messages_with_tool.json",
+      "filePath": "data/messages/messages_with_tool.json",
+      "summary": "工具调用成功场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，file_reader 成功返回文件内容。",
+      "tags": [
+        "测试固件",
+        "对话消息",
+        "工具调用",
+        "成功场景",
+        "集成测试"
+      ]
+    },
+    {
+      "id": "config:data/messages/tools_schema_basic.json",
+      "type": "config",
+      "name": "tools_schema_basic.json",
+      "filePath": "data/messages/tools_schema_basic.json",
+      "summary": "Agent 工具定义测试固件，包含 5 个工具的 OpenAPI 风格 function schema 定义：calculator、file_reader、local_file_search、table_analyzer 和 format_converter，每个工具均定义了输入参数和 x-returns 输出 schema。",
+      "tags": [
+        "测试固件",
+        "工具schema",
+        "函数定义",
+        "openapi",
+        "agent工具"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator.json",
+      "type": "config",
+      "name": "tool_input_calculator.json",
+      "filePath": "data/tool_inputs/tool_input_calculator.json",
+      "summary": "计算器工具的正常测试输入，包含数学表达式 \"23 * 17 + 9\"，用于验证表达式求值功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "calculator",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "config",
+      "name": "tool_input_calculator_error.json",
+      "filePath": "data/tool_inputs/tool_input_calculator_error.json",
+      "summary": "计算器工具的异常测试输入，包含 Python 代码注入表达式，用于验证沙箱安全防护机制。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "calculator",
+        "security",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader.json",
+      "type": "config",
+      "name": "tool_input_file_reader.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader.json",
+      "summary": "文件读取工具的正常测试输入，指定存在的文档路径和最大字符数，用于验证文件读取功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-reader",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "config",
+      "name": "tool_input_file_reader_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_reader_error.json",
+      "summary": "文件读取工具的异常测试输入，指定不存在的文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-reader",
+        "error-handling",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search.json",
+      "type": "config",
+      "name": "tool_input_file_search.json",
+      "filePath": "data/tool_inputs/tool_input_file_search.json",
+      "summary": "文件搜索工具的正常测试输入，指定查询关键词、目录范围和文件类型过滤条件，用于验证全文搜索功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-search",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "config",
+      "name": "tool_input_file_search_error.json",
+      "filePath": "data/tool_inputs/tool_input_file_search_error.json",
+      "summary": "文件搜索工具的异常测试输入，指定不存在的搜索目录，用于验证目录缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "file-search",
+        "error-handling",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter.json",
+      "type": "config",
+      "name": "tool_input_format_converter.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter.json",
+      "summary": "格式转换工具的正常测试输入，将 YAML 文本转换为 Markdown 格式并指定输出文件名，用于验证格式转换功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "format-converter",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "config",
+      "name": "tool_input_format_converter_error.json",
+      "filePath": "data/tool_inputs/tool_input_format_converter_error.json",
+      "summary": "格式转换工具的异常测试输入，指定不支持的 XML 目标格式，用于验证格式校验和错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "format-converter",
+        "error-handling",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer.json",
+      "summary": "表格分析工具的正常测试输入，指定存在的 CSV 文件路径并启用统计描述功能，用于验证表格分析功能。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "table-analyzer",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "config",
+      "name": "tool_input_table_analyzer_error.json",
+      "filePath": "data/tool_inputs/tool_input_table_analyzer_error.json",
+      "summary": "表格分析工具的异常测试输入，指定不存在的 CSV 文件路径，用于验证文件缺失时的错误处理逻辑。",
+      "tags": [
+        "test-fixture",
+        "tool-input",
+        "table-analyzer",
+        "error-handling",
+        "configuration"
+      ]
+    },
+    {
+      "id": "config:.claude/settings.local.json",
+      "type": "config",
+      "name": "settings.local.json",
+      "filePath": ".claude/settings.local.json",
+      "summary": "Claude Code 本地权限配置，允许 Bash 和 Read 操作以支持 Understand-Anything 插件及 pnpm/node 工具链的运行。",
+      "tags": [
+        "configuration",
+        "permissions",
+        "claude-code",
+        "tooling"
+      ]
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Understand-Anything 分析忽略模式文件，采用 .gitignore 语法定义哪些文件/目录应从代码分析中排除。当前所有模式均为注释状态。",
+      "tags": [
+        "configuration",
+        "ignore-patterns",
+        "analysis-scope"
+      ]
+    },
+    {
+      "id": "config:.understand-anything/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".understand-anything/config.json",
+      "summary": "Understand-Anything 插件配置，设置输出语言为中文（zh）。",
+      "tags": [
+        "configuration",
+        "language-setting",
+        "analysis"
+      ]
+    },
+    {
+      "id": "file:code/common/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "code/common/__init__.py",
+      "summary": "Python 包标记文件，声明 code/common 为共享工具模块，当前仅含一行 docstring，无实际导出。",
+      "tags": [
+        "package-marker",
+        "entry-point",
+        "python-package"
+      ]
+    },
+    {
+      "id": "file:data/tables/results.csv",
+      "type": "file",
+      "name": "results.csv",
+      "filePath": "data/tables/results.csv",
+      "summary": "Skill 执行基准测试数据，包含 task（任务名）、score（评分）、latency（延迟）三列，共三条记录。",
+      "tags": [
+        "benchmark-data",
+        "skill-results",
+        "tabular-data"
+      ]
+    },
+    {
+      "id": "document:memory/conversations/conv_000.md",
+      "type": "document",
+      "name": "conv_000.md",
+      "filePath": "memory/conversations/conv_000.md",
+      "summary": "对话记忆文档，记录了一次关于 Agent 概念的问答：用户要求简要定义 Agent，AI 在无工具调用的单轮对话中给出了中文回答，包含完整的消息序列和执行轨迹。",
+      "tags": [
+        "conversation-memory",
+        "agent-log",
+        "trace",
+        "example"
+      ]
+    },
+    {
+      "id": "document:memory/global/mem_course_001.md",
+      "type": "document",
+      "name": "mem_course_001.md",
+      "filePath": "memory/global/mem_course_001.md",
+      "summary": "全局记忆文档，介绍 Agent 基础概念：Agent 系统由模型、工具、记忆和执行循环四部分组成。",
+      "tags": [
+        "global-memory",
+        "knowledge-base",
+        "agent-concept"
+      ]
+    },
+    {
+      "id": "config:memory/memory_index.json",
+      "type": "config",
+      "name": "memory_index.json",
+      "filePath": "memory/memory_index.json",
+      "summary": "记忆索引文件，维护 memory_id 到元数据的映射，当前包含两条记录：全局记忆 mem_course_001 和对话记忆 mem_conversation_conv_000，记录类型、标题、摘要、路径和时间戳。",
+      "tags": [
+        "index",
+        "memory-management",
+        "metadata",
+        "json-database"
+      ]
+    },
+    {
+      "id": "file:models/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "models/.gitkeep",
+      "summary": "空占位文件，用于在 Git 仓库中保留空的 models/ 目录结构，供存放本地模型文件。",
+      "tags": [
+        "placeholder",
+        "directory-marker",
+        "git"
+      ]
+    },
+    {
+      "id": "document:prompts/local_tool_agent.txt",
+      "type": "document",
+      "name": "local_tool_agent.txt",
+      "filePath": "prompts/local_tool_agent.txt",
+      "summary": "本地工具调用 Agent 的系统提示模板，规定了工具使用原则：按需使用工具、不编造文件内容、一次只调用一个工具、等待 ToolMessage 后再决定下一步。被 B1 和 B4 模块引用。",
+      "tags": [
+        "system-prompt",
+        "agent-instruction",
+        "tool-use",
+        "template"
+      ]
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "项目完整文档，涵盖 Agent 框架概述（B1-B5 模块架构）、环境准备、公共数据格式（SkillResult/AIMessage/ToolMessage）、各模块详细说明（命令行、输入输出文件）、完整演示流程、CLI 退出码和输出文件附录，共 10 个章节。",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "project-overview",
+        "usage-guide",
+        "tutorial"
+      ]
+    },
+    {
+      "id": "document:requirements.txt",
+      "type": "document",
+      "name": "requirements.txt",
+      "filePath": "requirements.txt",
+      "summary": "Python 项目依赖清单，基于 Python 3.10，包含 PyTorch 2.7.1（CUDA 11.8）、Transformers 5.12.1、Accelerate 等深度学习推理核心库及配套工具。",
+      "tags": [
+        "dependencies",
+        "python",
+        "machine-learning",
+        "environment"
+      ]
+    },
+    {
+      "id": "file:skills/calculator.py",
+      "type": "file",
+      "name": "calculator.py",
+      "filePath": "skills/calculator.py",
+      "summary": "计算器 Skill 实现，使用 Python AST 解析器安全地求值算术表达式，支持加减乘除、整除、取模、幂运算及一元正负号，内置指数幅度和结果范围安全检查。",
+      "tags": [
+        "skill",
+        "calculator",
+        "ast-evaluation",
+        "arithmetic",
+        "safe-computation"
+      ]
+    },
+    {
+      "id": "file:skills/format_converter.py",
+      "type": "file",
+      "name": "format_converter.py",
+      "filePath": "skills/format_converter.py",
+      "summary": "格式转换 Skill 实现，将文本转换为 Markdown 无序列表或 JSON 格式。支持原生 JSON 解析和 key:value 行解析两种输入方式，自动生成输出文件并处理文件名冲突。",
+      "tags": [
+        "skill",
+        "format-conversion",
+        "markdown",
+        "json",
+        "file-output"
+      ]
+    }
+  ],
+  "importEdges": [
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/b1_agent_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ],
+  "allEdges": [
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_memory_context",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "function:code/b1_agent_runtime.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_memory_paths",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:_read_index",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "function:code/b5_memory.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:ensure_dir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:_atomic_write_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:write_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/io_utils.py",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:measure_latency",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "function:code/common/logging_utils.py:append_run_log",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:_build_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "function:code/run_full_demo.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b5_memory.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/common/logging_utils.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/b1_agent_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/run_full_demo.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:load_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b1_agent_runtime.py:run_agent",
+      "target": "function:code/b5_memory.py:save_memory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_read_index",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:load_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:save_memory",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:_memory_paths",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b5_memory.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/common/logging_utils.py:append_run_log",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:_build_report",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/b1_agent_runtime.py:run_agent",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/run_full_demo.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b5_memory.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b3_tool_layer.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b1_agent_runtime.py",
+      "target": "file:code/b4_local_agent_llm.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:run_skill",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_parameter_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_validate_args",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_three_points",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_dtype_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_model_cache_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/__init__.py",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "function:skills/file_reader.py:file_reader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/file_reader.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/file_reader.py:file_reader",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "function:skills/local_file_search.py:local_file_search",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/local_file_search.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/local_file_search.py:local_file_search",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "function:skills/table_analyzer.py:table_analyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/table_analyzer.py",
+      "target": "file:skills/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:skills/table_analyzer.py:table_analyzer",
+      "target": "function:skills/__init__.py:resolve_data_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:configs/memory_small_limit.yaml",
+      "target": "config:configs/memory.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/calculator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/file_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/local_file_search.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/table_analyzer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/tools.yaml",
+      "target": "file:skills/format_converter.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:configs/model.yaml",
+      "target": "config:configs/tools.yaml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_memory.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/preset_ai_messages.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/tool_calling.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/agent_intro.txt",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:data/docs/tool_calling.md",
+      "target": "document:data/docs/search_skill_demo.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_0.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_2.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_3.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_4.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_5.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/memory_save_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_trace.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_messages.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_no_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/messages_with_tool.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_calculator.json",
+      "target": "config:data/tool_inputs/tool_input_calculator_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_reader.json",
+      "target": "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_file_search.json",
+      "target": "config:data/tool_inputs/tool_input_file_search_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_format_converter.json",
+      "target": "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "target": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:_evaluate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_parse_key_value_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_safe_output_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/global/mem_course_001.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/conversations/conv_000.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:requirements.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:prompts/local_tool_agent.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/calculator.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/format_converter.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:memory/memory_index.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.claude/settings.local.json",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:.understand-anything/.understandignore",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

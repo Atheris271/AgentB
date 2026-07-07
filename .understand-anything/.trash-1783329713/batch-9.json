@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "config",
+      "name": "ai_message_with_tool_calls.json",
+      "filePath": "data/messages/ai_message_with_tool_calls.json",
+      "summary": "AI 助手消息测试固件，包含一条对 file_reader 工具的空内容调用及其参数，用于测试单工具调用场景。",
+      "tags": ["测试固件", "ai消息", "工具调用", "chat-completion"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "config",
+      "name": "b3_tool_call_format_converter_valid.json",
+      "filePath": "data/messages/b3_tool_call_format_converter_valid.json",
+      "summary": "format_converter 工具调用的有效测试固件，包含 text、target_format 和 output_filename 等完整转换参数。",
+      "tags": ["测试固件", "工具调用", "format-converter", "有效输入"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "config",
+      "name": "b3_tool_call_missing_required.json",
+      "filePath": "data/messages/b3_tool_call_missing_required.json",
+      "summary": "calculator 工具调用测试固件，args 为空对象，缺失必填参数 expression，用于测试参数验证失败场景。",
+      "tags": ["测试固件", "工具调用", "参数验证", "缺失参数", "边界用例"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "config",
+      "name": "b3_tool_call_unknown_tool.json",
+      "filePath": "data/messages/b3_tool_call_unknown_tool.json",
+      "summary": "调用未定义工具 unknown_tool 的测试固件，用于验证 Agent 在遇到未知工具时的错误处理行为。",
+      "tags": ["测试固件", "工具调用", "未知工具", "错误处理", "边界用例"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/messages_no_tool.json",
+      "type": "config",
+      "name": "messages_no_tool.json",
+      "filePath": "data/messages/messages_no_tool.json",
+      "summary": "不含工具调用的基础对话消息测试固件，仅包含 system 提示和 user 请求，作为无工具场景的基线参考。",
+      "tags": ["测试固件", "对话消息", "无工具", "基线"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/messages_with_error_tool.json",
+      "type": "config",
+      "name": "messages_with_error_tool.json",
+      "filePath": "data/messages/messages_with_error_tool.json",
+      "summary": "工具调用错误场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，tool 返回 max_chars 参数的 ValueError 错误。",
+      "tags": ["测试固件", "对话消息", "工具错误", "错误处理", "集成测试"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:data/messages/messages_with_tool.json",
+      "type": "config",
+      "name": "messages_with_tool.json",
+      "filePath": "data/messages/messages_with_tool.json",
+      "summary": "工具调用成功场景的完整对话测试固件，包含 system/user/assistant/tool 四轮对话，file_reader 成功返回文件内容。",
+      "tags": ["测试固件", "对话消息", "工具调用", "成功场景", "集成测试"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/messages/tools_schema_basic.json",
+      "type": "config",
+      "name": "tools_schema_basic.json",
+      "filePath": "data/messages/tools_schema_basic.json",
+      "summary": "Agent 工具定义测试固件，包含 5 个工具的 OpenAPI 风格 function schema 定义：calculator、file_reader、local_file_search、table_analyzer 和 format_converter，每个工具均定义了输入参数和 x-returns 输出 schema。",
+      "tags": ["测试固件", "工具schema", "函数定义", "openapi", "agent工具"],
+      "complexity": "moderate",
+      "languageNotes": "采用 OpenAI function-calling 规范定义工具，通过 x-returns 扩展字段补充输出结构，形成完整的输入/输出契约。"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/ai_message_with_tool_calls.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/b3_tool_call_unknown_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_no_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/tools_schema_basic.json",
+      "target": "config:data/messages/messages_with_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/messages_with_tool.json",
+      "target": "config:data/messages/messages_with_error_tool.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "target": "config:data/messages/b3_tool_call_missing_required.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

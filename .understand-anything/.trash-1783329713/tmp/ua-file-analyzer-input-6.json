@@ -1,0 +1,13 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/docs/agent_intro.txt", "language": "txt", "sizeLines": 3, "fileCategory": "docs"},
+    {"path": "data/docs/search_skill_demo.md", "language": "markdown", "sizeLines": 5, "fileCategory": "docs"},
+    {"path": "data/docs/tool_calling.md", "language": "markdown", "sizeLines": 3, "fileCategory": "docs"}
+  ],
+  "batchImportData": {
+    "data/docs/agent_intro.txt": [],
+    "data/docs/search_skill_demo.md": [],
+    "data/docs/tool_calling.md": []
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "nodes": [
+    {
+      "id": "config:.claude/settings.local.json",
+      "type": "config",
+      "name": "settings.local.json",
+      "filePath": ".claude/settings.local.json",
+      "summary": "Claude Code 本地权限配置，允许 Bash 和 Read 操作以支持 Understand-Anything 插件及 pnpm/node 工具链的运行。",
+      "tags": ["configuration", "permissions", "claude-code", "tooling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Understand-Anything 分析忽略模式文件，采用 .gitignore 语法定义哪些文件/目录应从代码分析中排除。当前所有模式均为注释状态。",
+      "tags": ["configuration", "ignore-patterns", "analysis-scope"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.understand-anything/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".understand-anything/config.json",
+      "summary": "Understand-Anything 插件配置，设置输出语言为中文（zh）。",
+      "tags": ["configuration", "language-setting", "analysis"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:code/common/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "code/common/__init__.py",
+      "summary": "Python 包标记文件，声明 code/common 为共享工具模块，当前仅含一行 docstring，无实际导出。",
+      "tags": ["package-marker", "entry-point", "python-package"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:data/tables/results.csv",
+      "type": "file",
+      "name": "results.csv",
+      "filePath": "data/tables/results.csv",
+      "summary": "Skill 执行基准测试数据，包含 task（任务名）、score（评分）、latency（延迟）三列，共三条记录。",
+      "tags": ["benchmark-data", "skill-results", "tabular-data"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:memory/conversations/conv_000.md",
+      "type": "document",
+      "name": "conv_000.md",
+      "filePath": "memory/conversations/conv_000.md",
+      "summary": "对话记忆文档，记录了一次关于 Agent 概念的问答：用户要求简要定义 Agent，AI 在无工具调用的单轮对话中给出了中文回答，包含完整的消息序列和执行轨迹。",
+      "tags": ["conversation-memory", "agent-log", "trace", "example"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:memory/global/mem_course_001.md",
+      "type": "document",
+      "name": "mem_course_001.md",
+      "filePath": "memory/global/mem_course_001.md",
+      "summary": "全局记忆文档，介绍 Agent 基础概念：Agent 系统由模型、工具、记忆和执行循环四部分组成。",
+      "tags": ["global-memory", "knowledge-base", "agent-concept"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:memory/memory_index.json",
+      "type": "config",
+      "name": "memory_index.json",
+      "filePath": "memory/memory_index.json",
+      "summary": "记忆索引文件，维护 memory_id 到元数据的映射，当前包含两条记录：全局记忆 mem_course_001 和对话记忆 mem_conversation_conv_000，记录类型、标题、摘要、路径和时间戳。",
+      "tags": ["index", "memory-management", "metadata", "json-database"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "models/.gitkeep",
+      "summary": "空占位文件，用于在 Git 仓库中保留空的 models/ 目录结构，供存放本地模型文件。",
+      "tags": ["placeholder", "directory-marker", "git"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:prompts/local_tool_agent.txt",
+      "type": "document",
+      "name": "local_tool_agent.txt",
+      "filePath": "prompts/local_tool_agent.txt",
+      "summary": "本地工具调用 Agent 的系统提示模板，规定了工具使用原则：按需使用工具、不编造文件内容、一次只调用一个工具、等待 ToolMessage 后再决定下一步。被 B1 和 B4 模块引用。",
+      "tags": ["system-prompt", "agent-instruction", "tool-use", "template"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "项目完整文档，涵盖 Agent 框架概述（B1-B5 模块架构）、环境准备、公共数据格式（SkillResult/AIMessage/ToolMessage）、各模块详细说明（命令行、输入输出文件）、完整演示流程、CLI 退出码和输出文件附录，共 10 个章节。",
+      "tags": ["documentation", "entry-point", "project-overview", "usage-guide", "tutorial"],
+      "complexity": "complex",
+      "languageNotes": "文档以中文撰写，包含大量 Markdown 表格和代码块，系统地记录了从环境搭建到全流程演示的完整操作步骤。"
+    },
+    {
+      "id": "document:requirements.txt",
+      "type": "document",
+      "name": "requirements.txt",
+      "filePath": "requirements.txt",
+      "summary": "Python 项目依赖清单，基于 Python 3.10，包含 PyTorch 2.7.1（CUDA 11.8）、Transformers 5.12.1、Accelerate 等深度学习推理核心库及配套工具。",
+      "tags": ["dependencies", "python", "machine-learning", "environment"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:skills/calculator.py",
+      "type": "file",
+      "name": "calculator.py",
+      "filePath": "skills/calculator.py",
+      "summary": "计算器 Skill 实现，使用 Python AST 解析器安全地求值算术表达式，支持加减乘除、整除、取模、幂运算及一元正负号，内置指数幅度和结果范围安全检查。",
+      "tags": ["skill", "calculator", "ast-evaluation", "arithmetic", "safe-computation"],
+      "complexity": "moderate",
+      "languageNotes": "通过 ast.parse(mode='eval') + 递归 AST 遍历实现安全求值，避免 eval() 的代码注入风险。限制指数 <=12、结果绝对值 <=1e100、表达式长度 <=200 字符。"
+    },
+    {
+      "id": "file:skills/format_converter.py",
+      "type": "file",
+      "name": "format_converter.py",
+      "filePath": "skills/format_converter.py",
+      "summary": "格式转换 Skill 实现，将文本转换为 Markdown 无序列表或 JSON 格式。支持原生 JSON 解析和 key:value 行解析两种输入方式，自动生成输出文件并处理文件名冲突。",
+      "tags": ["skill", "format-conversion", "markdown", "json", "file-output"],
+      "complexity": "moderate",
+      "languageNotes": "使用 pathlib 进行跨平台路径处理，输出文件冲突时自动添加数字后缀避免覆盖。默认输出目录为 outputs/format_converter_files/。"
+    },
+    {
+      "id": "function:skills/calculator.py:_evaluate",
+      "type": "function",
+      "name": "_evaluate",
+      "filePath": "skills/calculator.py",
+      "lineRange": [20, 36],
+      "summary": "递归遍历 AST 节点树求值算术表达式，处理 Expression、Constant、UnaryOp 和 BinOp 四种节点类型，内置安全范围检查。",
+      "tags": ["utility", "recursive", "ast-evaluator", "arithmetic"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:skills/calculator.py:calculator",
+      "type": "function",
+      "name": "calculator",
+      "filePath": "skills/calculator.py",
+      "lineRange": [39, 48],
+      "summary": "计算器 Skill 入口函数，验证输入字符串后通过 AST 解析并调用 _evaluate 求值，返回包含 result 的字典。",
+      "tags": ["entry-point", "skill-function", "safe-evaluation", "arithmetic"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:_parse_key_value_lines",
+      "type": "function",
+      "name": "_parse_key_value_lines",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [12, 25],
+      "summary": "将文本按行解析为 key:value 字典，检测无效格式和重复键并抛出 ValueError。",
+      "tags": ["utility", "parser", "key-value"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:_safe_output_path",
+      "type": "function",
+      "name": "_safe_output_path",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [28, 40],
+      "summary": "根据输出目录、文件名和目标格式生成安全的输出路径，自动处理文件名冲突（添加递增数字后缀）。",
+      "tags": ["utility", "filesystem", "path-resolution"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:skills/format_converter.py:format_converter",
+      "type": "function",
+      "name": "format_converter",
+      "filePath": "skills/format_converter.py",
+      "lineRange": [50, 71],
+      "summary": "格式转换 Skill 入口函数，将输入文本转换为 Markdown 无序列表或 JSON 格式，写入输出文件并返回格式化文本和文件路径。",
+      "tags": ["entry-point", "skill-function", "format-conversion"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:_evaluate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_parse_key_value_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:_safe_output_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:skills/calculator.py",
+      "target": "function:skills/calculator.py:calculator",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:skills/format_converter.py",
+      "target": "function:skills/format_converter.py:format_converter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/global/mem_course_001.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:memory/memory_index.json",
+      "target": "document:memory/conversations/conv_000.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:requirements.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:prompts/local_tool_agent.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/calculator.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:skills/format_converter.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:memory/memory_index.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.claude/settings.local.json",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:.understand-anything/.understandignore",
+      "target": "config:.understand-anything/config.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

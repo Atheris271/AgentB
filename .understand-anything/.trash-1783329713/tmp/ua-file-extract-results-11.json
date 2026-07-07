@@ -1,0 +1,21 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    ".claude/settings.local.json",
+    ".understand-anything/.understandignore",
+    ".understand-anything/config.json",
+    "code/common/__init__.py",
+    "data/tables/results.csv",
+    "memory/conversations/conv_000.md",
+    "memory/global/mem_course_001.md",
+    "memory/memory_index.json",
+    "models/.gitkeep",
+    "prompts/local_tool_agent.txt",
+    "README.md",
+    "requirements.txt",
+    "skills/calculator.py",
+    "skills/format_converter.py"
+  ],
+  "results": []
+}

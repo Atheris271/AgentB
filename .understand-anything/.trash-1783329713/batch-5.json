@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "config:data/b1_fixtures/b1_fixture_input.json",
+      "type": "config",
+      "name": "b1_fixture_input.json",
+      "filePath": "data/b1_fixtures/b1_fixture_input.json",
+      "summary": "B1 Agent 集成测试的固件入口配置，定义执行模式、对话参数、用户输入（要求阅读 docs/agent_intro.txt 并总结中文要点）、系统提示词路径、工具集及预设消息/记忆/工具结果文件的引用。",
+      "tags": ["configuration", "test-fixture", "agent-testing", "integration-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "config",
+      "name": "preset_ai_messages.json",
+      "filePath": "data/b1_fixtures/preset_ai_messages.json",
+      "summary": "预设的 AI 助手消息序列，模拟 B1 Agent 在集成测试中的两轮回复：第一轮发起 file_reader 工具调用读取 agent_intro.txt，第二轮返回三条中文要点总结（Agent 系统组成、工具调用能力、Memory 作用）。",
+      "tags": ["test-fixture", "ai-response", "message-preset", "tool-call"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_memory.json",
+      "type": "config",
+      "name": "preset_memory.json",
+      "filePath": "data/b1_fixtures/preset_memory.json",
+      "summary": "预设的 Memory 选择结果，包含一条 global 类型的记忆文档（标题「Fixture Agent 基础概念」），内容介绍 Agent 系统的模型-工具-记忆-执行循环组成，用于集成测试中模拟记忆检索的返回。",
+      "tags": ["test-fixture", "memory-preset", "mock-data"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "config",
+      "name": "preset_tool_messages.json",
+      "filePath": "data/b1_fixtures/preset_tool_messages.json",
+      "summary": "预设的工具调用结果，以 call_fixture_001 为键模拟 file_reader 工具成功读取 docs/agent_intro.txt 后的返回内容（92 字符的 Agent 系统介绍文本），配合 preset_ai_messages.json 共同构成 B1 Agent 集成测试的完整对话模拟。",
+      "tags": ["test-fixture", "tool-result", "mock-data"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_ai_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_memory.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/b1_fixture_input.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/b1_fixtures/preset_ai_messages.json",
+      "target": "config:data/b1_fixtures/preset_tool_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

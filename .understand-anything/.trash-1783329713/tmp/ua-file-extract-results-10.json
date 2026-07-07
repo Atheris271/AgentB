@@ -1,0 +1,17 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "data/tool_inputs/tool_input_calculator.json",
+    "data/tool_inputs/tool_input_calculator_error.json",
+    "data/tool_inputs/tool_input_file_reader.json",
+    "data/tool_inputs/tool_input_file_reader_error.json",
+    "data/tool_inputs/tool_input_file_search.json",
+    "data/tool_inputs/tool_input_file_search_error.json",
+    "data/tool_inputs/tool_input_format_converter.json",
+    "data/tool_inputs/tool_input_format_converter_error.json",
+    "data/tool_inputs/tool_input_table_analyzer.json",
+    "data/tool_inputs/tool_input_table_analyzer_error.json"
+  ],
+  "results": []
+}

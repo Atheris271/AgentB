@@ -1,0 +1,1021 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 69,
+  "totalBatches": 11,
+  "exportsByPath": {
+    ".understand-anything/.understandignore": [],
+    "code/b1_agent_runtime.py": [
+      "_validate_runtime_input",
+      "_memory_context",
+      "_default_llm_mode",
+      "generate_ai_message",
+      "_load_fixture_inputs",
+      "_fixture_tool_messages",
+      "run_agent",
+      "build_parser",
+      "main"
+    ],
+    "code/b2_run_skill.py": [
+      "run_skill",
+      "build_parser",
+      "main"
+    ],
+    "code/b3_tool_layer.py": [
+      "_load_tools_config",
+      "_resolve_toolset",
+      "_parameter_schema",
+      "get_tools_schema",
+      "_validate_args",
+      "_error_result",
+      "execute_tool_calls",
+      "build_parser",
+      "main"
+    ],
+    "code/b4_local_agent_llm.py": [
+      "_load_model_config",
+      "_artifact_paths",
+      "_extract_tool_result",
+      "_three_points",
+      "_mock_generate",
+      "_parse_tool_calls_fragment",
+      "_parse_json_with_backtick_tail",
+      "_candidate_to_message",
+      "_parse_model_output",
+      "_dtype_value",
+      "_model_cache_key",
+      "_load_model_bundle",
+      "_build_prompt_messages",
+      "_prompt_json_generate",
+      "generate_ai_message",
+      "build_parser",
+      "main"
+    ],
+    "code/b5_memory.py": [
+      "_memory_paths",
+      "_read_index",
+      "load_memory",
+      "_safe_conversation_id",
+      "save_memory",
+      "parse_bool",
+      "build_parser",
+      "main"
+    ],
+    "code/common/__init__.py": [],
+    "code/common/io_utils.py": [
+      "ensure_dir",
+      "read_text",
+      "_atomic_write_text",
+      "write_text",
+      "read_json",
+      "write_json",
+      "read_yaml",
+      "write_jsonl",
+      "append_jsonl"
+    ],
+    "code/common/logging_utils.py": [
+      "now_iso",
+      "measure_latency",
+      "append_run_log"
+    ],
+    "code/common/path_utils.py": [
+      "bootstrap_project_root",
+      "resolve_path",
+      "resolve_cli_path",
+      "resolve_from_file",
+      "require_within"
+    ],
+    "code/common/schemas.py": [
+      "make_ai_message",
+      "make_tool_message",
+      "make_skill_result",
+      "normalize_tool_call",
+      "validate_ai_message",
+      "validate_messages"
+    ],
+    "code/run_full_demo.py": [
+      "_build_report",
+      "build_parser",
+      "main"
+    ],
+    "models/.gitkeep": [],
+    "skills/__init__.py": [
+      "resolve_data_path"
+    ],
+    "skills/calculator.py": [
+      "_evaluate",
+      "calculator"
+    ],
+    "skills/file_reader.py": [
+      "file_reader"
+    ],
+    "skills/format_converter.py": [
+      "_parse_key_value_lines",
+      "_safe_output_path",
+      "_write_output_file",
+      "format_converter"
+    ],
+    "skills/local_file_search.py": [
+      "_snippet",
+      "local_file_search"
+    ],
+    "skills/table_analyzer.py": [
+      "table_analyzer"
+    ]
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "code/b1_agent_runtime.py",
+          "language": "python",
+          "sizeLines": 371,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/b5_memory.py",
+          "language": "python",
+          "sizeLines": 282,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/common/io_utils.py",
+          "language": "python",
+          "sizeLines": 61,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/common/logging_utils.py",
+          "language": "python",
+          "sizeLines": 27,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/run_full_demo.py",
+          "language": "python",
+          "sizeLines": 68,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "code/b1_agent_runtime.py": [
+          "code/common/io_utils.py",
+          "code/common/logging_utils.py",
+          "code/common/path_utils.py",
+          "code/common/schemas.py"
+        ],
+        "code/b5_memory.py": [
+          "code/common/io_utils.py",
+          "code/common/logging_utils.py",
+          "code/common/path_utils.py"
+        ],
+        "code/common/io_utils.py": [],
+        "code/common/logging_utils.py": [
+          "code/common/io_utils.py"
+        ],
+        "code/run_full_demo.py": [
+          "code/b1_agent_runtime.py",
+          "code/common/io_utils.py",
+          "code/common/path_utils.py"
+        ]
+      },
+      "neighborMap": {
+        "code/b1_agent_runtime.py": [
+          {
+            "path": "code/common/path_utils.py",
+            "batchIndex": 2,
+            "symbols": [
+              "bootstrap_project_root",
+              "resolve_path",
+              "resolve_cli_path",
+              "resolve_from_file",
+              "require_within"
+            ]
+          },
+          {
+            "path": "code/common/schemas.py",
+            "batchIndex": 2,
+            "symbols": [
+              "make_ai_message",
+              "make_tool_message",
+              "make_skill_result",
+              "normalize_tool_call",
+              "validate_ai_message",
+              "validate_messages"
+            ]
+          }
+        ],
+        "code/b5_memory.py": [
+          {
+            "path": "code/common/path_utils.py",
+            "batchIndex": 2,
+            "symbols": [
+              "bootstrap_project_root",
+              "resolve_path",
+              "resolve_cli_path",
+              "resolve_from_file",
+              "require_within"
+            ]
+          }
+        ],
+        "code/common/io_utils.py": [
+          {
+            "path": "code/b2_run_skill.py",
+            "batchIndex": 2,
+            "symbols": [
+              "run_skill",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/b3_tool_layer.py",
+            "batchIndex": 2,
+            "symbols": [
+              "_load_tools_config",
+              "_resolve_toolset",
+              "_parameter_schema",
+              "get_tools_schema",
+              "_validate_args",
+              "_error_result",
+              "execute_tool_calls",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/b4_local_agent_llm.py",
+            "batchIndex": 2,
+            "symbols": [
+              "_load_model_config",
+              "_artifact_paths",
+              "_extract_tool_result",
+              "_three_points",
+              "_mock_generate",
+              "_parse_tool_calls_fragment",
+              "_parse_json_with_backtick_tail",
+              "_candidate_to_message",
+              "_parse_model_output",
+              "_dtype_value",
+              "_model_cache_key",
+              "_load_model_bundle",
+              "_build_prompt_messages",
+              "_prompt_json_generate",
+              "generate_ai_message",
+              "build_parser",
+              "main"
+            ]
+          }
+        ],
+        "code/common/logging_utils.py": [
+          {
+            "path": "code/b2_run_skill.py",
+            "batchIndex": 2,
+            "symbols": [
+              "run_skill",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/b3_tool_layer.py",
+            "batchIndex": 2,
+            "symbols": [
+              "_load_tools_config",
+              "_resolve_toolset",
+              "_parameter_schema",
+              "get_tools_schema",
+              "_validate_args",
+              "_error_result",
+              "execute_tool_calls",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/b4_local_agent_llm.py",
+            "batchIndex": 2,
+            "symbols": [
+              "_load_model_config",
+              "_artifact_paths",
+              "_extract_tool_result",
+              "_three_points",
+              "_mock_generate",
+              "_parse_tool_calls_fragment",
+              "_parse_json_with_backtick_tail",
+              "_candidate_to_message",
+              "_parse_model_output",
+              "_dtype_value",
+              "_model_cache_key",
+              "_load_model_bundle",
+              "_build_prompt_messages",
+              "_prompt_json_generate",
+              "generate_ai_message",
+              "build_parser",
+              "main"
+            ]
+          }
+        ],
+        "code/run_full_demo.py": [
+          {
+            "path": "code/common/path_utils.py",
+            "batchIndex": 2,
+            "symbols": [
+              "bootstrap_project_root",
+              "resolve_path",
+              "resolve_cli_path",
+              "resolve_from_file",
+              "require_within"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": "code/b2_run_skill.py",
+          "language": "python",
+          "sizeLines": 92,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/b3_tool_layer.py",
+          "language": "python",
+          "sizeLines": 251,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/b4_local_agent_llm.py",
+          "language": "python",
+          "sizeLines": 446,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/common/path_utils.py",
+          "language": "python",
+          "sizeLines": 40,
+          "fileCategory": "code"
+        },
+        {
+          "path": "code/common/schemas.py",
+          "language": "python",
+          "sizeLines": 112,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "code/b2_run_skill.py": [
+          "code/common/io_utils.py",
+          "code/common/logging_utils.py",
+          "code/common/path_utils.py",
+          "code/common/schemas.py"
+        ],
+        "code/b3_tool_layer.py": [
+          "code/common/io_utils.py",
+          "code/common/logging_utils.py",
+          "code/common/path_utils.py",
+          "code/common/schemas.py"
+        ],
+        "code/b4_local_agent_llm.py": [
+          "code/common/io_utils.py",
+          "code/common/logging_utils.py",
+          "code/common/path_utils.py",
+          "code/common/schemas.py"
+        ],
+        "code/common/path_utils.py": [],
+        "code/common/schemas.py": []
+      },
+      "neighborMap": {
+        "code/b2_run_skill.py": [
+          {
+            "path": "code/common/io_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "ensure_dir",
+              "read_text",
+              "_atomic_write_text",
+              "write_text",
+              "read_json",
+              "write_json",
+              "read_yaml",
+              "write_jsonl",
+              "append_jsonl"
+            ]
+          },
+          {
+            "path": "code/common/logging_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "now_iso",
+              "measure_latency",
+              "append_run_log"
+            ]
+          }
+        ],
+        "code/b3_tool_layer.py": [
+          {
+            "path": "code/common/io_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "ensure_dir",
+              "read_text",
+              "_atomic_write_text",
+              "write_text",
+              "read_json",
+              "write_json",
+              "read_yaml",
+              "write_jsonl",
+              "append_jsonl"
+            ]
+          },
+          {
+            "path": "code/common/logging_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "now_iso",
+              "measure_latency",
+              "append_run_log"
+            ]
+          }
+        ],
+        "code/b4_local_agent_llm.py": [
+          {
+            "path": "code/common/io_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "ensure_dir",
+              "read_text",
+              "_atomic_write_text",
+              "write_text",
+              "read_json",
+              "write_json",
+              "read_yaml",
+              "write_jsonl",
+              "append_jsonl"
+            ]
+          },
+          {
+            "path": "code/common/logging_utils.py",
+            "batchIndex": 1,
+            "symbols": [
+              "now_iso",
+              "measure_latency",
+              "append_run_log"
+            ]
+          }
+        ],
+        "code/common/path_utils.py": [
+          {
+            "path": "code/b1_agent_runtime.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_validate_runtime_input",
+              "_memory_context",
+              "_default_llm_mode",
+              "generate_ai_message",
+              "_load_fixture_inputs",
+              "_fixture_tool_messages",
+              "run_agent",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/b5_memory.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_memory_paths",
+              "_read_index",
+              "load_memory",
+              "_safe_conversation_id",
+              "save_memory",
+              "parse_bool",
+              "build_parser",
+              "main"
+            ]
+          },
+          {
+            "path": "code/run_full_demo.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_build_report",
+              "build_parser",
+              "main"
+            ]
+          }
+        ],
+        "code/common/schemas.py": [
+          {
+            "path": "code/b1_agent_runtime.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_validate_runtime_input",
+              "_memory_context",
+              "_default_llm_mode",
+              "generate_ai_message",
+              "_load_fixture_inputs",
+              "_fixture_tool_messages",
+              "run_agent",
+              "build_parser",
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": "skills/__init__.py",
+          "language": "python",
+          "sizeLines": 19,
+          "fileCategory": "code"
+        },
+        {
+          "path": "skills/file_reader.py",
+          "language": "python",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": "skills/local_file_search.py",
+          "language": "python",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "skills/table_analyzer.py",
+          "language": "python",
+          "sizeLines": 53,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "skills/__init__.py": [],
+        "skills/file_reader.py": [
+          "skills/__init__.py"
+        ],
+        "skills/local_file_search.py": [
+          "skills/__init__.py"
+        ],
+        "skills/table_analyzer.py": [
+          "skills/__init__.py"
+        ]
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": "configs/memory.yaml",
+          "language": "yaml",
+          "sizeLines": 6,
+          "fileCategory": "config"
+        },
+        {
+          "path": "configs/memory_small_limit.yaml",
+          "language": "yaml",
+          "sizeLines": 6,
+          "fileCategory": "config"
+        },
+        {
+          "path": "configs/model.yaml",
+          "language": "yaml",
+          "sizeLines": 28,
+          "fileCategory": "config"
+        },
+        {
+          "path": "configs/tools.yaml",
+          "language": "yaml",
+          "sizeLines": 90,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "configs/memory.yaml": [],
+        "configs/memory_small_limit.yaml": [],
+        "configs/model.yaml": [],
+        "configs/tools.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": "data/b1_fixtures/b1_fixture_input.json",
+          "language": "json",
+          "sizeLines": 15,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/b1_fixtures/preset_ai_messages.json",
+          "language": "json",
+          "sizeLines": 21,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/b1_fixtures/preset_memory.json",
+          "language": "json",
+          "sizeLines": 20,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/b1_fixtures/preset_tool_messages.json",
+          "language": "json",
+          "sizeLines": 9,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "data/b1_fixtures/b1_fixture_input.json": [],
+        "data/b1_fixtures/preset_ai_messages.json": [],
+        "data/b1_fixtures/preset_memory.json": [],
+        "data/b1_fixtures/preset_tool_messages.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "data/docs/agent_intro.txt",
+          "language": "txt",
+          "sizeLines": 3,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "data/docs/search_skill_demo.md",
+          "language": "markdown",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "data/docs/tool_calling.md",
+          "language": "markdown",
+          "sizeLines": 3,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "data/docs/agent_intro.txt": [],
+        "data/docs/search_skill_demo.md": [],
+        "data/docs/tool_calling.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": "data/llm_input.json",
+          "language": "json",
+          "sizeLines": 5,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input_0.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input_2.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input_3.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input_4.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/runtime_input_5.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "data/llm_input.json": [],
+        "data/runtime_input.json": [],
+        "data/runtime_input_0.json": [],
+        "data/runtime_input_2.json": [],
+        "data/runtime_input_3.json": [],
+        "data/runtime_input_4.json": [],
+        "data/runtime_input_5.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": "data/memory_inputs/memory_save_global_input.json",
+          "language": "json",
+          "sizeLines": 7,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/memory_inputs/memory_save_input.json",
+          "language": "json",
+          "sizeLines": 7,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/memory_inputs/sample_final_answer.md",
+          "language": "markdown",
+          "sizeLines": 1,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "data/memory_inputs/sample_messages.json",
+          "language": "json",
+          "sizeLines": 5,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/memory_inputs/sample_trace.json",
+          "language": "json",
+          "sizeLines": 7,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "data/memory_inputs/memory_save_global_input.json": [],
+        "data/memory_inputs/memory_save_input.json": [],
+        "data/memory_inputs/sample_final_answer.md": [],
+        "data/memory_inputs/sample_messages.json": [],
+        "data/memory_inputs/sample_trace.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": "data/messages/ai_message_with_tool_calls.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/b3_tool_call_format_converter_valid.json",
+          "language": "json",
+          "sizeLines": 13,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/b3_tool_call_missing_required.json",
+          "language": "json",
+          "sizeLines": 9,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/b3_tool_call_unknown_tool.json",
+          "language": "json",
+          "sizeLines": 9,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/messages_no_tool.json",
+          "language": "json",
+          "sizeLines": 4,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/messages_with_error_tool.json",
+          "language": "json",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/messages_with_tool.json",
+          "language": "json",
+          "sizeLines": 18,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/messages/tools_schema_basic.json",
+          "language": "json",
+          "sizeLines": 130,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "data/messages/ai_message_with_tool_calls.json": [],
+        "data/messages/b3_tool_call_format_converter_valid.json": [],
+        "data/messages/b3_tool_call_missing_required.json": [],
+        "data/messages/b3_tool_call_unknown_tool.json": [],
+        "data/messages/messages_no_tool.json": [],
+        "data/messages/messages_with_error_tool.json": [],
+        "data/messages/messages_with_tool.json": [],
+        "data/messages/tools_schema_basic.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 10,
+      "files": [
+        {
+          "path": "data/tool_inputs/tool_input_calculator.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_calculator_error.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_file_reader.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_file_reader_error.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_file_search.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_file_search_error.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_format_converter.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_format_converter_error.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_table_analyzer.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "data/tool_inputs/tool_input_table_analyzer_error.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "data/tool_inputs/tool_input_calculator.json": [],
+        "data/tool_inputs/tool_input_calculator_error.json": [],
+        "data/tool_inputs/tool_input_file_reader.json": [],
+        "data/tool_inputs/tool_input_file_reader_error.json": [],
+        "data/tool_inputs/tool_input_file_search.json": [],
+        "data/tool_inputs/tool_input_file_search_error.json": [],
+        "data/tool_inputs/tool_input_format_converter.json": [],
+        "data/tool_inputs/tool_input_format_converter_error.json": [],
+        "data/tool_inputs/tool_input_table_analyzer.json": [],
+        "data/tool_inputs/tool_input_table_analyzer_error.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": ".claude/settings.local.json",
+          "language": "json",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/.understandignore",
+          "language": "unknown",
+          "sizeLines": 35,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".understand-anything/config.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "code/common/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "data/tables/results.csv",
+          "language": "csv",
+          "sizeLines": 4,
+          "fileCategory": "data"
+        },
+        {
+          "path": "memory/conversations/conv_000.md",
+          "language": "markdown",
+          "sizeLines": 64,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "memory/global/mem_course_001.md",
+          "language": "markdown",
+          "sizeLines": 3,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "memory/memory_index.json",
+          "language": "json",
+          "sizeLines": 22,
+          "fileCategory": "config"
+        },
+        {
+          "path": "models/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "prompts/local_tool_agent.txt",
+          "language": "txt",
+          "sizeLines": 1,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "README.md",
+          "language": "markdown",
+          "sizeLines": 514,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "requirements.txt",
+          "language": "txt",
+          "sizeLines": 20,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "skills/calculator.py",
+          "language": "python",
+          "sizeLines": 48,
+          "fileCategory": "code"
+        },
+        {
+          "path": "skills/format_converter.py",
+          "language": "python",
+          "sizeLines": 71,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        ".claude/settings.local.json": [],
+        ".understand-anything/.understandignore": [],
+        ".understand-anything/config.json": [],
+        "code/common/__init__.py": [],
+        "data/tables/results.csv": [],
+        "memory/conversations/conv_000.md": [],
+        "memory/global/mem_course_001.md": [],
+        "memory/memory_index.json": [],
+        "models/.gitkeep": [],
+        "prompts/local_tool_agent.txt": [],
+        "README.md": [],
+        "requirements.txt": [],
+        "skills/calculator.py": [],
+        "skills/format_converter.py": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/memory_inputs/memory_save_global_input.json", "language": "json", "sizeLines": 7, "fileCategory": "config"},
+    {"path": "data/memory_inputs/memory_save_input.json", "language": "json", "sizeLines": 7, "fileCategory": "config"},
+    {"path": "data/memory_inputs/sample_final_answer.md", "language": "markdown", "sizeLines": 1, "fileCategory": "docs"},
+    {"path": "data/memory_inputs/sample_messages.json", "language": "json", "sizeLines": 5, "fileCategory": "config"},
+    {"path": "data/memory_inputs/sample_trace.json", "language": "json", "sizeLines": 7, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "data/memory_inputs/memory_save_global_input.json": [],
+    "data/memory_inputs/memory_save_input.json": [],
+    "data/memory_inputs/sample_final_answer.md": [],
+    "data/memory_inputs/sample_messages.json": [],
+    "data/memory_inputs/sample_trace.json": []
+  }
+}

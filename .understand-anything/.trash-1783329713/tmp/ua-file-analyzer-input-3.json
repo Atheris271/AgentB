@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "skills/__init__.py", "language": "python", "sizeLines": 19, "fileCategory": "code"},
+    {"path": "skills/file_reader.py", "language": "python", "sizeLines": 21, "fileCategory": "code"},
+    {"path": "skills/local_file_search.py", "language": "python", "sizeLines": 55, "fileCategory": "code"},
+    {"path": "skills/table_analyzer.py", "language": "python", "sizeLines": 53, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "skills/__init__.py": [],
+    "skills/file_reader.py": ["skills/__init__.py"],
+    "skills/local_file_search.py": ["skills/__init__.py"],
+    "skills/table_analyzer.py": ["skills/__init__.py"]
+  }
+}

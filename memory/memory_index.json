@@ -1,0 +1,22 @@
+{
+  "mem_course_001": {
+    "memory_id": "mem_course_001",
+    "memory_type": "global",
+    "title": "Agent 基础概念",
+    "summary": "Agent 系统由模型、工具、记忆和执行循环组成。",
+    "path": "global/mem_course_001.md",
+    "conversation_id": null,
+    "created_at": "2026-06-20T00:00:00+08:00",
+    "updated_at": "2026-06-20T00:00:00+08:00"
+  },
+  "mem_conversation_conv_000": {
+    "memory_id": "mem_conversation_conv_000",
+    "memory_type": "conversation",
+    "title": "Conversation conv_000",
+    "summary": "Agent（智能体）是指能够自主感知环境、规划行动并执行任务的智能系统。它通常具备感知、决策和执行三个核心能力，能够根据目标动态调整行为，无需人类持续干预即可完成任务。在人工智能领域，Agent 可以是简单的规则系统，也可以是复杂的深度学习模型，广泛应用于自动化、机器人、客户服务等场景。",
+    "path": "conversations/conv_000.md",
+    "conversation_id": "conv_000",
+    "created_at": "2026-06-22T14:07:46+00:00",
+    "updated_at": "2026-06-22T14:07:46+00:00"
+  }
+}

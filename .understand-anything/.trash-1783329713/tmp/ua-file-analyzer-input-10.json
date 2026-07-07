@@ -1,0 +1,27 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/tool_inputs/tool_input_calculator.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_calculator_error.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_file_reader.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_file_reader_error.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_file_search.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_file_search_error.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_format_converter.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_format_converter_error.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_table_analyzer.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "data/tool_inputs/tool_input_table_analyzer_error.json", "language": "json", "sizeLines": 1, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "data/tool_inputs/tool_input_calculator.json": [],
+    "data/tool_inputs/tool_input_calculator_error.json": [],
+    "data/tool_inputs/tool_input_file_reader.json": [],
+    "data/tool_inputs/tool_input_file_reader_error.json": [],
+    "data/tool_inputs/tool_input_file_search.json": [],
+    "data/tool_inputs/tool_input_file_search_error.json": [],
+    "data/tool_inputs/tool_input_format_converter.json": [],
+    "data/tool_inputs/tool_input_format_converter_error.json": [],
+    "data/tool_inputs/tool_input_table_analyzer.json": [],
+    "data/tool_inputs/tool_input_table_analyzer_error.json": []
+  }
+}

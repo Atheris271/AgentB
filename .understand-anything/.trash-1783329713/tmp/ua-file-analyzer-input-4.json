@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "configs/memory.yaml", "language": "yaml", "sizeLines": 6, "fileCategory": "config"},
+    {"path": "configs/memory_small_limit.yaml", "language": "yaml", "sizeLines": 6, "fileCategory": "config"},
+    {"path": "configs/model.yaml", "language": "yaml", "sizeLines": 28, "fileCategory": "config"},
+    {"path": "configs/tools.yaml", "language": "yaml", "sizeLines": 90, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "configs/memory.yaml": [],
+    "configs/memory_small_limit.yaml": [],
+    "configs/model.yaml": [],
+    "configs/tools.yaml": []
+  }
+}

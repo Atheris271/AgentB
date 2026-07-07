@@ -1,0 +1,11 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "configs/memory.yaml",
+    "configs/memory_small_limit.yaml",
+    "configs/model.yaml",
+    "configs/tools.yaml"
+  ],
+  "results": []
+}

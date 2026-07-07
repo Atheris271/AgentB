@@ -1,0 +1,14 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "data/llm_input.json",
+    "data/runtime_input.json",
+    "data/runtime_input_0.json",
+    "data/runtime_input_2.json",
+    "data/runtime_input_3.json",
+    "data/runtime_input_4.json",
+    "data/runtime_input_5.json"
+  ],
+  "results": []
+}

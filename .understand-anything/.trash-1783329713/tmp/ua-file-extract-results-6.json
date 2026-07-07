@@ -1,0 +1,10 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "data/docs/agent_intro.txt",
+    "data/docs/search_skill_demo.md",
+    "data/docs/tool_calling.md"
+  ],
+  "results": []
+}

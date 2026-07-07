@@ -1,0 +1,1766 @@
+[
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_memory_context",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:run_agent",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:_memory_paths",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:_read_index",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:load_memory",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:save_memory",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:ensure_dir",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:_atomic_write_text",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:write_jsonl",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "function:code/common/logging_utils.py:measure_latency",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "function:code/common/logging_utils.py:append_run_log",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "function:code/run_full_demo.py:_build_report",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "function:code/run_full_demo.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_validate_runtime_input",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_memory_context",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:generate_ai_message",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:_fixture_tool_messages",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:run_agent",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "function:code/b1_agent_runtime.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:_memory_paths",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:_read_index",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:load_memory",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:save_memory",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "function:code/b5_memory.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:ensure_dir",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:_atomic_write_text",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:write_jsonl",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/io_utils.py",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "function:code/common/logging_utils.py:measure_latency",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "function:code/common/logging_utils.py:append_run_log",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "function:code/run_full_demo.py:_build_report",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "function:code/run_full_demo.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b5_memory.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/common/logging_utils.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/b1_agent_runtime.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/run_full_demo.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:_load_fixture_inputs",
+    "target": "function:code/common/schemas.py:validate_ai_message",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/b5_memory.py:load_memory",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b1_agent_runtime.py:run_agent",
+    "target": "function:code/b5_memory.py:save_memory",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:_memory_paths",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:_read_index",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:load_memory",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:load_memory",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:save_memory",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:save_memory",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:save_memory",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:main",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:_memory_paths",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b5_memory.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/common/logging_utils.py:append_run_log",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/run_full_demo.py:_build_report",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/run_full_demo.py:main",
+    "target": "function:code/b1_agent_runtime.py:run_agent",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/run_full_demo.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/b5_memory.py",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/b3_tool_layer.py",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "file:code/b1_agent_runtime.py",
+    "target": "file:code/b4_local_agent_llm.py",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:run_skill",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:build_parser",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:run_skill",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:build_parser",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "function:code/b2_run_skill.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b2_run_skill.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "function:code/b2_run_skill.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b2_run_skill.py:main",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b2_run_skill.py:main",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b2_run_skill.py:main",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b2_run_skill.py:main",
+    "target": "function:code/common/logging_utils.py:now_iso",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/logging_utils.py:now_iso",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "target": "function:code/common/logging_utils.py:now_iso",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b2_run_skill.py:run_skill",
+    "target": "function:code/common/schemas.py:make_skill_result",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:_parameter_schema",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:get_tools_schema",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:_validate_args",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:build_parser",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:get_tools_schema",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:build_parser",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "function:code/b3_tool_layer.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b3_tool_layer.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:main",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:get_tools_schema",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:get_tools_schema",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/schemas.py:make_skill_result",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/schemas.py:make_tool_message",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+    "target": "function:code/common/schemas.py:normalize_tool_call",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_three_points",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_mock_generate",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_dtype_value",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_model_cache_key",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:build_parser",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:main",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:build_parser",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "function:code/b4_local_agent_llm.py:main",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/io_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/logging_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/path_utils.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "file:code/b4_local_agent_llm.py",
+    "target": "file:code/common/schemas.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:main",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:main",
+    "target": "function:code/common/io_utils.py:read_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "target": "function:code/common/io_utils.py:read_yaml",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "target": "function:code/common/io_utils.py:append_jsonl",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "target": "function:code/common/io_utils.py:write_json",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:_mock_generate",
+    "target": "function:code/common/schemas.py:make_ai_message",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+    "target": "function:code/common/schemas.py:validate_ai_message",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+    "target": "function:code/common/schemas.py:validate_messages",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:bootstrap_project_root",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_path",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:require_within",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:bootstrap_project_root",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_path",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_cli_path",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:resolve_from_file",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/path_utils.py",
+    "target": "function:code/common/path_utils.py:require_within",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_ai_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_tool_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_skill_result",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:normalize_tool_call",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:validate_ai_message",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:validate_messages",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_ai_message",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_tool_message",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:make_skill_result",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:normalize_tool_call",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:validate_ai_message",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:code/common/schemas.py",
+    "target": "function:code/common/schemas.py:validate_messages",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/__init__.py",
+    "target": "function:skills/__init__.py:resolve_data_path",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/__init__.py",
+    "target": "function:skills/__init__.py:resolve_data_path",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/file_reader.py",
+    "target": "function:skills/file_reader.py:file_reader",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/file_reader.py",
+    "target": "function:skills/file_reader.py:file_reader",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/file_reader.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "function:skills/file_reader.py:file_reader",
+    "target": "function:skills/__init__.py:resolve_data_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/local_file_search.py",
+    "target": "function:skills/local_file_search.py:local_file_search",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/local_file_search.py",
+    "target": "function:skills/local_file_search.py:local_file_search",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/local_file_search.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "function:skills/local_file_search.py:local_file_search",
+    "target": "function:skills/__init__.py:resolve_data_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/table_analyzer.py",
+    "target": "function:skills/table_analyzer.py:table_analyzer",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/table_analyzer.py",
+    "target": "function:skills/table_analyzer.py:table_analyzer",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/table_analyzer.py",
+    "target": "file:skills/__init__.py",
+    "type": "imports",
+    "direction": "forward",
+    "weight": 0.7
+  },
+  {
+    "source": "function:skills/table_analyzer.py:table_analyzer",
+    "target": "function:skills/__init__.py:resolve_data_path",
+    "type": "calls",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "config:configs/memory_small_limit.yaml",
+    "target": "config:configs/memory.yaml",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:configs/tools.yaml",
+    "target": "file:skills/calculator.py",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:configs/tools.yaml",
+    "target": "file:skills/file_reader.py",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:configs/tools.yaml",
+    "target": "file:skills/local_file_search.py",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:configs/tools.yaml",
+    "target": "file:skills/table_analyzer.py",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:configs/tools.yaml",
+    "target": "file:skills/format_converter.py",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:configs/model.yaml",
+    "target": "config:configs/tools.yaml",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/b1_fixtures/b1_fixture_input.json",
+    "target": "config:data/b1_fixtures/preset_ai_messages.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/b1_fixtures/b1_fixture_input.json",
+    "target": "config:data/b1_fixtures/preset_memory.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/b1_fixtures/b1_fixture_input.json",
+    "target": "config:data/b1_fixtures/preset_tool_messages.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/b1_fixtures/preset_ai_messages.json",
+    "target": "config:data/b1_fixtures/preset_tool_messages.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:data/docs/agent_intro.txt",
+    "target": "document:data/docs/tool_calling.md",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:data/docs/agent_intro.txt",
+    "target": "document:data/docs/search_skill_demo.md",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:data/docs/tool_calling.md",
+    "target": "document:data/docs/search_skill_demo.md",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input_0.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input_2.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input_3.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input_4.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/llm_input.json",
+    "target": "config:data/runtime_input_5.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_global_input.json",
+    "target": "config:data/memory_inputs/sample_messages.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_global_input.json",
+    "target": "config:data/memory_inputs/sample_trace.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_global_input.json",
+    "target": "document:data/memory_inputs/sample_final_answer.md",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_input.json",
+    "target": "config:data/memory_inputs/sample_messages.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_input.json",
+    "target": "config:data/memory_inputs/sample_trace.json",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_input.json",
+    "target": "document:data/memory_inputs/sample_final_answer.md",
+    "type": "depends_on",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:data/memory_inputs/memory_save_global_input.json",
+    "target": "config:data/memory_inputs/memory_save_input.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/memory_inputs/sample_trace.json",
+    "target": "config:data/memory_inputs/sample_messages.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/memory_inputs/sample_messages.json",
+    "target": "document:data/memory_inputs/sample_final_answer.md",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/ai_message_with_tool_calls.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/b3_tool_call_format_converter_valid.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/b3_tool_call_missing_required.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/b3_tool_call_unknown_tool.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/messages_no_tool.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/messages_with_error_tool.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/tools_schema_basic.json",
+    "target": "config:data/messages/messages_with_tool.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/messages_with_tool.json",
+    "target": "config:data/messages/messages_with_error_tool.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/messages/b3_tool_call_format_converter_valid.json",
+    "target": "config:data/messages/b3_tool_call_missing_required.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/tool_inputs/tool_input_calculator.json",
+    "target": "config:data/tool_inputs/tool_input_calculator_error.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/tool_inputs/tool_input_file_reader.json",
+    "target": "config:data/tool_inputs/tool_input_file_reader_error.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/tool_inputs/tool_input_file_search.json",
+    "target": "config:data/tool_inputs/tool_input_file_search_error.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/tool_inputs/tool_input_format_converter.json",
+    "target": "config:data/tool_inputs/tool_input_format_converter_error.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:data/tool_inputs/tool_input_table_analyzer.json",
+    "target": "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "file:skills/calculator.py",
+    "target": "function:skills/calculator.py:_evaluate",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/calculator.py",
+    "target": "function:skills/calculator.py:calculator",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/format_converter.py",
+    "target": "function:skills/format_converter.py:_parse_key_value_lines",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/format_converter.py",
+    "target": "function:skills/format_converter.py:_safe_output_path",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/format_converter.py",
+    "target": "function:skills/format_converter.py:format_converter",
+    "type": "contains",
+    "direction": "forward",
+    "weight": 1.0
+  },
+  {
+    "source": "file:skills/calculator.py",
+    "target": "function:skills/calculator.py:calculator",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "file:skills/format_converter.py",
+    "target": "function:skills/format_converter.py:format_converter",
+    "type": "exports",
+    "direction": "forward",
+    "weight": 0.8
+  },
+  {
+    "source": "config:memory/memory_index.json",
+    "target": "document:memory/global/mem_course_001.md",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "config:memory/memory_index.json",
+    "target": "document:memory/conversations/conv_000.md",
+    "type": "configures",
+    "direction": "forward",
+    "weight": 0.6
+  },
+  {
+    "source": "document:README.md",
+    "target": "document:requirements.txt",
+    "type": "documents",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:README.md",
+    "target": "document:prompts/local_tool_agent.txt",
+    "type": "documents",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:README.md",
+    "target": "file:skills/calculator.py",
+    "type": "documents",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:README.md",
+    "target": "file:skills/format_converter.py",
+    "type": "documents",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "document:README.md",
+    "target": "config:memory/memory_index.json",
+    "type": "documents",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "config:.claude/settings.local.json",
+    "target": "config:.understand-anything/config.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  },
+  {
+    "source": "file:.understand-anything/.understandignore",
+    "target": "config:.understand-anything/config.json",
+    "type": "related",
+    "direction": "forward",
+    "weight": 0.5
+  }
+]

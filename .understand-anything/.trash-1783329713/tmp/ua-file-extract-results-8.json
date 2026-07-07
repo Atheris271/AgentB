@@ -1,0 +1,12 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "data/memory_inputs/memory_save_global_input.json",
+    "data/memory_inputs/memory_save_input.json",
+    "data/memory_inputs/sample_final_answer.md",
+    "data/memory_inputs/sample_messages.json",
+    "data/memory_inputs/sample_trace.json"
+  ],
+  "results": []
+}

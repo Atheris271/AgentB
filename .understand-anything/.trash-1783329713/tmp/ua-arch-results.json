@@ -1,0 +1,532 @@
+{
+  "scriptCompleted": true,
+  "directoryGroups": {
+    "code": [
+      "file:code/b1_agent_runtime.py",
+      "file:code/b5_memory.py",
+      "file:code/common/io_utils.py",
+      "file:code/common/logging_utils.py",
+      "file:code/run_full_demo.py",
+      "file:code/b2_run_skill.py",
+      "file:code/b3_tool_layer.py",
+      "file:code/b4_local_agent_llm.py",
+      "file:code/common/path_utils.py",
+      "file:code/common/schemas.py",
+      "file:code/common/__init__.py"
+    ],
+    "skills": [
+      "file:skills/__init__.py",
+      "file:skills/file_reader.py",
+      "file:skills/local_file_search.py",
+      "file:skills/table_analyzer.py",
+      "file:skills/calculator.py",
+      "file:skills/format_converter.py"
+    ],
+    "configs": [
+      "config:configs/memory.yaml",
+      "config:configs/memory_small_limit.yaml",
+      "config:configs/model.yaml",
+      "config:configs/tools.yaml"
+    ],
+    "data": [
+      "config:data/b1_fixtures/b1_fixture_input.json",
+      "config:data/b1_fixtures/preset_ai_messages.json",
+      "config:data/b1_fixtures/preset_memory.json",
+      "config:data/b1_fixtures/preset_tool_messages.json",
+      "document:data/docs/agent_intro.txt",
+      "document:data/docs/search_skill_demo.md",
+      "document:data/docs/tool_calling.md",
+      "config:data/llm_input.json",
+      "config:data/runtime_input.json",
+      "config:data/runtime_input_0.json",
+      "config:data/runtime_input_2.json",
+      "config:data/runtime_input_3.json",
+      "config:data/runtime_input_4.json",
+      "config:data/runtime_input_5.json",
+      "config:data/memory_inputs/memory_save_global_input.json",
+      "config:data/memory_inputs/memory_save_input.json",
+      "document:data/memory_inputs/sample_final_answer.md",
+      "config:data/memory_inputs/sample_messages.json",
+      "config:data/memory_inputs/sample_trace.json",
+      "config:data/messages/ai_message_with_tool_calls.json",
+      "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "config:data/messages/b3_tool_call_missing_required.json",
+      "config:data/messages/b3_tool_call_unknown_tool.json",
+      "config:data/messages/messages_no_tool.json",
+      "config:data/messages/messages_with_error_tool.json",
+      "config:data/messages/messages_with_tool.json",
+      "config:data/messages/tools_schema_basic.json",
+      "config:data/tool_inputs/tool_input_calculator.json",
+      "config:data/tool_inputs/tool_input_calculator_error.json",
+      "config:data/tool_inputs/tool_input_file_reader.json",
+      "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "config:data/tool_inputs/tool_input_file_search.json",
+      "config:data/tool_inputs/tool_input_file_search_error.json",
+      "config:data/tool_inputs/tool_input_format_converter.json",
+      "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "file:data/tables/results.csv"
+    ],
+    ".claude": [
+      "config:.claude/settings.local.json"
+    ],
+    ".understand-anything": [
+      "file:.understand-anything/.understandignore",
+      "config:.understand-anything/config.json"
+    ],
+    "memory": [
+      "document:memory/conversations/conv_000.md",
+      "document:memory/global/mem_course_001.md",
+      "config:memory/memory_index.json"
+    ],
+    "models": [
+      "file:models/.gitkeep"
+    ],
+    "prompts": [
+      "document:prompts/local_tool_agent.txt"
+    ],
+    "root": [
+      "document:README.md",
+      "document:requirements.txt"
+    ]
+  },
+  "nodeTypeGroups": {
+    "file": [
+      "file:code/b1_agent_runtime.py",
+      "file:code/b5_memory.py",
+      "file:code/common/io_utils.py",
+      "file:code/common/logging_utils.py",
+      "file:code/run_full_demo.py",
+      "file:code/b2_run_skill.py",
+      "file:code/b3_tool_layer.py",
+      "file:code/b4_local_agent_llm.py",
+      "file:code/common/path_utils.py",
+      "file:code/common/schemas.py",
+      "file:skills/__init__.py",
+      "file:skills/file_reader.py",
+      "file:skills/local_file_search.py",
+      "file:skills/table_analyzer.py",
+      "file:.understand-anything/.understandignore",
+      "file:code/common/__init__.py",
+      "file:data/tables/results.csv",
+      "file:models/.gitkeep",
+      "file:skills/calculator.py",
+      "file:skills/format_converter.py"
+    ],
+    "config": [
+      "config:configs/memory.yaml",
+      "config:configs/memory_small_limit.yaml",
+      "config:configs/model.yaml",
+      "config:configs/tools.yaml",
+      "config:data/b1_fixtures/b1_fixture_input.json",
+      "config:data/b1_fixtures/preset_ai_messages.json",
+      "config:data/b1_fixtures/preset_memory.json",
+      "config:data/b1_fixtures/preset_tool_messages.json",
+      "config:data/llm_input.json",
+      "config:data/runtime_input.json",
+      "config:data/runtime_input_0.json",
+      "config:data/runtime_input_2.json",
+      "config:data/runtime_input_3.json",
+      "config:data/runtime_input_4.json",
+      "config:data/runtime_input_5.json",
+      "config:data/memory_inputs/memory_save_global_input.json",
+      "config:data/memory_inputs/memory_save_input.json",
+      "config:data/memory_inputs/sample_messages.json",
+      "config:data/memory_inputs/sample_trace.json",
+      "config:data/messages/ai_message_with_tool_calls.json",
+      "config:data/messages/b3_tool_call_format_converter_valid.json",
+      "config:data/messages/b3_tool_call_missing_required.json",
+      "config:data/messages/b3_tool_call_unknown_tool.json",
+      "config:data/messages/messages_no_tool.json",
+      "config:data/messages/messages_with_error_tool.json",
+      "config:data/messages/messages_with_tool.json",
+      "config:data/messages/tools_schema_basic.json",
+      "config:data/tool_inputs/tool_input_calculator.json",
+      "config:data/tool_inputs/tool_input_calculator_error.json",
+      "config:data/tool_inputs/tool_input_file_reader.json",
+      "config:data/tool_inputs/tool_input_file_reader_error.json",
+      "config:data/tool_inputs/tool_input_file_search.json",
+      "config:data/tool_inputs/tool_input_file_search_error.json",
+      "config:data/tool_inputs/tool_input_format_converter.json",
+      "config:data/tool_inputs/tool_input_format_converter_error.json",
+      "config:data/tool_inputs/tool_input_table_analyzer.json",
+      "config:data/tool_inputs/tool_input_table_analyzer_error.json",
+      "config:.claude/settings.local.json",
+      "config:.understand-anything/config.json",
+      "config:memory/memory_index.json"
+    ],
+    "document": [
+      "document:data/docs/agent_intro.txt",
+      "document:data/docs/search_skill_demo.md",
+      "document:data/docs/tool_calling.md",
+      "document:data/memory_inputs/sample_final_answer.md",
+      "document:memory/conversations/conv_000.md",
+      "document:memory/global/mem_course_001.md",
+      "document:prompts/local_tool_agent.txt",
+      "document:README.md",
+      "document:requirements.txt"
+    ]
+  },
+  "crossCategoryEdges": [
+    {
+      "fromType": "file",
+      "toType": "function",
+      "edgeType": "contains",
+      "count": 64
+    },
+    {
+      "fromType": "file",
+      "toType": "function",
+      "edgeType": "exports",
+      "count": 50
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "imports",
+      "count": 26
+    },
+    {
+      "fromType": "function",
+      "toType": "function",
+      "edgeType": "calls",
+      "count": 55
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "depends_on",
+      "count": 5
+    },
+    {
+      "fromType": "config",
+      "toType": "config",
+      "edgeType": "related",
+      "count": 26
+    },
+    {
+      "fromType": "config",
+      "toType": "file",
+      "edgeType": "configures",
+      "count": 5
+    },
+    {
+      "fromType": "config",
+      "toType": "config",
+      "edgeType": "depends_on",
+      "count": 7
+    },
+    {
+      "fromType": "document",
+      "toType": "document",
+      "edgeType": "related",
+      "count": 3
+    },
+    {
+      "fromType": "config",
+      "toType": "document",
+      "edgeType": "depends_on",
+      "count": 2
+    },
+    {
+      "fromType": "config",
+      "toType": "document",
+      "edgeType": "related",
+      "count": 1
+    },
+    {
+      "fromType": "config",
+      "toType": "document",
+      "edgeType": "configures",
+      "count": 2
+    },
+    {
+      "fromType": "document",
+      "toType": "document",
+      "edgeType": "documents",
+      "count": 2
+    },
+    {
+      "fromType": "document",
+      "toType": "file",
+      "edgeType": "documents",
+      "count": 2
+    },
+    {
+      "fromType": "document",
+      "toType": "config",
+      "edgeType": "documents",
+      "count": 1
+    },
+    {
+      "fromType": "file",
+      "toType": "config",
+      "edgeType": "related",
+      "count": 1
+    }
+  ],
+  "interGroupImports": [],
+  "intraGroupDensity": {
+    "code": {
+      "internalEdges": 23,
+      "totalEdges": 23,
+      "density": 1
+    },
+    "skills": {
+      "internalEdges": 3,
+      "totalEdges": 3,
+      "density": 1
+    },
+    "configs": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    "data": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    ".claude": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    ".understand-anything": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    "memory": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    "models": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    "prompts": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    },
+    "root": {
+      "internalEdges": 0,
+      "totalEdges": 1,
+      "density": 0
+    }
+  },
+  "patternMatches": {
+    "code": "utility",
+    "skills": "entry",
+    "configs": "utility",
+    "data": "data",
+    ".claude": "utility",
+    ".understand-anything": "utility",
+    "memory": "documentation",
+    "models": "data",
+    "prompts": "utility",
+    "root": "documentation"
+  },
+  "deploymentTopology": {
+    "hasDockerfile": false,
+    "hasCompose": false,
+    "hasK8s": false,
+    "hasTerraform": false,
+    "hasCI": false,
+    "infraFiles": []
+  },
+  "dataPipeline": {
+    "schemaFiles": [],
+    "migrationFiles": [],
+    "dataModelFiles": [
+      "code/b3_tool_layer.py",
+      "code/common/schemas.py",
+      "configs/tools.yaml",
+      "data/messages/tools_schema_basic.json"
+    ],
+    "apiHandlerFiles": [
+      "code/b3_tool_layer.py",
+      "data/messages/tools_schema_basic.json"
+    ]
+  },
+  "docCoverage": {
+    "groupsWithDocs": 4,
+    "totalGroups": 10,
+    "coverageRatio": 0.4,
+    "undocumentedGroups": [
+      "code",
+      "skills",
+      "configs",
+      ".claude",
+      ".understand-anything",
+      "models"
+    ]
+  },
+  "dependencyDirection": [],
+  "fileStats": {
+    "totalFileNodes": 69,
+    "filesPerGroup": {
+      "code": 11,
+      "skills": 6,
+      "configs": 4,
+      "data": 38,
+      ".claude": 1,
+      ".understand-anything": 2,
+      "memory": 3,
+      "models": 1,
+      "prompts": 1,
+      "root": 2
+    },
+    "nodeTypeCounts": {
+      "file": 20,
+      "config": 40,
+      "document": 9
+    }
+  },
+  "fileFanIn": {
+    "file:code/b1_agent_runtime.py": 1,
+    "file:code/b5_memory.py": 0,
+    "file:code/common/io_utils.py": 7,
+    "file:code/common/logging_utils.py": 5,
+    "file:code/run_full_demo.py": 0,
+    "file:code/b2_run_skill.py": 0,
+    "file:code/b3_tool_layer.py": 0,
+    "file:code/b4_local_agent_llm.py": 0,
+    "file:code/common/path_utils.py": 6,
+    "file:code/common/schemas.py": 4,
+    "file:skills/__init__.py": 3,
+    "file:skills/file_reader.py": 0,
+    "file:skills/local_file_search.py": 0,
+    "file:skills/table_analyzer.py": 0,
+    "config:configs/memory.yaml": 0,
+    "config:configs/memory_small_limit.yaml": 0,
+    "config:configs/model.yaml": 0,
+    "config:configs/tools.yaml": 0,
+    "config:data/b1_fixtures/b1_fixture_input.json": 0,
+    "config:data/b1_fixtures/preset_ai_messages.json": 0,
+    "config:data/b1_fixtures/preset_memory.json": 0,
+    "config:data/b1_fixtures/preset_tool_messages.json": 0,
+    "document:data/docs/agent_intro.txt": 0,
+    "document:data/docs/search_skill_demo.md": 0,
+    "document:data/docs/tool_calling.md": 0,
+    "config:data/llm_input.json": 0,
+    "config:data/runtime_input.json": 0,
+    "config:data/runtime_input_0.json": 0,
+    "config:data/runtime_input_2.json": 0,
+    "config:data/runtime_input_3.json": 0,
+    "config:data/runtime_input_4.json": 0,
+    "config:data/runtime_input_5.json": 0,
+    "config:data/memory_inputs/memory_save_global_input.json": 0,
+    "config:data/memory_inputs/memory_save_input.json": 0,
+    "document:data/memory_inputs/sample_final_answer.md": 0,
+    "config:data/memory_inputs/sample_messages.json": 0,
+    "config:data/memory_inputs/sample_trace.json": 0,
+    "config:data/messages/ai_message_with_tool_calls.json": 0,
+    "config:data/messages/b3_tool_call_format_converter_valid.json": 0,
+    "config:data/messages/b3_tool_call_missing_required.json": 0,
+    "config:data/messages/b3_tool_call_unknown_tool.json": 0,
+    "config:data/messages/messages_no_tool.json": 0,
+    "config:data/messages/messages_with_error_tool.json": 0,
+    "config:data/messages/messages_with_tool.json": 0,
+    "config:data/messages/tools_schema_basic.json": 0,
+    "config:data/tool_inputs/tool_input_calculator.json": 0,
+    "config:data/tool_inputs/tool_input_calculator_error.json": 0,
+    "config:data/tool_inputs/tool_input_file_reader.json": 0,
+    "config:data/tool_inputs/tool_input_file_reader_error.json": 0,
+    "config:data/tool_inputs/tool_input_file_search.json": 0,
+    "config:data/tool_inputs/tool_input_file_search_error.json": 0,
+    "config:data/tool_inputs/tool_input_format_converter.json": 0,
+    "config:data/tool_inputs/tool_input_format_converter_error.json": 0,
+    "config:data/tool_inputs/tool_input_table_analyzer.json": 0,
+    "config:data/tool_inputs/tool_input_table_analyzer_error.json": 0,
+    "config:.claude/settings.local.json": 0,
+    "file:.understand-anything/.understandignore": 0,
+    "config:.understand-anything/config.json": 0,
+    "file:code/common/__init__.py": 0,
+    "file:data/tables/results.csv": 0,
+    "document:memory/conversations/conv_000.md": 0,
+    "document:memory/global/mem_course_001.md": 0,
+    "config:memory/memory_index.json": 0,
+    "file:models/.gitkeep": 0,
+    "document:prompts/local_tool_agent.txt": 0,
+    "document:README.md": 0,
+    "document:requirements.txt": 0,
+    "file:skills/calculator.py": 0,
+    "file:skills/format_converter.py": 0
+  },
+  "fileFanOut": {
+    "file:code/b1_agent_runtime.py": 4,
+    "file:code/b5_memory.py": 3,
+    "file:code/common/io_utils.py": 0,
+    "file:code/common/logging_utils.py": 1,
+    "file:code/run_full_demo.py": 3,
+    "file:code/b2_run_skill.py": 4,
+    "file:code/b3_tool_layer.py": 4,
+    "file:code/b4_local_agent_llm.py": 4,
+    "file:code/common/path_utils.py": 0,
+    "file:code/common/schemas.py": 0,
+    "file:skills/__init__.py": 0,
+    "file:skills/file_reader.py": 1,
+    "file:skills/local_file_search.py": 1,
+    "file:skills/table_analyzer.py": 1,
+    "config:configs/memory.yaml": 0,
+    "config:configs/memory_small_limit.yaml": 0,
+    "config:configs/model.yaml": 0,
+    "config:configs/tools.yaml": 0,
+    "config:data/b1_fixtures/b1_fixture_input.json": 0,
+    "config:data/b1_fixtures/preset_ai_messages.json": 0,
+    "config:data/b1_fixtures/preset_memory.json": 0,
+    "config:data/b1_fixtures/preset_tool_messages.json": 0,
+    "document:data/docs/agent_intro.txt": 0,
+    "document:data/docs/search_skill_demo.md": 0,
+    "document:data/docs/tool_calling.md": 0,
+    "config:data/llm_input.json": 0,
+    "config:data/runtime_input.json": 0,
+    "config:data/runtime_input_0.json": 0,
+    "config:data/runtime_input_2.json": 0,
+    "config:data/runtime_input_3.json": 0,
+    "config:data/runtime_input_4.json": 0,
+    "config:data/runtime_input_5.json": 0,
+    "config:data/memory_inputs/memory_save_global_input.json": 0,
+    "config:data/memory_inputs/memory_save_input.json": 0,
+    "document:data/memory_inputs/sample_final_answer.md": 0,
+    "config:data/memory_inputs/sample_messages.json": 0,
+    "config:data/memory_inputs/sample_trace.json": 0,
+    "config:data/messages/ai_message_with_tool_calls.json": 0,
+    "config:data/messages/b3_tool_call_format_converter_valid.json": 0,
+    "config:data/messages/b3_tool_call_missing_required.json": 0,
+    "config:data/messages/b3_tool_call_unknown_tool.json": 0,
+    "config:data/messages/messages_no_tool.json": 0,
+    "config:data/messages/messages_with_error_tool.json": 0,
+    "config:data/messages/messages_with_tool.json": 0,
+    "config:data/messages/tools_schema_basic.json": 0,
+    "config:data/tool_inputs/tool_input_calculator.json": 0,
+    "config:data/tool_inputs/tool_input_calculator_error.json": 0,
+    "config:data/tool_inputs/tool_input_file_reader.json": 0,
+    "config:data/tool_inputs/tool_input_file_reader_error.json": 0,
+    "config:data/tool_inputs/tool_input_file_search.json": 0,
+    "config:data/tool_inputs/tool_input_file_search_error.json": 0,
+    "config:data/tool_inputs/tool_input_format_converter.json": 0,
+    "config:data/tool_inputs/tool_input_format_converter_error.json": 0,
+    "config:data/tool_inputs/tool_input_table_analyzer.json": 0,
+    "config:data/tool_inputs/tool_input_table_analyzer_error.json": 0,
+    "config:.claude/settings.local.json": 0,
+    "file:.understand-anything/.understandignore": 0,
+    "config:.understand-anything/config.json": 0,
+    "file:code/common/__init__.py": 0,
+    "file:data/tables/results.csv": 0,
+    "document:memory/conversations/conv_000.md": 0,
+    "document:memory/global/mem_course_001.md": 0,
+    "config:memory/memory_index.json": 0,
+    "file:models/.gitkeep": 0,
+    "document:prompts/local_tool_agent.txt": 0,
+    "document:README.md": 0,
+    "document:requirements.txt": 0,
+    "file:skills/calculator.py": 0,
+    "file:skills/format_converter.py": 0
+  }
+}

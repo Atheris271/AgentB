@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "config:data/memory_inputs/memory_save_global_input.json",
+      "type": "config",
+      "name": "memory_save_global_input.json",
+      "filePath": "data/memory_inputs/memory_save_global_input.json",
+      "summary": "全局记忆保存的输入配置，指定会话ID、保存类型为 global，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": ["configuration", "memory", "input-data", "global"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/memory_save_input.json",
+      "type": "config",
+      "name": "memory_save_input.json",
+      "filePath": "data/memory_inputs/memory_save_input.json",
+      "summary": "会话级记忆保存的输入配置，指定会话ID、保存类型为 conversation，并引用关联的消息文件、追踪文件和最终答案文件路径。",
+      "tags": ["configuration", "memory", "input-data", "conversation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "document",
+      "name": "sample_final_answer.md",
+      "filePath": "data/memory_inputs/sample_final_answer.md",
+      "summary": "示例最终答案文件，包含 Agent 的中文回复样本——「Agent 会结合模型、工具和记忆完成任务」，作为记忆保存功能的测试数据。",
+      "tags": ["sample-data", "documentation", "memory", "answer"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/sample_messages.json",
+      "type": "config",
+      "name": "sample_messages.json",
+      "filePath": "data/memory_inputs/sample_messages.json",
+      "summary": "示例对话消息数组，包含 system、user 和 assistant 角色的多轮对话样本，其中 assistant 消息内嵌空 tool_calls 字段，用于测试记忆保存的消息处理流程。",
+      "tags": ["sample-data", "memory", "conversation", "messages"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/memory_inputs/sample_trace.json",
+      "type": "config",
+      "name": "sample_trace.json",
+      "filePath": "data/memory_inputs/sample_trace.json",
+      "summary": "示例会话追踪记录，包含会话ID、执行状态（success）、工具使用轮次和 LLM 调用次数统计，用于测试记忆保存的追踪数据处理流程。",
+      "tags": ["sample-data", "memory", "trace", "execution"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "config:data/memory_inputs/sample_trace.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_input.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:data/memory_inputs/memory_save_global_input.json",
+      "target": "config:data/memory_inputs/memory_save_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_trace.json",
+      "target": "config:data/memory_inputs/sample_messages.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/memory_inputs/sample_messages.json",
+      "target": "document:data/memory_inputs/sample_final_answer.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

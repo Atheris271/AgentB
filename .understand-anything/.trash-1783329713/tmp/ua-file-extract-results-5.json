@@ -1,0 +1,11 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "data/b1_fixtures/b1_fixture_input.json",
+    "data/b1_fixtures/preset_ai_messages.json",
+    "data/b1_fixtures/preset_memory.json",
+    "data/b1_fixtures/preset_tool_messages.json"
+  ],
+  "results": []
+}

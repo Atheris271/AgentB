@@ -1,0 +1,17 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "code/b2_run_skill.py", "language": "python", "sizeLines": 92, "fileCategory": "code"},
+    {"path": "code/b3_tool_layer.py", "language": "python", "sizeLines": 251, "fileCategory": "code"},
+    {"path": "code/b4_local_agent_llm.py", "language": "python", "sizeLines": 446, "fileCategory": "code"},
+    {"path": "code/common/path_utils.py", "language": "python", "sizeLines": 40, "fileCategory": "code"},
+    {"path": "code/common/schemas.py", "language": "python", "sizeLines": 112, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "code/b2_run_skill.py": ["code/common/io_utils.py", "code/common/logging_utils.py", "code/common/path_utils.py", "code/common/schemas.py"],
+    "code/b3_tool_layer.py": ["code/common/io_utils.py", "code/common/logging_utils.py", "code/common/path_utils.py", "code/common/schemas.py"],
+    "code/b4_local_agent_llm.py": ["code/common/io_utils.py", "code/common/logging_utils.py", "code/common/path_utils.py", "code/common/schemas.py"],
+    "code/common/path_utils.py": [],
+    "code/common/schemas.py": []
+  }
+}

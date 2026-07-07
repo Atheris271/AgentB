@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "config:data/llm_input.json",
+      "type": "config",
+      "name": "llm_input.json",
+      "filePath": "data/llm_input.json",
+      "summary": "LLM配置入口文件，指定模型配置文件路径、消息文件路径和工具Schema路径，为Agent系统提供LLM调用所需的基础参数。",
+      "tags": ["configuration", "llm", "ai-agent", "model-config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input.json",
+      "type": "config",
+      "name": "runtime_input.json",
+      "filePath": "data/runtime_input.json",
+      "summary": "会话conv_001的运行时输入配置，要求Agent阅读docs/agent_intro.txt并总结三条中文要点，启用全局记忆且保存对话记忆。",
+      "tags": ["configuration", "agent", "conversation", "memory-enabled", "document-reading"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_0.json",
+      "type": "config",
+      "name": "runtime_input_0.json",
+      "filePath": "data/runtime_input_0.json",
+      "summary": "会话conv_000的运行时输入配置，要求Agent不使用工具简要说明Agent概念，为无工具调用的基础对话场景。",
+      "tags": ["configuration", "agent", "conversation", "no-tools", "concept-explanation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_2.json",
+      "type": "config",
+      "name": "runtime_input_2.json",
+      "filePath": "data/runtime_input_2.json",
+      "summary": "会话conv_002的运行时输入配置，要求Agent调用计算Skill完成56*29+81的数学运算。",
+      "tags": ["configuration", "agent", "conversation", "calculation", "skill-call"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_3.json",
+      "type": "config",
+      "name": "runtime_input_3.json",
+      "filePath": "data/runtime_input_3.json",
+      "summary": "会话conv_003的运行时输入配置，要求Agent调用local_file_search Skill在docs目录搜索文件并返回最相关结果及中文摘要。",
+      "tags": ["configuration", "agent", "conversation", "file-search", "skill-call"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_4.json",
+      "type": "config",
+      "name": "runtime_input_4.json",
+      "filePath": "data/runtime_input_4.json",
+      "summary": "会话conv_004的运行时输入配置，要求Agent调用table_analyzer Skill分析CSV文件并计算score和latency的平均值。",
+      "tags": ["configuration", "agent", "conversation", "data-analysis", "skill-call"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:data/runtime_input_5.json",
+      "type": "config",
+      "name": "runtime_input_5.json",
+      "filePath": "data/runtime_input_5.json",
+      "summary": "会话conv_005的运行时输入配置，要求Agent调用format_converter Skill将键值文本转换为真实JSON文件。",
+      "tags": ["configuration", "agent", "conversation", "format-conversion", "skill-call"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_0.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_2.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_3.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_4.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:data/llm_input.json",
+      "target": "config:data/runtime_input_5.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

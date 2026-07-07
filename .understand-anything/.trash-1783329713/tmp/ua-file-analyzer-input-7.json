@@ -1,0 +1,21 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": "data/llm_input.json", "language": "json", "sizeLines": 5, "fileCategory": "config"},
+    {"path": "data/runtime_input.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "data/runtime_input_0.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "data/runtime_input_2.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "data/runtime_input_3.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "data/runtime_input_4.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "data/runtime_input_5.json", "language": "json", "sizeLines": 10, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "data/llm_input.json": [],
+    "data/runtime_input.json": [],
+    "data/runtime_input_0.json": [],
+    "data/runtime_input_2.json": [],
+    "data/runtime_input_3.json": [],
+    "data/runtime_input_4.json": [],
+    "data/runtime_input_5.json": []
+  }
+}

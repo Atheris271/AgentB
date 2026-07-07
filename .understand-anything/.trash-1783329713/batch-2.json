@@ -1,0 +1,1050 @@
+{
+  "nodes": [
+    {
+      "id": "file:code/b2_run_skill.py",
+      "type": "file",
+      "name": "b2_run_skill.py",
+      "filePath": "code/b2_run_skill.py",
+      "summary": "Skill独立运行的入口模块，通过动态导入（importlib）执行指定Skill函数，捕获异常并生成标准化SkillResult，支持CLI参数解析和JSONL运行日志记录。",
+      "tags": ["entry-point", "skill-executor", "cli", "dynamic-import"],
+      "complexity": "moderate",
+      "languageNotes": "使用 importlib.import_module 和 inspect.signature 实现反射式动态函数调用，根据函数签名自动注入 data_root 和 output_dir 参数。"
+    },
+    {
+      "id": "file:code/b3_tool_layer.py",
+      "type": "file",
+      "name": "b3_tool_layer.py",
+      "filePath": "code/b3_tool_layer.py",
+      "summary": "工具层核心模块，从YAML配置加载工具定义、生成符合OpenAI风格的function-calling JSON Schema、校验工具调用参数类型，并通过动态导入执行具体Skill函数，是整个Agent工具调用链路的枢纽。",
+      "tags": ["tool-layer", "schema-generation", "validation", "cli", "api-handler"],
+      "complexity": "complex",
+      "languageNotes": "生成与OpenAI function-calling兼容的JSON Schema（含 x-returns 扩展字段），支持integer/number类型严格校验（排除bool误判），根据函数签名自动注入 data_root 和 output_dir。"
+    },
+    {
+      "id": "file:code/b4_local_agent_llm.py",
+      "type": "file",
+      "name": "b4_local_agent_llm.py",
+      "filePath": "code/b4_local_agent_llm.py",
+      "summary": "本地LLM推理引擎模块，支持mock模式和真实transformers推理两种后端，负责构建含工具schema和格式指令的prompt messages、解析模型原始输出为标准化AIMessage，并缓存已加载的模型/分词器实例以减少重复加载开销。",
+      "tags": ["llm-inference", "prompt-engineering", "model-cache", "json-parsing", "cli"],
+      "complexity": "complex",
+      "languageNotes": "实现多级JSON解析容错策略（标准解析→尾随反引号截断→tool_calls片段提取），模型缓存在模块级字典中使用可哈希元组键避免重复加载，支持bfloat16/float16/float32 dtype配置。"
+    },
+    {
+      "id": "file:code/common/path_utils.py",
+      "type": "file",
+      "name": "path_utils.py",
+      "filePath": "code/common/path_utils.py",
+      "summary": "项目全局路径工具模块，提供项目根路径推导与sys.path引导、相对路径解析（基于CWD或包含文件目录）、以及路径沙箱约束校验，被所有B模块和common模块依赖。",
+      "tags": ["utility", "path-resolution", "sandbox", "common"],
+      "complexity": "simple",
+      "languageNotes": "PROJECT_ROOT 通过 __file__ 向上两级推导，bootstrap_project_root 将项目根注入 sys.path 实现无安装导入。"
+    },
+    {
+      "id": "file:code/common/schemas.py",
+      "type": "file",
+      "name": "schemas.py",
+      "filePath": "code/common/schemas.py",
+      "summary": "Agent框架核心数据模型模块，定义并校验所有标准化消息结构——AIMessage、ToolMessage、SkillResult和ToolCall——这些schema是B1-B5模块之间数据交换的契约基础。",
+      "tags": ["data-model", "schema-definition", "validation", "message-contract", "common"],
+      "complexity": "moderate",
+      "languageNotes": "采用工厂函数模式（make_*）构造消息，配套 validate_* 函数进行严格校验，normalize_tool_call 同时兼容OpenAI标准格式（function.name/arguments）和简化格式（name/args）。"
+    },
+
+    {
+      "id": "function:code/b2_run_skill.py:run_skill",
+      "type": "function",
+      "name": "run_skill",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [28, 51],
+      "summary": "动态导入并执行指定Skill函数，通过inspect.signature自动注入data_root和output_dir参数，捕获异常并返回标准化SkillResult。",
+      "tags": ["skill-executor", "dynamic-dispatch", "error-handling"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b2_run_skill.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [54, 60],
+      "summary": "构建CLI参数解析器，定义--skill、--input、--outdir和--data_root四个参数。",
+      "tags": ["cli", "argparse"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b2_run_skill.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b2_run_skill.py",
+      "lineRange": [63, 88],
+      "summary": "CLI入口函数，解析参数、读取输入JSON、执行Skill并将结果和运行日志写入输出目录。",
+      "tags": ["entry-point", "cli", "orchestrator"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:code/b3_tool_layer.py:_parameter_schema",
+      "type": "function",
+      "name": "_parameter_schema",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [51, 68],
+      "summary": "将YAML工具参数定义转换为JSON Schema格式的properties/required对象，校验参数类型必须在JSON_TYPES映射中。",
+      "tags": ["schema-generation", "validation", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "function",
+      "name": "get_tools_schema",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [71, 107],
+      "summary": "从YAML配置加载指定toolset的所有工具定义，生成OpenAI兼容的function-calling JSON Schema数组，可选写入输出目录。",
+      "tags": ["schema-generation", "toolset", "openai-compatible"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:_validate_args",
+      "type": "function",
+      "name": "_validate_args",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [110, 131],
+      "summary": "校验工具调用参数：检查必填字段、未知参数、类型匹配（含bool误判防护）及数组元素类型。",
+      "tags": ["validation", "type-checking", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "function",
+      "name": "execute_tool_calls",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [145, 211],
+      "summary": "批量执行工具调用：逐一校验参数、动态导入并调用Skill函数、收集结果并生成ToolMessage列表，同时记录JSONL运行日志。",
+      "tags": ["tool-executor", "batch-processing", "logging"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [214, 223],
+      "summary": "构建CLI参数解析器，定义--tools_config、--toolset、--tool_calls及互斥的--export_schema/--execute动作参数。",
+      "tags": ["cli", "argparse"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b3_tool_layer.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b3_tool_layer.py",
+      "lineRange": [226, 247],
+      "summary": "CLI入口函数，根据--export_schema或--execute动作分流：导出工具Schema或执行工具调用并输出结果。",
+      "tags": ["entry-point", "cli", "orchestrator"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:code/b4_local_agent_llm.py:_three_points",
+      "type": "function",
+      "name": "_three_points",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [49, 59],
+      "summary": "将文本按句子和换行分割，提取最多三条去重要点，不足时用占位文本填充。",
+      "tags": ["text-processing", "summarization", "internal"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "type": "function",
+      "name": "_mock_generate",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [62, 87],
+      "summary": "Mock模式生成器：无工具消息时返回默认file_reader调用，有工具消息时提取结果并生成三条中文要点回答。",
+      "tags": ["mock", "llm-simulation", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+      "type": "function",
+      "name": "_parse_tool_calls_fragment",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [90, 112],
+      "summary": "JSON解析容错策略之一：从原始文本中提取tool_calls数组片段并尝试解析，处理转义引号情况。",
+      "tags": ["json-parsing", "error-recovery", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "type": "function",
+      "name": "_candidate_to_message",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [127, 145],
+      "summary": "将解析后的候选字典转换为标准AIMessage格式，校验content和tool_calls互斥（必须有且仅有一个非空），并执行validate_ai_message。",
+      "tags": ["validation", "message-format", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_dtype_value",
+      "type": "function",
+      "name": "_dtype_value",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [159, 169],
+      "summary": "将配置中的torch dtype字符串（auto/bfloat16/float16/float32）映射为torch模块的实际dtype常量。",
+      "tags": ["torch", "type-mapping", "internal"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_model_cache_key",
+      "type": "function",
+      "name": "_model_cache_key",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [172, 197],
+      "summary": "基于模型路径、分词器路径、加载参数和设备映射生成可哈希元组，用作模块级模型缓存的键。",
+      "tags": ["caching", "hash-key", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+      "type": "function",
+      "name": "_load_model_bundle",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [200, 240],
+      "summary": "加载或从缓存获取模型和分词器：命中缓存时直接返回，未命中时调用from_pretrained加载并写入_MODEL_CACHE。",
+      "tags": ["model-loading", "caching", "transformers", "internal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+      "type": "function",
+      "name": "_build_prompt_messages",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [243, 298],
+      "summary": "构建发送给LLM的完整prompt消息列表：注入工具JSON Schema到system消息、追加严格的JSON输出格式指令、在最后一条user消息后添加输出格式提醒，处理tool角色消息的后续引导。",
+      "tags": ["prompt-engineering", "format-instruction", "internal"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "type": "function",
+      "name": "_prompt_json_generate",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [301, 350],
+      "summary": "使用transformers库执行本地LLM推理：加载模型和分词器、应用chat template、执行generate并解码新生成的tokens为原始文本。",
+      "tags": ["llm-inference", "transformers", "token-generation", "internal"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "function",
+      "name": "generate_ai_message",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [353, 414],
+      "summary": "统一AI消息生成入口：校验输入messages、根据mode分发到mock或prompt_json后端、解析模型输出并写入artifact文件（原始输出和AI消息JSON），返回包含ai_message/status/error的结果字典。",
+      "tags": ["orchestrator", "multi-backend", "artifact-writing"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [417, 424],
+      "summary": "构建CLI参数解析器，定义--model_config、--messages、--tools_schema、--mode和--outdir五个参数。",
+      "tags": ["cli", "argparse"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/b4_local_agent_llm.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "code/b4_local_agent_llm.py",
+      "lineRange": [427, 442],
+      "summary": "CLI入口函数，解析参数、读取消息和工具schema JSON文件、调用generate_ai_message并输出ai_message.json路径。",
+      "tags": ["entry-point", "cli", "orchestrator"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "function",
+      "name": "bootstrap_project_root",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [11, 15],
+      "summary": "将PROJECT_ROOT注入sys.path首位，使所有模块无需安装即可相互导入，返回项目根路径。",
+      "tags": ["path-setup", "sys-path", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_path",
+      "type": "function",
+      "name": "resolve_path",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [18, 22],
+      "summary": "通用路径解析：支持~展开和相对路径基于base_dir解析，返回绝对路径。",
+      "tags": ["path-resolution", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "function",
+      "name": "resolve_cli_path",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [25, 26],
+      "summary": "基于当前工作目录（CWD）解析CLI传入的路径参数。",
+      "tags": ["path-resolution", "cli", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "function",
+      "name": "resolve_from_file",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [29, 30],
+      "summary": "基于包含文件的所在目录解析相对路径，用于配置文件中的相对路径引用。",
+      "tags": ["path-resolution", "config", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/path_utils.py:require_within",
+      "type": "function",
+      "name": "require_within",
+      "filePath": "code/common/path_utils.py",
+      "lineRange": [33, 40],
+      "summary": "路径沙箱校验：确保解析后的路径在指定root目录内，否则抛出ValueError，用于数据安全防护。",
+      "tags": ["sandbox", "security", "path-validation", "utility"],
+      "complexity": "simple"
+    },
+
+    {
+      "id": "function:code/common/schemas.py:make_ai_message",
+      "type": "function",
+      "name": "make_ai_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [9, 16],
+      "summary": "构造标准化AIMessage字典（role=assistant），自动校验content和tool_calls字段合法性。",
+      "tags": ["factory", "message-construction", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:make_tool_message",
+      "type": "function",
+      "name": "make_tool_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [19, 33],
+      "summary": "构造标准化ToolMessage字典（role=tool），包含tool_call_id、name、content和status字段，校验status必须为success或error。",
+      "tags": ["factory", "message-construction", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:make_skill_result",
+      "type": "function",
+      "name": "make_skill_result",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [36, 53],
+      "summary": "构造标准化SkillResult字典，包含skill_name、status、input、output、error和latency_ms字段，校验status必须为success或error。",
+      "tags": ["factory", "result-structure", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "function",
+      "name": "normalize_tool_call",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [56, 77],
+      "summary": "标准化工具调用格式：兼容OpenAI标准格式（function.name/arguments）和简化格式（name/args），处理字符串args的JSON反序列化，生成统一id。",
+      "tags": ["normalization", "openai-compatible", "tool-call"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/schemas.py:validate_ai_message",
+      "type": "function",
+      "name": "validate_ai_message",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [80, 91],
+      "summary": "校验AIMessage结构：role必须为assistant、content为字符串、tool_calls为列表且可规范化，content与tool_calls不能同时为空。",
+      "tags": ["validation", "message-contract"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:code/common/schemas.py:validate_messages",
+      "type": "function",
+      "name": "validate_messages",
+      "filePath": "code/common/schemas.py",
+      "lineRange": [94, 112],
+      "summary": "批量校验消息列表：检查每条消息的role合法性、content类型、assistant消息的tool_calls规范化、tool消息的必填字段完整性。",
+      "tags": ["validation", "message-contract", "batch"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:run_skill",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "function:code/b2_run_skill.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b2_run_skill.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:main",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b2_run_skill.py:run_skill",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_parameter_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:_validate_args",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:get_tools_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "function:code/b3_tool_layer.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b3_tool_layer.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:get_tools_schema",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b3_tool_layer.py:execute_tool_calls",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_three_points",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_parse_tool_calls_fragment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_dtype_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_model_cache_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_load_model_bundle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_build_prompt_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:build_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "function:code/b4_local_agent_llm.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/io_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/logging_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/path_utils.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:code/b4_local_agent_llm.py",
+      "target": "file:code/common/schemas.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:main",
+      "target": "function:code/common/io_utils.py:read_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_prompt_json_generate",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:read_yaml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:append_jsonl",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/io_utils.py:write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/logging_utils.py:now_iso",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_mock_generate",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:_candidate_to_message",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:code/b4_local_agent_llm.py:generate_ai_message",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:bootstrap_project_root",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_cli_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:resolve_from_file",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/path_utils.py",
+      "target": "function:code/common/path_utils.py:require_within",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_tool_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:make_skill_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:normalize_tool_call",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_ai_message",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:code/common/schemas.py",
+      "target": "function:code/common/schemas.py:validate_messages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

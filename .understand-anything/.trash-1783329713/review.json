@@ -1,0 +1,30 @@
+{
+  "issues": [],
+  "warnings": [
+    "Node 'file:code/common/__init__.py' has no edges (orphan)",
+    "Node 'file:data/tables/results.csv' has no edges (orphan)",
+    "Node 'file:models/.gitkeep' has no edges (orphan)"
+  ],
+  "stats": {
+    "totalNodes": 134,
+    "totalEdges": 252,
+    "totalLayers": 7,
+    "tourSteps": 11,
+    "nodeTypes": {
+      "file": 20,
+      "function": 65,
+      "config": 40,
+      "document": 9
+    },
+    "edgeTypes": {
+      "contains": 64,
+      "exports": 50,
+      "imports": 26,
+      "calls": 55,
+      "depends_on": 14,
+      "related": 31,
+      "configures": 7,
+      "documents": 5
+    }
+  }
+}

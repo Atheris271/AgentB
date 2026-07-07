@@ -1,0 +1,35 @@
+{
+  "projectRoot": "/d/Desktop/agent",
+  "batchFiles": [
+    {"path": ".claude/settings.local.json", "language": "json", "sizeLines": 29, "fileCategory": "config"},
+    {"path": ".understand-anything/.understandignore", "language": "unknown", "sizeLines": 35, "fileCategory": "code"},
+    {"path": ".understand-anything/config.json", "language": "json", "sizeLines": 1, "fileCategory": "config"},
+    {"path": "code/common/__init__.py", "language": "python", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "data/tables/results.csv", "language": "csv", "sizeLines": 4, "fileCategory": "data"},
+    {"path": "memory/conversations/conv_000.md", "language": "markdown", "sizeLines": 64, "fileCategory": "docs"},
+    {"path": "memory/global/mem_course_001.md", "language": "markdown", "sizeLines": 3, "fileCategory": "docs"},
+    {"path": "memory/memory_index.json", "language": "json", "sizeLines": 22, "fileCategory": "config"},
+    {"path": "models/.gitkeep", "language": "unknown", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "prompts/local_tool_agent.txt", "language": "txt", "sizeLines": 1, "fileCategory": "docs"},
+    {"path": "README.md", "language": "markdown", "sizeLines": 514, "fileCategory": "docs"},
+    {"path": "requirements.txt", "language": "txt", "sizeLines": 20, "fileCategory": "docs"},
+    {"path": "skills/calculator.py", "language": "python", "sizeLines": 48, "fileCategory": "code"},
+    {"path": "skills/format_converter.py", "language": "python", "sizeLines": 71, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    ".claude/settings.local.json": [],
+    ".understand-anything/.understandignore": [],
+    ".understand-anything/config.json": [],
+    "code/common/__init__.py": [],
+    "data/tables/results.csv": [],
+    "memory/conversations/conv_000.md": [],
+    "memory/global/mem_course_001.md": [],
+    "memory/memory_index.json": [],
+    "models/.gitkeep": [],
+    "prompts/local_tool_agent.txt": [],
+    "README.md": [],
+    "requirements.txt": [],
+    "skills/calculator.py": [],
+    "skills/format_converter.py": []
+  }
+}
