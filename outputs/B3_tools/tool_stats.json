@@ -1,0 +1,9 @@
+{
+  "file_reader": {
+    "calls": 1,
+    "success": 1,
+    "error": 0,
+    "avg_latency_ms": 12.034,
+    "failure_rate": 0.0
+  }
+}

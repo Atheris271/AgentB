@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "mode": "mock",
+  "raw_text": "{\"role\": \"assistant\", \"content\": \"\", \"tool_calls\": [{\"id\": \"call_001\", \"name\": \"file_reader\", \"args\": {\"path\": \"docs/agent_intro.txt\", \"max_size_kb\": 512}}]}",
+  "parsed": {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+      {
+        "id": "call_001",
+        "name": "file_reader",
+        "args": {
+          "path": "docs/agent_intro.txt",
+          "max_size_kb": 512
+        }
+      }
+    ]
+  },
+  "error": null,
+  "latency_ms": 0.208
+}

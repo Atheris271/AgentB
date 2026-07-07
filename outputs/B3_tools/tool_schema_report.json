@@ -1,0 +1,72 @@
+{
+  "status": "success",
+  "tools_config": "C:\\Users\\87500\\Desktop\\shixun2\\6.30\\AgentB-main\\configs\\tools.yaml",
+  "toolset": "basic_tools",
+  "tool_count": 5,
+  "tools": [
+    {
+      "name": "calculator",
+      "available": true,
+      "warnings": [],
+      "parameters": [
+        "expression"
+      ],
+      "required": [
+        "expression"
+      ]
+    },
+    {
+      "name": "file_reader",
+      "available": true,
+      "warnings": [],
+      "parameters": [
+        "path",
+        "max_size_kb"
+      ],
+      "required": [
+        "path"
+      ]
+    },
+    {
+      "name": "local_file_search",
+      "available": true,
+      "warnings": [],
+      "parameters": [
+        "query",
+        "directory",
+        "max_depth"
+      ],
+      "required": []
+    },
+    {
+      "name": "table_analyzer",
+      "available": true,
+      "warnings": [],
+      "parameters": [
+        "source",
+        "action",
+        "max_rows"
+      ],
+      "required": [
+        "source"
+      ]
+    },
+    {
+      "name": "format_converter",
+      "available": true,
+      "warnings": [],
+      "parameters": [
+        "input_data",
+        "from_format",
+        "to_format",
+        "indent"
+      ],
+      "required": [
+        "input_data",
+        "from_format",
+        "to_format"
+      ]
+    }
+  ],
+  "warnings": []
+}

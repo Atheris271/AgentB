@@ -1,0 +1,5 @@
+{
+  "role": "assistant",
+  "content": "根据工具返回结果，结论如下：\n- file_reader 调用失败：Error: file not found - docs/missing.txt",
+  "tool_calls": []
+}
