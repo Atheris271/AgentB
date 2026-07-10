@@ -4,3 +4,4 @@ outputs/_test_*/
 outputs/tmp*/
 models/*
 !models/.gitkeep
+B1_B2_execution_flow.md
