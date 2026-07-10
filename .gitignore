@@ -4,3 +4,6 @@ outputs/_test_*/
 outputs/tmp*/
 models/*
 !models/.gitkeep
+data/*
+memory/*
+outputs/*

@@ -123,13 +123,13 @@ def run_agent(
     model_config: str | None,
     outdir: str,
     llm_mode: str | None = None,
+    interactive: bool = False,
 ) -> dict:
     started = perf_counter()
     input_file = Path(input_path).resolve()
     output_dir = Path(outdir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     runtime = _validate_runtime_input(read_json(input_file))
-    print(f"user_input: {runtime['user_input']}")
     execution_mode = runtime["execution_mode"]
     prompt_path = resolve_from_file(runtime["system_prompt_path"], input_file)
     system_prompt = read_text(prompt_path).strip()
@@ -161,106 +161,167 @@ def run_agent(
     memory_context = _memory_context(selected_memory)
     if memory_context:
         system_prompt = f"{system_prompt}\n\n{memory_context}"
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": runtime["user_input"]},
-    ]
-    tool_rounds = 0
+    system_msg = {"role": "system", "content": system_prompt}
+
+    # Cross-turn accumulators
+    all_messages: list[dict] = []
+    all_turns: list[dict] = []
+    all_tool_messages: list[dict] = []
     llm_calls = 0
-    turns = []
-    all_tool_messages = []
+    tool_rounds_total = 0
     final_answer = ""
     status = "success"
-    terminal_error = None
-    warnings = []
+    terminal_error: dict | None = None
+    warnings: list[str] = []
     if selected_memory.get("status") in {"partial", "error"}:
         warnings.append("memory selection completed with errors")
 
-    while True:
-        llm_calls += 1
-        turn_start = perf_counter()
-        if execution_mode == "fixture":
-            if llm_calls > len(fixture_data["ai_messages"]):
-                raise ValueError("fixture AIMessage sequence ended before a final answer")
-            ai_message = deepcopy(fixture_data["ai_messages"][llm_calls - 1])
-            llm_status = "success"
-            llm_error = None
-        else:
-            llm_result = generate_ai_message(
-                str(model_file),
-                messages,
-                tools_schema,
-                mode,
-                str(output_dir / "llm_calls"),
-                f"llm_call_{llm_calls:03d}",
-            )
-            if not isinstance(llm_result, dict) or not isinstance(llm_result.get("ai_message"), dict):
-                raise ValueError("B4 result must contain an ai_message object")
-            ai_message = llm_result["ai_message"]
-            llm_status = llm_result.get("status")
-            llm_error = llm_result.get("error")
-        messages.append(ai_message)
-        turn = {
-            "turn_index": llm_calls,
-            "ai_message": ai_message,
-            "llm_status": llm_status,
-            "llm_error": llm_error,
-            "tool_messages": [],
-            "latency_ms": None,
-        }
-        if llm_status != "success":
-            status = "llm_parse_error"
-            terminal_error = {
-                "type": "LLMParseError",
-                "message": "B4 failed to parse the model output as a valid AIMessage JSON object.",
-                "llm_call_index": llm_calls,
-                "cause": llm_error,
-            }
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        tool_calls = ai_message.get("tool_calls", [])
-        if not tool_calls:
-            final_answer = ai_message["content"]
-            print(f"content: {final_answer}")
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        if tool_rounds >= runtime["max_turns"]:
-            requested = ", ".join(call.get("name", "unknown") for call in tool_calls)
-            final_answer = (
-                "任务因超过最大工具调用轮次而终止，"
-                f"最后一次模型仍请求调用工具：{requested}。"
-            )
-            status = "max_turns_exceeded"
-            terminal_error = {
-                "type": "MaxTurnsExceeded",
-                "message": final_answer,
-                "unexecuted_tool_calls": tool_calls,
-            }
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        if execution_mode == "fixture":
-            tool_messages = _fixture_tool_messages(
-                tool_calls,
-                fixture_data["tool_messages"],
-            )
-        else:
-            tool_messages = execute_tool_calls(
-                tool_calls,
-                str(tools_file),
-                runtime["toolset"],
-                str(output_dir),
-            )
-        tool_rounds += 1
-        messages.extend(tool_messages)
-        all_tool_messages.extend(tool_messages)
-        turn["tool_messages"] = tool_messages
-        turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-        turns.append(turn)
+    if interactive:
+        print(f"\n{'='*60}")
+        print(f"  交互对话模式  conversation_id: {runtime['conversation_id']}")
+        print(f"  输入 /exit 或 /quit 退出")
+        print(f"{'='*60}\n")
 
-    write_json(messages, output_dir / "messages.json")
+    turn_idx = 0
+    while True:
+        # ---- outer loop: each iteration = one user turn ----
+
+        # --- get user input ---
+        if interactive:
+            if turn_idx == 0:
+                user_text = runtime["user_input"]
+            else:
+                try:
+                    user_text = input(">>> ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    print()
+                    break
+                if not user_text or user_text in {"/exit", "/quit"}:
+                    break
+        else:
+            user_text = runtime["user_input"]
+        print(f"user_input: {user_text}")
+
+        # Build or extend message list for this turn
+        if turn_idx == 0:
+            messages = [system_msg, {"role": "user", "content": user_text}]
+        else:
+            messages.append({"role": "user", "content": user_text})
+
+        # Per-turn state (reset each round)
+        turns: list[dict] = []
+        turn_tool_messages: list[dict] = []
+        tool_rounds = 0
+        turn_final_answer = ""
+        turn_status = "success"
+        turn_terminal_error: dict | None = None
+
+        # ======== tool_calls loop (unchanged logic) ========
+        while True:
+            llm_calls += 1
+            turn_start = perf_counter()
+            if execution_mode == "fixture":
+                if llm_calls > len(fixture_data["ai_messages"]):
+                    raise ValueError("fixture AIMessage sequence ended before a final answer")
+                ai_message = deepcopy(fixture_data["ai_messages"][llm_calls - 1])
+                llm_status = "success"
+                llm_error = None
+            else:
+                llm_result = generate_ai_message(
+                    str(model_file),
+                    messages,
+                    tools_schema,
+                    mode,
+                    str(output_dir / "llm_calls"),
+                    f"llm_call_{llm_calls:03d}",
+                )
+                if not isinstance(llm_result, dict) or not isinstance(llm_result.get("ai_message"), dict):
+                    raise ValueError("B4 result must contain an ai_message object")
+                ai_message = llm_result["ai_message"]
+                llm_status = llm_result.get("status")
+                llm_error = llm_result.get("error")
+            messages.append(ai_message)
+            turn = {
+                "turn_index": llm_calls,
+                "ai_message": ai_message,
+                "llm_status": llm_status,
+                "llm_error": llm_error,
+                "tool_messages": [],
+                "latency_ms": None,
+            }
+            if llm_status != "success":
+                turn_status = "llm_parse_error"
+                turn_terminal_error = {
+                    "type": "LLMParseError",
+                    "message": "B4 failed to parse the model output as a valid AIMessage JSON object.",
+                    "llm_call_index": llm_calls,
+                    "cause": llm_error,
+                }
+                turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+                turns.append(turn)
+                break
+            tool_calls = ai_message.get("tool_calls", [])
+            if not tool_calls:
+                turn_final_answer = ai_message["content"]
+                turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+                turns.append(turn)
+                break
+            if tool_rounds >= runtime["max_turns"]:
+                requested = ", ".join(call.get("name", "unknown") for call in tool_calls)
+                turn_final_answer = (
+                    "任务因超过最大工具调用轮次而终止，"
+                    f"最后一次模型仍请求调用工具：{requested}。"
+                )
+                turn_status = "max_turns_exceeded"
+                turn_terminal_error = {
+                    "type": "MaxTurnsExceeded",
+                    "message": turn_final_answer,
+                    "unexecuted_tool_calls": tool_calls,
+                }
+                turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+                turns.append(turn)
+                break
+            if execution_mode == "fixture":
+                tool_messages = _fixture_tool_messages(
+                    tool_calls,
+                    fixture_data["tool_messages"],
+                )
+            else:
+                tool_messages = execute_tool_calls(
+                    tool_calls,
+                    str(tools_file),
+                    runtime["toolset"],
+                    str(output_dir),
+                )
+            tool_rounds += 1
+            messages.extend(tool_messages)
+            turn_tool_messages.extend(tool_messages)
+            turn["tool_messages"] = tool_messages
+            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+            turns.append(turn)
+        # ======== end tool_calls loop ========
+
+        # Accumulate across turns
+        all_messages = messages  # always the latest (carries full history)
+        all_turns.extend(turns)
+        all_tool_messages.extend(turn_tool_messages)
+        tool_rounds_total += tool_rounds
+        final_answer = turn_final_answer
+        status = turn_status
+        terminal_error = turn_terminal_error
+
+        if turn_final_answer:
+            print(f"content: {turn_final_answer}")
+
+        if not interactive:
+            break
+
+        if turn_status != "success":
+            break
+
+        turn_idx += 1
+
+    write_json(all_messages, output_dir / "messages.json")
     if execution_mode == "integrated":
         write_json(all_tool_messages, output_dir / "tool_messages.json")
     write_text(final_answer.strip() + "\n", output_dir / "final_answer.md")
@@ -273,9 +334,9 @@ def run_agent(
         "status": status,
         "toolset": runtime["toolset"],
         "max_turns": runtime["max_turns"],
-        "tool_rounds_used": tool_rounds,
+        "tool_rounds_used": tool_rounds_total,
         "llm_call_count": llm_calls,
-        "turns": turns,
+        "turns": all_turns,
         "final_answer_path": "final_answer.md",
         "memory_save": memory_save,
         "warnings": warnings,
@@ -329,7 +390,7 @@ def run_agent(
                 "execution_mode": execution_mode,
                 "status": trace["status"],
                 "llm_mode": mode,
-                "tool_rounds_used": tool_rounds,
+                "tool_rounds_used": tool_rounds_total,
                 "llm_call_count": llm_calls,
                 "elapsed_ms": result["elapsed_ms"],
             },
@@ -346,6 +407,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model_config")
     parser.add_argument("--llm_mode", choices=["mock", "prompt_json"], default=None)
     parser.add_argument("--outdir", required=True)
+    parser.add_argument("--interactive", "-i", action="store_true",
+                        help="交互对话模式：用户在命令行持续输入消息，对话历史跨轮次保留。")
     return parser
 
 
@@ -359,6 +422,7 @@ def main(argv: list[str] | None = None) -> int:
             str(resolve_cli_path(args.model_config)) if args.model_config else None,
             str(resolve_cli_path(args.outdir)),
             args.llm_mode,
+            interactive=args.interactive,
         )
         print(result["final_answer_path"])
         return 0
