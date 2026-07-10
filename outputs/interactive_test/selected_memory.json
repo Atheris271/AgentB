@@ -1,0 +1,20 @@
+{
+  "status": "success",
+  "query": "",
+  "selected_memory_docs": [
+    {
+      "memory_id": "mem_course_001",
+      "memory_type": "global",
+      "title": "Agent 基础概念",
+      "path": "global/mem_course_001.md",
+      "content": "# Agent 基础概念\n\nAgent ",
+      "original_chars": 75,
+      "included_chars": 20,
+      "truncated": true
+    }
+  ],
+  "max_memory_chars": 20,
+  "total_chars": 20,
+  "truncated": true,
+  "errors": []
+}

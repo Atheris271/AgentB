@@ -1,0 +1,21 @@
+{
+  "mode": "mock",
+  "backend": "mock",
+  "raw_text": "{\"content\": \"\", \"tool_calls\": [{\"id\": \"call_001\", \"name\": \"file_reader\", \"args\": {\"path\": \"docs/agent_intro.txt\", \"max_chars\": 2000}}]}",
+  "parsed_candidate": {
+    "content": "",
+    "tool_calls": [
+      {
+        "id": "call_001",
+        "name": "file_reader",
+        "args": {
+          "path": "docs/agent_intro.txt",
+          "max_chars": 2000
+        }
+      }
+    ]
+  },
+  "status": "success",
+  "error": null,
+  "generated_at": "2026-07-10T09:41:14+08:00"
+}

@@ -7,7 +7,7 @@ from pathlib import Path
 from time import perf_counter
 
 from common.io_utils import append_jsonl, read_json, read_text, read_yaml, write_json, write_text
-from common.logging_utils import now_iso
+from common.logging_utils import now_iso, measure_latency
 from common.path_utils import resolve_cli_path, resolve_from_file
 from common.schemas import validate_ai_message
 
@@ -116,6 +116,136 @@ def _fixture_tool_messages(tool_calls: list[dict], preset_messages: dict) -> lis
     return results
 
 
+def _run_tool_loop(
+    messages: list[dict],
+    tools_schema: list[dict],
+    execution_mode: str,
+    mode: str,
+    model_file: Path,
+    tools_file: Path,
+    toolset: str,
+    output_dir: Path,
+    max_turns: int,
+    fixture_data: dict | None = None,
+    global_llm_calls: int = 0,
+) -> dict:
+    """Run one complete tool-calling loop against the given messages list.
+
+    Returns the updated messages (with all ai/tool messages appended), the
+    final answer, and per-round statistics.  ``global_llm_calls`` allows the
+    caller to continue a global counter across multiple invocations (used by
+    the interactive REPL).
+    """
+    tool_rounds = 0
+    llm_calls = 0
+    turns: list[dict] = []
+    all_tool_messages: list[dict] = []
+    final_answer = ""
+    status = "success"
+    terminal_error: dict | None = None
+
+    while True:
+        llm_calls += 1
+        turn_index = global_llm_calls + llm_calls
+        turn_start = perf_counter()
+        if execution_mode == "fixture":
+            if fixture_data is None:
+                raise ValueError("fixture_data is required in fixture mode")
+            if turn_index > len(fixture_data["ai_messages"]):
+                raise ValueError("fixture AIMessage sequence ended before a final answer")
+            ai_message = deepcopy(fixture_data["ai_messages"][turn_index - 1])
+            llm_status = "success"
+            llm_error = None
+        else:
+            llm_result = generate_ai_message(
+                str(model_file),
+                messages,
+                tools_schema,
+                mode,
+                str(output_dir / "llm_calls"),
+                f"llm_call_{turn_index:03d}",
+            )
+            if not isinstance(llm_result, dict) or not isinstance(llm_result.get("ai_message"), dict):
+                raise ValueError("B4 result must contain an ai_message object")
+            ai_message = llm_result["ai_message"]
+            llm_status = llm_result.get("status")
+            llm_error = llm_result.get("error")
+        messages.append(ai_message)
+        turn = {
+            "turn_index": turn_index,
+            "ai_message": ai_message,
+            "llm_status": llm_status,
+            "llm_error": llm_error,
+            "tool_messages": [],
+            "latency_ms": None,
+        }
+        if llm_status != "success":
+            status = "llm_parse_error"
+            terminal_error = {
+                "type": "LLMParseError",
+                "message": "B4 failed to parse the model output as a valid AIMessage JSON object.",
+                "llm_call_index": turn_index,
+                "cause": llm_error,
+            }
+            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+            turns.append(turn)
+            break
+        tool_calls = ai_message.get("tool_calls", [])
+        if not tool_calls:
+            final_answer = ai_message["content"]
+            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+            turns.append(turn)
+            break
+        if tool_rounds >= max_turns:
+            requested = ", ".join(call.get("name", "unknown") for call in tool_calls)
+            final_answer = (
+                "任务因超过最大工具调用轮次而终止，"
+                f"最后一次模型仍请求调用工具：{requested}。"
+            )
+            status = "max_turns_exceeded"
+            terminal_error = {
+                "type": "MaxTurnsExceeded",
+                "message": final_answer,
+                "unexecuted_tool_calls": tool_calls,
+            }
+            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+            turns.append(turn)
+            break
+        if execution_mode == "fixture":
+            if fixture_data is None:
+                raise ValueError("fixture_data is required in fixture mode")
+            tool_messages = _fixture_tool_messages(
+                tool_calls,
+                fixture_data["tool_messages"],
+            )
+        else:
+            from b3_tool_layer import execute_tool_calls
+
+            tool_messages = execute_tool_calls(
+                tool_calls,
+                str(tools_file),
+                toolset,
+                str(output_dir),
+            )
+        tool_rounds += 1
+        messages.extend(tool_messages)
+        all_tool_messages.extend(tool_messages)
+        turn["tool_messages"] = tool_messages
+        turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
+        turns.append(turn)
+
+    return {
+        "messages": messages,
+        "final_answer": final_answer,
+        "status": status,
+        "terminal_error": terminal_error,
+        "turns": turns,
+        "all_tool_messages": all_tool_messages,
+        "tool_rounds": tool_rounds,
+        "llm_calls": llm_calls,
+    }
+
+
 def run_agent(
     input_path: str,
     tools_config: str | None,
@@ -143,7 +273,7 @@ def run_agent(
     else:
         if not tools_config or not memory_config or not model_config:
             raise ValueError("integrated mode requires tools_config, memory_config, and model_config")
-        from b3_tool_layer import execute_tool_calls, get_tools_schema
+        from b3_tool_layer import get_tools_schema
         from b5_memory import load_memory
 
         tools_file = Path(tools_config).resolve()
@@ -165,100 +295,33 @@ def run_agent(
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": runtime["user_input"]},
     ]
-    tool_rounds = 0
-    llm_calls = 0
-    turns = []
-    all_tool_messages = []
-    final_answer = ""
-    status = "success"
-    terminal_error = None
-    warnings = []
+    warnings: list[str] = []
     if selected_memory.get("status") in {"partial", "error"}:
         warnings.append("memory selection completed with errors")
 
-    while True:
-        llm_calls += 1
-        turn_start = perf_counter()
-        if execution_mode == "fixture":
-            if llm_calls > len(fixture_data["ai_messages"]):
-                raise ValueError("fixture AIMessage sequence ended before a final answer")
-            ai_message = deepcopy(fixture_data["ai_messages"][llm_calls - 1])
-            llm_status = "success"
-            llm_error = None
-        else:
-            llm_result = generate_ai_message(
-                str(model_file),
-                messages,
-                tools_schema,
-                mode,
-                str(output_dir / "llm_calls"),
-                f"llm_call_{llm_calls:03d}",
-            )
-            if not isinstance(llm_result, dict) or not isinstance(llm_result.get("ai_message"), dict):
-                raise ValueError("B4 result must contain an ai_message object")
-            ai_message = llm_result["ai_message"]
-            llm_status = llm_result.get("status")
-            llm_error = llm_result.get("error")
-        messages.append(ai_message)
-        turn = {
-            "turn_index": llm_calls,
-            "ai_message": ai_message,
-            "llm_status": llm_status,
-            "llm_error": llm_error,
-            "tool_messages": [],
-            "latency_ms": None,
-        }
-        if llm_status != "success":
-            status = "llm_parse_error"
-            terminal_error = {
-                "type": "LLMParseError",
-                "message": "B4 failed to parse the model output as a valid AIMessage JSON object.",
-                "llm_call_index": llm_calls,
-                "cause": llm_error,
-            }
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        tool_calls = ai_message.get("tool_calls", [])
-        if not tool_calls:
-            final_answer = ai_message["content"]
-            print(f"content: {final_answer}")
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        if tool_rounds >= runtime["max_turns"]:
-            requested = ", ".join(call.get("name", "unknown") for call in tool_calls)
-            final_answer = (
-                "任务因超过最大工具调用轮次而终止，"
-                f"最后一次模型仍请求调用工具：{requested}。"
-            )
-            status = "max_turns_exceeded"
-            terminal_error = {
-                "type": "MaxTurnsExceeded",
-                "message": final_answer,
-                "unexecuted_tool_calls": tool_calls,
-            }
-            turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-            turns.append(turn)
-            break
-        if execution_mode == "fixture":
-            tool_messages = _fixture_tool_messages(
-                tool_calls,
-                fixture_data["tool_messages"],
-            )
-        else:
-            tool_messages = execute_tool_calls(
-                tool_calls,
-                str(tools_file),
-                runtime["toolset"],
-                str(output_dir),
-            )
-        tool_rounds += 1
-        messages.extend(tool_messages)
-        all_tool_messages.extend(tool_messages)
-        turn["tool_messages"] = tool_messages
-        turn["latency_ms"] = round((perf_counter() - turn_start) * 1000, 3)
-        turns.append(turn)
+    loop_result = _run_tool_loop(
+        messages=messages,
+        tools_schema=tools_schema,
+        execution_mode=execution_mode,
+        mode=mode,
+        model_file=model_file or Path("."),
+        tools_file=tools_file or Path("."),
+        toolset=runtime["toolset"],
+        output_dir=output_dir,
+        max_turns=runtime["max_turns"],
+        fixture_data=fixture_data,
+    )
+    messages = loop_result["messages"]
+    final_answer = loop_result["final_answer"]
+    status = loop_result["status"]
+    terminal_error = loop_result["terminal_error"]
+    turns = loop_result["turns"]
+    all_tool_messages = loop_result["all_tool_messages"]
+    tool_rounds = loop_result["tool_rounds"]
+    llm_calls = loop_result["llm_calls"]
+
+    if final_answer:
+        print(f"content: {final_answer}")
 
     write_json(messages, output_dir / "messages.json")
     if execution_mode == "integrated":
@@ -338,6 +401,245 @@ def run_agent(
     return result
 
 
+def run_agent_interactive(
+    input_path: str,
+    tools_config: str | None,
+    memory_config: str | None,
+    model_config: str | None,
+    outdir: str,
+    llm_mode: str | None = None,
+) -> dict:
+    """Interactive REPL mode — user types messages at a prompt, conversation
+    history is preserved across turns, tool-calls loop runs each turn."""
+    started = perf_counter()
+    input_file = Path(input_path).resolve()
+    output_dir = Path(outdir).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # --- Phase 0: init (same as run_agent, but skip the first user message) ---
+    base_runtime = read_json(input_file)
+    if not isinstance(base_runtime, dict):
+        raise ValueError("runtime_input.json must contain an object")
+    # Relax user_input validation for interactive mode — we get it from stdin.
+    base_runtime.setdefault("user_input", " ")
+    runtime = _validate_runtime_input(base_runtime)
+    runtime["user_input"] = ""  # will be filled per-turn
+
+    execution_mode = runtime["execution_mode"]
+    if execution_mode != "integrated":
+        raise ValueError("interactive mode only supports execution_mode=integrated")
+    if not tools_config or not memory_config or not model_config:
+        raise ValueError("interactive mode requires --tools_config, --memory_config, and --model_config")
+
+    from b3_tool_layer import get_tools_schema
+    from b5_memory import load_memory
+
+    tools_file = Path(tools_config).resolve()
+    memory_file = Path(memory_config).resolve()
+    model_file = Path(model_config).resolve()
+    mode = llm_mode or _default_llm_mode(model_file)
+
+    prompt_path = resolve_from_file(runtime["system_prompt_path"], input_file)
+    system_prompt = read_text(prompt_path).strip()
+    selected_memory = load_memory(
+        str(memory_file),
+        runtime["selected_memory_ids"],
+        runtime["use_global_memory"],
+        "",  # no query yet
+        str(output_dir),
+    )
+    tools_schema = get_tools_schema(str(tools_file), runtime["toolset"], str(output_dir))
+
+    memory_context = _memory_context(selected_memory)
+    if memory_context:
+        system_prompt = f"{system_prompt}\n\n{memory_context}"
+
+    messages: list[dict] = [{"role": "system", "content": system_prompt}]
+    max_turns = runtime["max_turns"]
+
+    all_turns: list[dict] = []
+    all_tool_messages: list[dict] = []
+    global_llm_calls = 0
+    total_tool_rounds = 0
+    final_answer = ""
+    overall_status = "success"
+    terminal_error: dict | None = None
+
+    print(f"\n{'='*60}")
+    print(f"  交互对话模式 — conversation_id: {runtime['conversation_id']}")
+    print(f"  工具集: {runtime['toolset']}  |  LLM 模式: {mode}")
+    print(f"  输入 /exit 或 /quit 退出，输入空行也退出")
+    print(f"{'='*60}\n")
+
+    # --- Phase 1: REPL loop ---
+    turn_index = 0
+    while True:
+        try:
+            user_input = input(">>> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\n[exit]")
+            break
+
+        if not user_input or user_input in {"/exit", "/quit"}:
+            if not user_input:
+                print("[exit]")
+            break
+
+        messages.append({"role": "user", "content": user_input})
+        turn_outdir = output_dir / f"turn_{turn_index:03d}"
+        turn_outdir.mkdir(parents=True, exist_ok=True)
+
+        turn_start = perf_counter()
+        loop_result = _run_tool_loop(
+            messages=messages,
+            tools_schema=tools_schema,
+            execution_mode="integrated",
+            mode=mode,
+            model_file=model_file,
+            tools_file=tools_file,
+            toolset=runtime["toolset"],
+            output_dir=turn_outdir,
+            max_turns=max_turns,
+            fixture_data=None,
+            global_llm_calls=global_llm_calls,
+        )
+        messages = loop_result["messages"]
+        final_answer = loop_result["final_answer"]
+        turn_status = loop_result["status"]
+        turn_turns = loop_result["turns"]
+        turn_tool_messages = loop_result["all_tool_messages"]
+        tool_rounds_used = loop_result["tool_rounds"]
+        llm_calls_used = loop_result["llm_calls"]
+        global_llm_calls += llm_calls_used
+        total_tool_rounds += tool_rounds_used
+        turn_elapsed = round((perf_counter() - turn_start) * 1000, 3)
+
+        all_turns.extend(turn_turns)
+        all_tool_messages.extend(turn_tool_messages)
+
+        if turn_status != "success":
+            overall_status = turn_status
+            terminal_error = loop_result["terminal_error"]
+
+        print(f"\nAgent: {final_answer}\n")
+
+        # Write per-turn artifacts
+        write_json(messages, turn_outdir / "messages.json")
+        write_json(turn_tool_messages, turn_outdir / "tool_messages.json")
+        write_text(final_answer.strip() + "\n", turn_outdir / "final_answer.md")
+        turn_trace = {
+            "conversation_id": runtime["conversation_id"],
+            "turn_index": turn_index,
+            "user_input": user_input,
+            "status": turn_status,
+            "tool_rounds_used": tool_rounds_used,
+            "llm_call_count": llm_calls_used,
+            "turns": turn_turns,
+            "final_answer": final_answer,
+            "error": loop_result["terminal_error"],
+            "elapsed_ms": turn_elapsed,
+        }
+        write_json(turn_trace, turn_outdir / "trace.json")
+        append_jsonl(
+            {
+                "timestamp": now_iso(),
+                "conversation_id": runtime["conversation_id"],
+                "turn_index": turn_index,
+                "status": turn_status,
+                "llm_mode": mode,
+                "tool_rounds_used": tool_rounds_used,
+                "llm_call_count": llm_calls_used,
+                "elapsed_ms": turn_elapsed,
+            },
+            output_dir / "runtime_log.jsonl",
+        )
+
+        if overall_status != "success":
+            break
+        turn_index += 1
+
+    # --- Phase 2: finalize ---
+    total_elapsed = round((perf_counter() - started) * 1000, 3)
+
+    write_json(messages, output_dir / "messages.json")
+    write_json(all_tool_messages, output_dir / "tool_messages.json")
+    write_text(final_answer.strip() + "\n", output_dir / "final_answer.md")
+
+    memory_save = {"requested": runtime["save_memory"], "status": "not_requested"}
+    if overall_status != "success" and runtime["save_memory"] != "none":
+        memory_save = {"requested": runtime["save_memory"], "status": "skipped", "reason": overall_status}
+
+    session_trace = {
+        "conversation_id": runtime["conversation_id"],
+        "execution_mode": "interactive",
+        "status": overall_status,
+        "toolset": runtime["toolset"],
+        "max_turns_per_round": max_turns,
+        "total_turns": turn_index + 1,
+        "total_tool_rounds": total_tool_rounds,
+        "total_llm_calls": global_llm_calls,
+        "turns": all_turns,
+        "final_answer_path": "final_answer.md",
+        "memory_save": memory_save,
+        "warnings": [],
+        "error": terminal_error,
+    }
+    write_json(session_trace, output_dir / "trace.json")
+
+    saved_memory = None
+    if runtime["save_memory"] != "none" and overall_status == "success":
+        try:
+            from b5_memory import save_memory
+
+            saved_memory = save_memory(
+                str(memory_file),
+                runtime["conversation_id"],
+                runtime["save_memory"],
+                str(output_dir / "messages.json"),
+                str(output_dir / "trace.json"),
+                str(output_dir / "final_answer.md"),
+                str(output_dir),
+            )
+            session_trace["memory_save"] = {"requested": runtime["save_memory"], "status": "success"}
+        except Exception as exc:
+            session_trace["memory_save"] = {
+                "requested": runtime["save_memory"],
+                "status": "error",
+                "error": {"type": type(exc).__name__, "message": str(exc)},
+            }
+            if session_trace["status"] == "success":
+                session_trace["status"] = "partial"
+        write_json(session_trace, output_dir / "trace.json")
+
+    append_jsonl(
+        {
+            "timestamp": now_iso(),
+            "conversation_id": runtime["conversation_id"],
+            "execution_mode": "interactive",
+            "status": session_trace["status"],
+            "llm_mode": mode,
+            "total_turns": turn_index + 1,
+            "total_tool_rounds": total_tool_rounds,
+            "total_llm_calls": global_llm_calls,
+            "elapsed_ms": total_elapsed,
+        },
+        output_dir / "runtime_log.jsonl",
+    )
+
+    return {
+        "conversation_id": runtime["conversation_id"],
+        "execution_mode": "interactive",
+        "status": session_trace["status"],
+        "final_answer": final_answer,
+        "messages_path": str(output_dir / "messages.json"),
+        "trace_path": str(output_dir / "trace.json"),
+        "final_answer_path": str(output_dir / "final_answer.md"),
+        "selected_memory": selected_memory,
+        "saved_memory": saved_memory,
+        "elapsed_ms": total_elapsed,
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the local Agent message and tool loop.")
     parser.add_argument("--input", required=True)
@@ -346,20 +648,32 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model_config")
     parser.add_argument("--llm_mode", choices=["mock", "prompt_json"], default=None)
     parser.add_argument("--outdir", required=True)
+    parser.add_argument("--interactive", "-i", action="store_true",
+                        help="REPL mode: user types messages at a prompt; conversation history persists across turns.")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        result = run_agent(
-            str(resolve_cli_path(args.input)),
-            str(resolve_cli_path(args.tools_config)) if args.tools_config else None,
-            str(resolve_cli_path(args.memory_config)) if args.memory_config else None,
-            str(resolve_cli_path(args.model_config)) if args.model_config else None,
-            str(resolve_cli_path(args.outdir)),
-            args.llm_mode,
-        )
+        if args.interactive:
+            result = run_agent_interactive(
+                str(resolve_cli_path(args.input)),
+                str(resolve_cli_path(args.tools_config)) if args.tools_config else None,
+                str(resolve_cli_path(args.memory_config)) if args.memory_config else None,
+                str(resolve_cli_path(args.model_config)) if args.model_config else None,
+                str(resolve_cli_path(args.outdir)),
+                args.llm_mode,
+            )
+        else:
+            result = run_agent(
+                str(resolve_cli_path(args.input)),
+                str(resolve_cli_path(args.tools_config)) if args.tools_config else None,
+                str(resolve_cli_path(args.memory_config)) if args.memory_config else None,
+                str(resolve_cli_path(args.model_config)) if args.model_config else None,
+                str(resolve_cli_path(args.outdir)),
+                args.llm_mode,
+            )
         print(result["final_answer_path"])
         return 0
     except Exception as exc:

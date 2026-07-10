@@ -1,0 +1,2 @@
+{"timestamp": "2026-07-10T09:41:14+08:00", "conversation_id": "conv_001", "turn_index": 0, "status": "success", "llm_mode": "mock", "tool_rounds_used": 1, "llm_call_count": 2, "elapsed_ms": 25.462}
+{"timestamp": "2026-07-10T09:41:14+08:00", "conversation_id": "conv_001", "execution_mode": "interactive", "status": "success", "llm_mode": "mock", "total_turns": 2, "total_tool_rounds": 1, "total_llm_calls": 2, "elapsed_ms": 91.041}
