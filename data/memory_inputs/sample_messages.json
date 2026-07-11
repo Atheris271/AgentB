@@ -1,5 +1,7 @@
 [
-  {"role": "system", "content": "You are a local agent."},
-  {"role": "user", "content": "什么是 Agent？"},
-  {"role": "assistant", "content": "Agent 会结合模型、工具和记忆完成任务。", "tool_calls": []}
+  {"role": "system", "content": "You are a helpful assistant."},
+  {"role": "user", "content": "帮我阅读 docs/agent_intro.txt，总结三条中文要点。"},
+  {"role": "assistant", "content": "", "tool_calls": [{"id": "call_001", "name": "file_reader", "args": {"path": "docs/agent_intro.txt", "max_chars": 2000}}]},
+  {"role": "tool", "tool_call_id": "call_001", "name": "file_reader", "content": "Agent 系统由模型、工具、记忆和执行循环组成。"},
+  {"role": "assistant", "content": "根据文件内容，三条要点是：\n1. Agent 系统由模型、工具、记忆和执行循环组成。\n2. 工具调用让模型能够读取本地文件。\n3. Memory 为 Agent 提供上下文。"}
 ]
