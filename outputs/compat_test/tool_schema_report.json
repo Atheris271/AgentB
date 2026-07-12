@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "toolset": "basic_tools",
+  "tool_count": 5,
+  "tools": [
+    "calculator",
+    "file_reader",
+    "local_file_search",
+    "table_analyzer",
+    "format_converter"
+  ]
+}
