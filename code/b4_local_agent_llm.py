@@ -1,446 +1,567 @@
+"""B4: local Agent LLM decision module.
+
+B4 receives ``messages`` and ``tools_schema`` from B1/B3, then returns a
+standard AIMessage dictionary. It does not execute tools. It only decides
+whether the next assistant message should contain final ``content`` or
+``tool_calls`` for B3 to execute.
+"""
+
 from __future__ import annotations
 
 import argparse
 import json
 import re
 import sys
-from copy import deepcopy
+import time
 from pathlib import Path
 from typing import Any
 
-from common.io_utils import append_jsonl, read_json, read_yaml, write_json
-from common.logging_utils import now_iso
-from common.path_utils import resolve_cli_path, resolve_from_file
-from common.schemas import make_ai_message, validate_ai_message, validate_messages
+ROOT = Path(__file__).resolve().parent.parent
+CODE_ROOT = Path(__file__).resolve().parent
+for item in (ROOT, CODE_ROOT):
+    if str(item) not in sys.path:
+        sys.path.insert(0, str(item))
 
 
-PARSE_ERROR_CONTENT = "模型输出解析失败，无法生成有效工具调用或最终回答。"
-_MODEL_CACHE: dict[tuple[str, ...], tuple[Any, Any]] = {}
+JsonDict = dict[str, Any]
 
 
-def _load_model_config(model_config: str | Path) -> tuple[Path, dict]:
-    path = Path(model_config).resolve()
-    config = read_yaml(path)
-    if not isinstance(config, dict):
-        raise ValueError("model.yaml must contain an object")
-    return path, config
+def _read_json(path: str | Path) -> Any:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
-def _artifact_paths(artifact_dir: str | Path, stem: str | None) -> tuple[Path, Path, Path]:
-    directory = Path(artifact_dir)
-    prefix = f"{stem}_" if stem else ""
-    return (
-        directory / f"{prefix}raw_model_output.json",
-        directory / f"{prefix}ai_message.json",
-        directory / "llm_run_log.jsonl",
-    )
+def _write_json(path: str | Path, data: Any) -> None:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _extract_tool_result(message: dict) -> dict:
-    try:
-        result = json.loads(message["content"])
-    except (KeyError, json.JSONDecodeError, TypeError) as exc:
-        raise ValueError("ToolMessage content is not a SkillResult JSON string") from exc
-    if not isinstance(result, dict):
-        raise ValueError("ToolMessage content must decode to an object")
-    return result
+def _append_jsonl(path: str | Path, record: JsonDict) -> None:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
-def _three_points(text: str) -> list[str]:
-    parts = [part.strip(" \t\r\n。") for part in re.split(r"\n+|(?<=[。！？!?])", text) if part.strip()]
-    points = []
-    for part in parts:
-        if part not in points:
-            points.append(part)
-        if len(points) == 3:
+def _minimal_yaml_load(text: str) -> JsonDict:
+    """Small fallback parser for this project's simple YAML configs."""
+
+    def strip_comment(line: str) -> str:
+        in_quote = False
+        quote = ""
+        for index, char in enumerate(line):
+            if char in {"'", '"'}:
+                if not in_quote:
+                    in_quote = True
+                    quote = char
+                elif quote == char:
+                    in_quote = False
+            elif char == "#" and not in_quote:
+                return line[:index].rstrip()
+        return line.rstrip()
+
+    def scalar(value: str) -> Any:
+        value = value.strip()
+        if value == "":
+            return {}
+        if value in {"true", "True", "TRUE"}:
+            return True
+        if value in {"false", "False", "FALSE"}:
+            return False
+        if value in {"null", "None", "~"}:
+            return None
+        if (value.startswith('"') and value.endswith('"')) or (
+            value.startswith("'") and value.endswith("'")
+        ):
+            return value[1:-1]
+        if value.startswith("[") and value.endswith("]"):
+            inner = value[1:-1].strip()
+            return [] if not inner else [scalar(part) for part in inner.split(",")]
+        if re.fullmatch(r"-?\d+", value):
+            return int(value)
+        if re.fullmatch(r"-?\d+\.\d+", value):
+            return float(value)
+        return value
+
+    lines = text.splitlines()
+    root: JsonDict = {}
+    stack: list[tuple[int, Any]] = [(-1, root)]
+    for index, raw in enumerate(lines):
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        line = strip_comment(raw)
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        content = line.strip()
+        while indent <= stack[-1][0]:
+            stack.pop()
+        parent = stack[-1][1]
+        if content.startswith("- "):
+            if not isinstance(parent, list):
+                raise ValueError(f"List item outside list: {raw}")
+            parent.append(scalar(content[2:]))
+            continue
+        if ":" not in content:
+            raise ValueError(f"Unsupported YAML line: {raw}")
+        key, value = content.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        if value:
+            parent[key] = scalar(value)
+            continue
+        container: Any = {}
+        for next_raw in lines[index + 1 :]:
+            if not next_raw.strip() or next_raw.lstrip().startswith("#"):
+                continue
+            next_indent = len(next_raw) - len(next_raw.lstrip(" "))
+            next_content = strip_comment(next_raw).strip()
+            if next_indent > indent and next_content.startswith("- "):
+                container = []
             break
-    while len(points) < 3:
-        points.append("工具结果未提供更多可提取内容")
-    return points
+        parent[key] = container
+        stack.append((indent, container))
+    return root
 
 
-def _mock_generate(messages: list[dict]) -> dict:
-    tool_messages = [message for message in messages if message.get("role") == "tool"]
-    if not tool_messages:
-        return make_ai_message(
-            "",
-            [
-                {
-                    "id": "call_001",
-                    "name": "file_reader",
-                    "args": {"path": "docs/agent_intro.txt", "max_chars": 2000},
-                }
-            ],
-        )
-    latest = tool_messages[-1]
-    result = _extract_tool_result(latest)
-    if latest.get("status") != "success" or result.get("status") != "success":
-        error = result.get("error") or {}
-        detail = error.get("message", "未知工具错误") if isinstance(error, dict) else str(error)
-        return make_ai_message(f"工具调用失败，无法完成请求：{detail}", [])
-    output = result.get("output") or {}
-    content = output.get("content") if isinstance(output, dict) else None
-    if not isinstance(content, str) or not content.strip():
-        content = json.dumps(output, ensure_ascii=False)
-    points = _three_points(content)
-    answer = "三条中文要点如下：\n" + "\n".join(f"{index}. {point}" for index, point in enumerate(points, 1))
-    return make_ai_message(answer, [])
-
-
-def _parse_tool_calls_fragment(raw_text: str, original_error: json.JSONDecodeError) -> dict:
-    markers = ['"tool_calls":[', '\\"tool_calls\\":[']
-    marker_index = -1
-    marker = ""
-    for item in markers:
-        marker_index = raw_text.find(item)
-        if marker_index != -1:
-            marker = item
-            break
-    if marker_index == -1:
-        raise original_error
-    array_start = marker_index + marker.index("[")
-    array_end = raw_text.rfind("]")
-    if array_end < array_start:
-        raise ValueError("model output contains tool_calls marker but no closing array")
-    array_text = raw_text[array_start : array_end + 1]
+def _load_config(path: str | Path) -> JsonDict:
+    path = Path(path)
     try:
-        tool_calls = json.loads(array_text)
-    except json.JSONDecodeError:
-        tool_calls = json.loads(array_text.replace('\\"', '"'))
-    if not isinstance(tool_calls, list) or not tool_calls:
-        raise original_error
-    return {"content": "", "tool_calls": tool_calls}
+        from common.config_loader import load_yaml
+
+        return load_yaml(path)
+    except Exception:
+        text = path.read_text(encoding="utf-8")
+        stripped = text.strip()
+        if stripped.startswith("{"):
+            return json.loads(stripped)
+        return _minimal_yaml_load(text)
 
 
-def _parse_json_with_backtick_tail(raw_text: str, original_error: json.JSONDecodeError) -> dict:
-    text = raw_text.strip()
-    try:
-        candidate, end_index = json.JSONDecoder().raw_decode(text)
-    except json.JSONDecodeError:
-        raise original_error
-    trailing = text[end_index:].strip()
-    if trailing and set(trailing) <= {"`"}:
-        return candidate
-    raise original_error
+def _load_messages(messages: str | Path | list[JsonDict]) -> list[JsonDict]:
+    if isinstance(messages, (str, Path)):
+        messages = _read_json(messages)
+    if not isinstance(messages, list):
+        raise ValueError("messages must be a JSON array")
+    return [dict(item) for item in messages]
 
 
-def _candidate_to_message(candidate: dict) -> tuple[dict, dict]:
-    if not isinstance(candidate, dict):
-        raise ValueError("model output JSON must be an object")
-    expected_keys = {"content", "tool_calls"}
-    unknown_keys = set(candidate) - expected_keys
-    if unknown_keys:
-        raise ValueError(f"model output JSON contains unknown keys: {', '.join(sorted(unknown_keys))}")
-    message = {
-        "role": "assistant",
-        "content": candidate.get("content", ""),
-        "tool_calls": candidate.get("tool_calls", []),
-    }
-    validate_ai_message(message)
-    has_content = bool(message["content"].strip())
-    has_tool_calls = bool(message["tool_calls"])
-    if has_content == has_tool_calls:
-        raise ValueError("model output must contain either final content or tool calls, but not both")
-    parsed_candidate = {"content": message["content"], "tool_calls": message["tool_calls"]}
-    return parsed_candidate, message
+def _load_tools_schema(tools_schema: str | Path | list[JsonDict]) -> list[JsonDict]:
+    if isinstance(tools_schema, (str, Path)):
+        tools_schema = _read_json(tools_schema)
+    if not isinstance(tools_schema, list):
+        raise ValueError("tools_schema must be a JSON array")
+    return [dict(item) for item in tools_schema]
 
 
-def _parse_model_output(raw_text: str) -> tuple[dict, dict]:
-    try:
-        candidate = json.loads(raw_text.strip())
-    except json.JSONDecodeError as exc:
-        try:
-            candidate = _parse_json_with_backtick_tail(raw_text, exc)
-        except json.JSONDecodeError:
-            candidate = _parse_tool_calls_fragment(raw_text, exc)
-    return _candidate_to_message(candidate)
+def _tool_names(tools_schema: list[JsonDict]) -> set[str]:
+    names = set()
+    for item in tools_schema:
+        fn = item.get("function") if isinstance(item, dict) else None
+        if isinstance(fn, dict) and fn.get("name"):
+            names.add(str(fn["name"]))
+    return names
 
 
-def _dtype_value(torch_module: Any, configured: str) -> Any:
-    if configured == "auto":
-        return "auto"
-    mapping = {
-        "bfloat16": torch_module.bfloat16,
-        "float16": torch_module.float16,
-        "float32": torch_module.float32,
-    }
-    if configured not in mapping:
-        raise ValueError(f"unsupported torch_dtype: {configured}")
-    return mapping[configured]
-
-
-def _model_cache_key(
-    model_path: Path,
-    tokenizer_path: Path,
-    local_only: bool,
-    trust_remote_code: bool,
-    dtype: Any,
-    device_map: Any,
-    max_memory: Any,
-) -> tuple[str, ...]:
-    try:
-        device_map_key = json.dumps(device_map, sort_keys=True, separators=(",", ":"))
-    except TypeError:
-        device_map_key = repr(device_map)
-    try:
-        max_memory_key = json.dumps(max_memory, sort_keys=True, separators=(",", ":"))
-    except TypeError:
-        max_memory_key = repr(max_memory)
-    return (
-        str(model_path),
-        str(tokenizer_path),
-        str(local_only),
-        str(trust_remote_code),
-        str(dtype),
-        device_map_key,
-        max_memory_key,
-    )
-
-
-def _load_model_bundle(
-    auto_model: Any,
-    auto_tokenizer: Any,
-    model_path: Path,
-    tokenizer_path: Path,
-    local_only: bool,
-    trust_remote_code: bool,
-    dtype: Any,
-    device_map: Any,
-    max_memory: Any,
-) -> tuple[Any, Any]:
-    cache_key = _model_cache_key(
-        model_path,
-        tokenizer_path,
-        local_only,
-        trust_remote_code,
-        dtype,
-        device_map,
-        max_memory,
-    )
-    cached = _MODEL_CACHE.get(cache_key)
-    if cached is not None:
-        print("model_cache=hit", file=sys.stderr, flush=True)
-        return cached
-
-    print("model_cache=miss", file=sys.stderr, flush=True)
-    tokenizer = auto_tokenizer.from_pretrained(
-        str(tokenizer_path),
-        local_files_only=local_only,
-        trust_remote_code=trust_remote_code,
-    )
-    model = auto_model.from_pretrained(
-        str(model_path),
-        local_files_only=local_only,
-        trust_remote_code=trust_remote_code,
-        dtype=dtype,
-        device_map=device_map,
-        max_memory=max_memory,
-    )
-    _MODEL_CACHE[cache_key] = (tokenizer, model)
-    return tokenizer, model
-
-
-def _build_prompt_messages(messages: list[dict], tools_schema: list[dict]) -> list[dict]:
-    prompt_messages = deepcopy(messages)
-    format_instruction = (
-        "IMPORTANT OUTPUT FORMAT:\n"
-        "You must return exactly one valid JSON object.\n"
-        "Do not output markdown.\n"
-        "Do not output explanations.\n"
-        "Do not output code fences or backticks.\n"
-        'The first output character must be "{" and the last output character must be "}".\n\n'
-        "Valid schema A:\n"
-        '{"content":"final answer text","tool_calls":[]}\n\n'
-        "Valid schema B:\n"
-        '{"content":"","tool_calls":[{"id":"call_001","name":"file_reader",'
-        '"args":{"path":"docs/agent_intro.txt","max_chars":2000}}]}\n\n'
-        "The top-level keys must be exactly:\n"
-        "- content: string\n"
-        "- tool_calls: array\n\n"
-        "Never put tool_calls inside content.\n"
-        'Never output {"content":"tool_calls": ...}.'
-    )
-    envelope_reminder = (
-        "IMPORTANT OUTPUT FORMAT: Output the JSON object now. "
-        'Your first output character must be "{" and your last output character must be "}". '
-        "Never output a backtick, Markdown, a code block, an explanation, or text outside the JSON. "
-        'Use exactly the top-level keys "content" (string) and "tool_calls" (array). '
-        "Choose exactly one schema: final content with an empty tool_calls array, or empty content with tool calls. "
-        'Never put tool_calls inside content. Never output {"content":"tool_calls": ...}.'
-    )
-    system_instruction = (
-        "\n\nAvailable tools JSON schema:\n"
-        + json.dumps(tools_schema, ensure_ascii=False)
-        + "\n"
-        + format_instruction
-    )
-    if prompt_messages and prompt_messages[0].get("role") == "system":
-        prompt_messages[0]["content"] += system_instruction
-    else:
-        prompt_messages.insert(0, {"role": "system", "content": system_instruction.strip()})
-
-    for message in reversed(prompt_messages):
+def _last_user_text(messages: list[JsonDict]) -> str:
+    for message in reversed(messages):
         if message.get("role") == "user":
-            message["content"] += "\n\n" + envelope_reminder
+            return str(message.get("content") or "")
+    return ""
+
+
+def _tool_messages(messages: list[JsonDict]) -> list[JsonDict]:
+    return [msg for msg in messages if msg.get("role") == "tool"]
+
+
+def _first_available(name: str, names: set[str]) -> str | None:
+    return name if name in names else None
+
+
+def _mock_file_reader_args(path_text: str, tools_schema: list[JsonDict]) -> JsonDict:
+    args: JsonDict = {"path": path_text.replace("\\", "/")}
+    for item in tools_schema:
+        fn = item.get("function") if isinstance(item, dict) else None
+        if isinstance(fn, dict) and fn.get("name") == "file_reader":
+            props = ((fn.get("parameters") or {}).get("properties") or {})
+            if "max_chars" in props:
+                args["max_chars"] = 2000
+            elif "max_size_kb" in props:
+                args["max_size_kb"] = 512
             break
-    if prompt_messages[-1].get("role") == "tool":
-        prompt_messages.append(
-            {
-                "role": "user",
-                "content": (
-                    envelope_reminder
-                    + " The latest ToolMessage already contains a tool result. If it provides the requested "
-                    'information, answer with schema A now and set "tool_calls" to exactly []. Do not repeat the '
-                    "completed tool call."
-                ),
+    return args
+
+
+def _mock_ai_message(messages: list[JsonDict], tools_schema: list[JsonDict]) -> JsonDict:
+    """Deterministic demo mode for environments without a local model."""
+
+    tool_msgs = _tool_messages(messages)
+    names = _tool_names(tools_schema)
+    user_text = _last_user_text(messages)
+
+    if not tool_msgs:
+        file_match = re.search(r"([\w./\\-]+\.(?:txt|md|csv|tsv|json))", user_text)
+        if file_match and _first_available("file_reader", names):
+            return {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": "call_001",
+                        "name": "file_reader",
+                        "args": _mock_file_reader_args(file_match.group(1), tools_schema),
+                    }
+                ],
             }
-        )
-    return prompt_messages
+
+        if re.search(r"\d+\s*[-+*/%^]|\bsqrt\b|平方根|计算", user_text) and _first_available("calculator", names):
+            expression = "sqrt(256)" if "平方根" in user_text or "square root" in user_text.lower() else user_text
+            return {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {"id": "call_001", "name": "calculator", "args": {"expression": expression}}
+                ],
+            }
+
+        return {
+            "role": "assistant",
+            "content": "当前问题不需要调用工具，我可以直接回答。请提供更具体的本地文件、表格或计算任务。",
+            "tool_calls": [],
+        }
+
+    summaries: list[str] = []
+    for tool_msg in tool_msgs:
+        name = tool_msg.get("name", "tool")
+        content = str(tool_msg.get("content") or "")
+        try:
+            payload = json.loads(content)
+            if payload.get("status") == "success":
+                output = payload.get("output")
+                if isinstance(output, dict) and "result" in output:
+                    text = str(output["result"])
+                else:
+                    text = json.dumps(output, ensure_ascii=False)
+                summaries.append(f"{name} 返回成功：{text}")
+            else:
+                summaries.append(f"{name} 调用失败：{payload.get('error')}")
+        except json.JSONDecodeError:
+            summaries.append(f"{name} 返回：{content}")
+    return {
+        "role": "assistant",
+        "content": "根据工具返回结果，结论如下：\n" + "\n".join(f"- {item}" for item in summaries),
+        "tool_calls": [],
+    }
 
 
-def _prompt_json_generate(config_path: Path, config: dict, messages: list[dict], tools_schema: list[dict]) -> str:
+def _message_to_prompt_line(message: JsonDict) -> str:
+    role = message.get("role", "unknown")
+    payload = {key: value for key, value in message.items() if key != "role"}
+    return f"{role}: {json.dumps(payload, ensure_ascii=False)}"
+
+
+def build_prompt(messages: list[JsonDict], tools_schema: list[JsonDict]) -> str:
+    return (
+        "You are a local tool-using agent decision module.\n"
+        "You must output only one valid JSON object and no markdown fences.\n"
+        "Do not output <think>, chain-of-thought, or hidden reasoning.\n"
+        "If a tool is needed, return exactly this shape:\n"
+        '{"role":"assistant","content":"","tool_calls":[{"id":"call_001","name":"tool_name","args":{}}]}\n'
+        "If no tool is needed, return exactly this shape:\n"
+        '{"role":"assistant","content":"final answer","tool_calls":[]}\n\n'
+        "Available tools_schema:\n"
+        f"{json.dumps(tools_schema, ensure_ascii=False, indent=2)}\n\n"
+        "Conversation messages:\n"
+        + "\n".join(_message_to_prompt_line(message) for message in messages)
+        + "\n\nReturn JSON now:"
+    )
+
+
+def _strip_think_blocks(text: str) -> str:
+    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE).strip()
+
+
+def _strip_fences(text: str) -> str:
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```$", "", text)
+    return text.strip()
+
+
+def _extract_json_object(text: str) -> JsonDict:
+    text = _strip_fences(_strip_think_blocks(text))
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    start = text.find("{")
+    if start < 0:
+        raise ValueError("model output does not contain a JSON object")
+    depth = 0
+    in_string = False
+    escape = False
+    for index in range(start, len(text)):
+        char = text[index]
+        if escape:
+            escape = False
+            continue
+        if char == "\\" and in_string:
+            escape = True
+            continue
+        if char == '"':
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                parsed = json.loads(text[start : index + 1])
+                if not isinstance(parsed, dict):
+                    raise ValueError("parsed JSON is not an object")
+                return parsed
+    raise ValueError("could not find a complete JSON object")
+
+
+def _normalize_tool_call(call: Any, index: int) -> JsonDict:
+    if not isinstance(call, dict):
+        raise ValueError(f"tool_calls[{index}] is not an object")
+    if isinstance(call.get("function"), dict):
+        fn = call["function"]
+        name = fn.get("name", "")
+        args = fn.get("arguments", {})
+    else:
+        name = call.get("name") or call.get("tool_name") or ""
+        args = call.get("args", call.get("arguments", {}))
+    if isinstance(args, str):
+        args = json.loads(args)
+    if not isinstance(args, dict):
+        raise ValueError(f"tool_calls[{index}].args must be an object")
+    if not name:
+        raise ValueError(f"tool_calls[{index}].name is missing")
+    return {
+        "id": str(call.get("id") or f"call_{index + 1:03d}"),
+        "name": str(name),
+        "args": args,
+    }
+
+
+def parse_ai_message(raw_text: str) -> tuple[JsonDict, JsonDict]:
+    """Parse raw model text into a standard AIMessage dict."""
+
+    payload = _extract_json_object(raw_text)
+    if "choices" in payload and isinstance(payload["choices"], list):
+        message = payload["choices"][0].get("message", {})
+        if isinstance(message, dict):
+            payload = message
+
+    tool_calls_raw = payload.get("tool_calls") or []
+    if tool_calls_raw and not isinstance(tool_calls_raw, list):
+        raise ValueError("tool_calls must be a list")
+    tool_calls = [
+        _normalize_tool_call(call, index)
+        for index, call in enumerate(tool_calls_raw)
+    ]
+    content = payload.get("content", "")
+    if content is None:
+        content = ""
+    if tool_calls:
+        content = ""
+    if not tool_calls and not str(content).strip():
+        raise ValueError("AIMessage must contain either content or tool_calls")
+
+    ai_message = {
+        "role": "assistant",
+        "content": str(content),
+        "tool_calls": tool_calls,
+    }
+    raw_record = {
+        "status": "success",
+        "raw_text": raw_text,
+        "parsed": ai_message,
+        "error": None,
+    }
+    return ai_message, raw_record
+
+
+def _run_transformers_prompt(prompt: str, model_cfg: JsonDict) -> str:
     try:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
-    except ImportError as exc:
-        raise RuntimeError("prompt_json mode requires requirements-llm.txt") from exc
-    model_config = config.get("model", {})
-    generation_config = config.get("generation", {})
-    model_setting = model_config.get("model_name_or_path")
-    tokenizer_setting = model_config.get("tokenizer_name_or_path", model_setting)
-    if not isinstance(model_setting, str) or not isinstance(tokenizer_setting, str):
-        raise ValueError("model_name_or_path and tokenizer_name_or_path are required")
-    model_path = resolve_from_file(model_setting, config_path)
-    tokenizer_path = resolve_from_file(tokenizer_setting, config_path)
-    if not model_path.exists() or not tokenizer_path.exists():
-        raise FileNotFoundError(f"local model path does not exist: {model_path}")
-    local_only = bool(model_config.get("local_files_only", True))
-    trust_remote_code = bool(model_config.get("trust_remote_code", False))
-    dtype = _dtype_value(torch, str(model_config.get("torch_dtype", "auto")))
-    tokenizer, model = _load_model_bundle(
-        AutoModelForCausalLM,
-        AutoTokenizer,
-        model_path,
+    except ModuleNotFoundError as exc:
+        raise RuntimeError(
+            "prompt_json mode requires torch and transformers. Install dependencies "
+            "and make sure the local model path in model.yaml is correct."
+        ) from exc
+
+    model_section = model_cfg.get("model") or {}
+    generation = model_section.get("generation") or model_cfg.get("generation") or {}
+    context = model_section.get("context") or model_cfg.get("context") or {}
+    model_path = (
+        model_section.get("model_name_or_path")
+        or model_section.get("model_name")
+        or model_section.get("model_path")
+    )
+    tokenizer_path = model_section.get("tokenizer_name_or_path") or model_path
+    if not model_path:
+        raise ValueError("model.yaml must set model.model_name_or_path for prompt_json mode")
+
+    dtype_name = str(model_section.get("torch_dtype") or "auto")
+    dtype = "auto"
+    if dtype_name == "bfloat16":
+        dtype = torch.bfloat16
+    elif dtype_name == "float16":
+        dtype = torch.float16
+    elif dtype_name == "float32":
+        dtype = torch.float32
+
+    tokenizer = AutoTokenizer.from_pretrained(
         tokenizer_path,
-        local_only,
-        trust_remote_code,
-        dtype,
-        model_config.get("device_map", "auto"),
-        model_config.get("max_memory"),
+        local_files_only=bool(model_section.get("local_files_only", True)),
+        trust_remote_code=bool(model_section.get("trust_remote_code", True)),
     )
-    prompt_messages = _build_prompt_messages(messages, tools_schema)
-    inputs = tokenizer.apply_chat_template(
-        prompt_messages,
-        tokenize=True,
-        add_generation_prompt=True,
-        return_tensors="pt",
-        return_dict=True,
-        enable_thinking=False,
+    model = AutoModelForCausalLM.from_pretrained(
+        model_path,
+        local_files_only=bool(model_section.get("local_files_only", True)),
+        trust_remote_code=bool(model_section.get("trust_remote_code", True)),
+        torch_dtype=dtype,
+        device_map=model_section.get("device_map", "auto"),
     )
-    device = next(model.parameters()).device
-    inputs = inputs.to(device)
-    input_length = inputs["input_ids"].shape[-1]
-    options = {
-        "max_new_tokens": int(generation_config.get("max_new_tokens", 1024)),
-        "do_sample": bool(generation_config.get("do_sample", False)),
-    }
+
+    inputs = tokenizer(prompt, return_tensors="pt")
+    max_input_tokens = int(context.get("max_input_tokens") or 4096)
+    if inputs["input_ids"].shape[-1] > max_input_tokens:
+        inputs["input_ids"] = inputs["input_ids"][:, -max_input_tokens:]
+        if "attention_mask" in inputs:
+            inputs["attention_mask"] = inputs["attention_mask"][:, -max_input_tokens:]
+    inputs = {key: value.to(model.device) for key, value in inputs.items()}
+
     with torch.no_grad():
-        generated = model.generate(**inputs, **options)
-    new_tokens = generated[0][input_length:]
-    return tokenizer.decode(new_tokens, skip_special_tokens=True)
+        generated = model.generate(
+            **inputs,
+            max_new_tokens=int(generation.get("max_new_tokens") or 1024),
+            do_sample=bool(generation.get("do_sample", False)),
+            temperature=float(generation.get("temperature", 0) or 0),
+            top_p=float(generation.get("top_p", 1) or 1),
+            pad_token_id=tokenizer.eos_token_id,
+        )
+    output_ids = generated[0][inputs["input_ids"].shape[-1] :]
+    return tokenizer.decode(output_ids, skip_special_tokens=True)
 
 
 def generate_ai_message(
-    model_config: str,
-    messages: list[dict],
-    tools_schema: list[dict],
-    mode: str = "prompt_json",
-    artifact_dir: str | None = None,
-    artifact_stem: str | None = None,
-) -> dict:
-    config_path, config = _load_model_config(model_config)
-    messages = validate_messages(deepcopy(messages))
-    if not isinstance(tools_schema, list):
-        raise ValueError("tools_schema must be an array")
-    generated_at = now_iso()
-    backend = "mock" if mode == "mock" else config.get("model", {}).get("backend", "transformers")
-    if mode == "mock":
-        ai_message = _mock_generate(messages)
-        raw_text = json.dumps({"content": ai_message["content"], "tool_calls": ai_message["tool_calls"]}, ensure_ascii=False)
-        parsed_candidate = {"content": ai_message["content"], "tool_calls": ai_message["tool_calls"]}
-        status = "success"
-        error = None
-    elif mode == "prompt_json":
-        raw_text = _prompt_json_generate(config_path, config, messages, tools_schema)
-        try:
-            parsed_candidate, ai_message = _parse_model_output(raw_text)
-            status = "success"
-            error = None
-        except Exception as exc:
-            parsed_candidate = None
-            ai_message = make_ai_message(PARSE_ERROR_CONTENT, [])
-            status = "error"
-            error = {"type": type(exc).__name__, "message": str(exc)}
-    else:
-        raise ValueError("mode must be mock or prompt_json")
-    raw_record = {
-        "mode": mode,
-        "backend": backend,
-        "raw_text": raw_text,
-        "parsed_candidate": parsed_candidate,
-        "status": status,
-        "error": error,
-        "generated_at": generated_at,
-    }
-    if artifact_dir:
-        raw_path, message_path, log_path = _artifact_paths(artifact_dir, artifact_stem)
-        write_json(raw_record, raw_path)
-        write_json(ai_message, message_path)
-        append_jsonl(
-            {
-                "timestamp": generated_at,
-                "mode": mode,
-                "status": status,
-                "raw_output_path": str(raw_path),
-                "ai_message_path": str(message_path),
-                "error": error,
-            },
-            log_path,
-        )
-    return {
+    model_config: str | Path | JsonDict,
+    messages: str | Path | list[JsonDict],
+    tools_schema: str | Path | list[JsonDict],
+    mode: str | None = None,
+    outdir: str | Path | None = None,
+    call_id: str | None = None,
+) -> JsonDict:
+    """Public B1-facing API: generate one AIMessage dict."""
+
+    model_cfg = _load_config(model_config) if isinstance(model_config, (str, Path)) else dict(model_config)
+    message_list = _load_messages(messages)
+    schema = _load_tools_schema(tools_schema)
+    selected_mode = mode or (model_cfg.get("runtime") or {}).get("default_mode") or "prompt_json"
+    out = Path(outdir) if outdir else None
+    if out and call_id:
+        out = out / call_id
+    if out:
+        out.mkdir(parents=True, exist_ok=True)
+
+    started = time.perf_counter()
+    prompt_text = build_prompt(message_list, schema)
+    raw_record: JsonDict
+
+    try:
+        if selected_mode == "mock":
+            ai_message = _mock_ai_message(message_list, schema)
+            raw_text = json.dumps(ai_message, ensure_ascii=False)
+            raw_record = {
+                "status": "success",
+                "mode": "mock",
+                "raw_text": raw_text,
+                "parsed": ai_message,
+                "error": None,
+            }
+        elif selected_mode == "prompt_json":
+            raw_text = _run_transformers_prompt(prompt_text, model_cfg)
+            ai_message, raw_record = parse_ai_message(raw_text)
+            raw_record["mode"] = "prompt_json"
+        else:
+            raise ValueError(f"unsupported B4 mode: {selected_mode}")
+    except Exception as exc:
+        ai_message = {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [],
+            "status": "error",
+            "error": str(exc),
+        }
+        raw_record = {
+            "status": "error",
+            "mode": selected_mode,
+            "raw_text": "",
+            "parsed": None,
+            "error": str(exc),
+        }
+
+    raw_record["latency_ms"] = round((time.perf_counter() - started) * 1000, 3)
+
+    result = {
+        "status": raw_record["status"],
         "ai_message": ai_message,
-        "status": status,
-        "error": error,
+        "raw_model_output": raw_record,
+        "error": raw_record.get("error"),
     }
 
+    if out:
+        _write_json(out / "raw_model_output.json", raw_record)
+        _write_json(out / "ai_message.json", ai_message)
+        (out / "prompt_text.txt").write_text(prompt_text, encoding="utf-8")
+        _append_jsonl(
+            out / "llm_run_log.jsonl",
+            {
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "mode": selected_mode,
+                "status": raw_record["status"],
+                "latency_ms": raw_record["latency_ms"],
+                "message_count": len(message_list),
+                "tool_count": len(schema),
+                "error": raw_record.get("error"),
+            },
+        )
+    return result
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Generate one AIMessage with a local or mock LLM.")
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="B4 local Agent LLM decision module")
     parser.add_argument("--model_config", required=True)
     parser.add_argument("--messages", required=True)
     parser.add_argument("--tools_schema", required=True)
-    parser.add_argument("--mode", choices=["mock", "prompt_json"], required=True)
-    parser.add_argument("--outdir", required=True)
-    return parser
+    parser.add_argument("--mode", default=None, choices=["mock", "prompt_json"])
+    parser.add_argument("--outdir", default="../outputs/B4_llm/demo")
+    args = parser.parse_args()
 
-
-def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    try:
-        outdir = resolve_cli_path(args.outdir)
-        generate_ai_message(
-            str(resolve_cli_path(args.model_config)),
-            read_json(resolve_cli_path(args.messages)),
-            read_json(resolve_cli_path(args.tools_schema)),
-            args.mode,
-            str(outdir),
-        )
-        print(outdir / "ai_message.json")
-        return 0
-    except Exception as exc:
-        print(f"fatal: {type(exc).__name__}: {exc}", file=sys.stderr)
-        return 1
+    ai_message = generate_ai_message(
+        args.model_config,
+        args.messages,
+        args.tools_schema,
+        mode=args.mode,
+        outdir=args.outdir,
+    )
+    status = ai_message.get("status", "success")
+    if "ai_message" in ai_message:
+        print(json.dumps(ai_message, ensure_ascii=False))
+    else:
+        print(json.dumps({"status": status, "ai_message": ai_message}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
