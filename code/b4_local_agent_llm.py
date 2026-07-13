@@ -192,6 +192,75 @@ def _mock_file_reader_args(path_text: str, tools_schema: list[JsonDict]) -> Json
     return args
 
 
+def _tool_properties(tool_name: str, tools_schema: list[JsonDict]) -> JsonDict:
+    for item in tools_schema:
+        fn = item.get("function") if isinstance(item, dict) else None
+        if isinstance(fn, dict) and fn.get("name") == tool_name:
+            return ((fn.get("parameters") or {}).get("properties") or {})
+    return {}
+
+
+def _mock_local_file_search_args(user_text: str, tools_schema: list[JsonDict]) -> JsonDict:
+    props = _tool_properties("local_file_search", tools_schema)
+    args: JsonDict = {}
+    if "query" in props:
+        args["query"] = "Agent" if "Agent" in user_text else user_text.strip()[:40] or "Agent"
+    if "root_dir" in props:
+        args["root_dir"] = "docs"
+    elif "directory" in props:
+        args["directory"] = "docs"
+    if "file_types" in props:
+        args["file_types"] = [".txt", ".md"]
+    if "top_k" in props:
+        args["top_k"] = 5
+    if "max_depth" in props:
+        args["max_depth"] = 3
+    return args
+
+
+def _extract_math_expression(user_text: str) -> str:
+    match = re.search(r"([0-9\s+\-*/().%^]+)", user_text)
+    if match and match.group(1).strip():
+        return match.group(1).strip()
+    return "sqrt(256)" if "square root" in user_text.lower() else user_text
+
+
+def _mock_multi_tool_calls(user_text: str, names: set[str], tools_schema: list[JsonDict]) -> list[JsonDict]:
+    if not re.search(r"同时|并且|分别|以及|and|also", user_text, re.IGNORECASE):
+        return []
+
+    calls: list[JsonDict] = []
+    if re.search(r"\d+\s*[-+*/%^]|\bsqrt\b|计算|算一下", user_text) and _first_available("calculator", names):
+        calls.append(
+            {
+                "id": f"call_{len(calls) + 1:03d}",
+                "name": "calculator",
+                "args": {"expression": _extract_math_expression(user_text)},
+            }
+        )
+
+    file_match = re.search(r"([\w./\\-]+\.(?:txt|md|csv|tsv|json))", user_text)
+    if file_match and _first_available("file_reader", names):
+        calls.append(
+            {
+                "id": f"call_{len(calls) + 1:03d}",
+                "name": "file_reader",
+                "args": _mock_file_reader_args(file_match.group(1), tools_schema),
+            }
+        )
+
+    if re.search(r"搜索|查找|search|find", user_text, re.IGNORECASE) and _first_available("local_file_search", names):
+        calls.append(
+            {
+                "id": f"call_{len(calls) + 1:03d}",
+                "name": "local_file_search",
+                "args": _mock_local_file_search_args(user_text, tools_schema),
+            }
+        )
+
+    return calls
+
+
 def _mock_ai_message(messages: list[JsonDict], tools_schema: list[JsonDict]) -> JsonDict:
     """Deterministic demo mode for environments without a local model."""
 
@@ -200,6 +269,10 @@ def _mock_ai_message(messages: list[JsonDict], tools_schema: list[JsonDict]) -> 
     user_text = _last_user_text(messages)
 
     if not tool_msgs:
+        multi_calls = _mock_multi_tool_calls(user_text, names, tools_schema)
+        if multi_calls:
+            return {"role": "assistant", "content": "", "tool_calls": multi_calls}
+
         file_match = re.search(r"([\w./\\-]+\.(?:txt|md|csv|tsv|json))", user_text)
         if file_match and _first_available("file_reader", names):
             return {
@@ -221,6 +294,19 @@ def _mock_ai_message(messages: list[JsonDict], tools_schema: list[JsonDict]) -> 
                 "content": "",
                 "tool_calls": [
                     {"id": "call_001", "name": "calculator", "args": {"expression": expression}}
+                ],
+            }
+
+        if re.search(r"搜索|查找|search|find", user_text, re.IGNORECASE) and _first_available("local_file_search", names):
+            return {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": "call_001",
+                        "name": "local_file_search",
+                        "args": _mock_local_file_search_args(user_text, tools_schema),
+                    }
                 ],
             }
 
@@ -265,8 +351,8 @@ def build_prompt(messages: list[JsonDict], tools_schema: list[JsonDict]) -> str:
         "You are a local tool-using agent decision module.\n"
         "You must output only one valid JSON object and no markdown fences.\n"
         "Do not output <think>, chain-of-thought, or hidden reasoning.\n"
-        "If a tool is needed, return exactly this shape:\n"
-        '{"role":"assistant","content":"","tool_calls":[{"id":"call_001","name":"tool_name","args":{}}]}\n'
+        "If one or more tools are needed, return exactly this shape. Use multiple items only for independent operations:\n"
+        '{"role":"assistant","content":"","tool_calls":[{"id":"call_001","name":"tool_name","args":{}},{"id":"call_002","name":"another_tool","args":{}}]}\n'
         "If no tool is needed, return exactly this shape:\n"
         '{"role":"assistant","content":"final answer","tool_calls":[]}\n\n'
         "Available tools_schema:\n"
@@ -390,7 +476,7 @@ def parse_ai_message(raw_text: str) -> tuple[JsonDict, JsonDict]:
     return ai_message, raw_record
 
 
-def _run_transformers_prompt(prompt: str, model_cfg: JsonDict) -> str:
+def _run_transformers_prompt(prompt: str, model_cfg: JsonDict) -> tuple[str, JsonDict]:
     try:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -452,7 +538,14 @@ def _run_transformers_prompt(prompt: str, model_cfg: JsonDict) -> str:
             pad_token_id=tokenizer.eos_token_id,
         )
     output_ids = generated[0][inputs["input_ids"].shape[-1] :]
-    return tokenizer.decode(output_ids, skip_special_tokens=True)
+    input_tokens = int(inputs["input_ids"].shape[-1])
+    output_tokens = int(output_ids.shape[-1])
+    usage = {
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "total_tokens": input_tokens + output_tokens,
+    }
+    return tokenizer.decode(output_ids, skip_special_tokens=True), usage
 
 
 def generate_ai_message(
@@ -478,22 +571,35 @@ def generate_ai_message(
     started = time.perf_counter()
     prompt_text = build_prompt(message_list, schema)
     raw_record: JsonDict
+    token_usage: JsonDict = {
+        "input_tokens": None,
+        "output_tokens": None,
+        "total_tokens": None,
+    }
 
     try:
         if selected_mode == "mock":
             ai_message = _mock_ai_message(message_list, schema)
             raw_text = json.dumps(ai_message, ensure_ascii=False)
+            token_usage = {
+                "input_tokens": len(prompt_text.split()),
+                "output_tokens": len(raw_text.split()),
+                "total_tokens": len(prompt_text.split()) + len(raw_text.split()),
+                "note": "mock_whitespace_estimate",
+            }
             raw_record = {
                 "status": "success",
                 "mode": "mock",
                 "raw_text": raw_text,
                 "parsed": ai_message,
                 "error": None,
+                "token_usage": token_usage,
             }
         elif selected_mode == "prompt_json":
-            raw_text = _run_transformers_prompt(prompt_text, model_cfg)
+            raw_text, token_usage = _run_transformers_prompt(prompt_text, model_cfg)
             ai_message, raw_record = parse_ai_message(raw_text)
             raw_record["mode"] = "prompt_json"
+            raw_record["token_usage"] = token_usage
         else:
             raise ValueError(f"unsupported B4 mode: {selected_mode}")
     except Exception as exc:
@@ -510,9 +616,11 @@ def generate_ai_message(
             "raw_text": "",
             "parsed": None,
             "error": str(exc),
+            "token_usage": token_usage,
         }
 
     raw_record["latency_ms"] = round((time.perf_counter() - started) * 1000, 3)
+    raw_record.setdefault("token_usage", token_usage)
 
     result = {
         "status": raw_record["status"],
@@ -534,6 +642,7 @@ def generate_ai_message(
                 "latency_ms": raw_record["latency_ms"],
                 "message_count": len(message_list),
                 "tool_count": len(schema),
+                "token_usage": raw_record.get("token_usage"),
                 "error": raw_record.get("error"),
             },
         )
