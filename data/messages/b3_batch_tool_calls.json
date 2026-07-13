@@ -1,0 +1,46 @@
+{
+  "role": "assistant",
+  "content": "",
+  "tool_calls": [
+    {
+      "id": "call_calc_001",
+      "name": "calculator",
+      "args": {
+        "expression": "(18+24)*3"
+      }
+    },
+    {
+      "id": "call_calc_002",
+      "name": "calculator",
+      "args": {
+        "expression": "(18+24)*3"
+      }
+    },
+    {
+      "id": "call_file_001",
+      "name": "file_reader",
+      "args": {
+        "path": "docs/agent_intro.txt",
+        "max_chars": 2000
+      }
+    },
+    {
+      "id": "call_search_001",
+      "name": "local_file_search",
+      "args": {
+        "query": "Agent",
+        "root_dir": "docs",
+        "file_types": [".txt", ".md"],
+        "top_k": 5
+      }
+    },
+    {
+      "id": "call_error_001",
+      "name": "file_reader",
+      "args": {
+        "path": "docs/not_exists.txt",
+        "max_chars": 2000
+      }
+    }
+  ]
+}

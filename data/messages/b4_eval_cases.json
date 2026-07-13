@@ -1,0 +1,22 @@
+[
+  {
+    "id": "read_agent_doc",
+    "user": "帮我阅读 docs/agent_intro.txt，总结三条中文要点。",
+    "expected_tools": ["file_reader"]
+  },
+  {
+    "id": "calculate_expression",
+    "user": "请用工具计算 (18+24)*3，并告诉我结果。",
+    "expected_tools": ["calculator"]
+  },
+  {
+    "id": "search_agent_docs",
+    "user": "请搜索 docs 目录里和 Agent 有关的内容，并总结匹配结果。",
+    "expected_tools": ["local_file_search"]
+  },
+  {
+    "id": "multi_independent_ops",
+    "user": "请同时用工具计算 (18+24)*3，读取 docs/agent_intro.txt，并搜索 docs 目录里和 Agent 有关的内容。",
+    "expected_tools": ["calculator", "file_reader", "local_file_search"]
+  }
+]

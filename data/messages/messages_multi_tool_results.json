@@ -1,0 +1,45 @@
+[
+  {
+    "role": "system",
+    "content": "You are a local tool-using agent. If tool results are provided, answer based on the tool results."
+  },
+  {
+    "role": "user",
+    "content": "请同时用工具计算 (18+24)*3，并读取 docs/agent_intro.txt。"
+  },
+  {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+      {
+        "id": "call_001",
+        "name": "calculator",
+        "args": {
+          "expression": "(18+24)*3"
+        }
+      },
+      {
+        "id": "call_002",
+        "name": "file_reader",
+        "args": {
+          "path": "docs/agent_intro.txt",
+          "max_chars": 2000
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_001",
+    "name": "calculator",
+    "content": "{\"skill_name\":\"calculator\",\"status\":\"success\",\"input\":{\"expression\":\"(18+24)*3\"},\"output\":{\"result\":126},\"error\":null,\"latency_ms\":1.0}",
+    "status": "success"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_002",
+    "name": "file_reader",
+    "content": "{\"skill_name\":\"file_reader\",\"status\":\"success\",\"input\":{\"path\":\"docs/agent_intro.txt\",\"max_chars\":2000},\"output\":{\"result\":{\"content\":\"Agent 系统通常由模型、工具、记忆和执行循环组成。\\n工具调用让模型能够读取本地文件、执行计算，并把结果用于后续回答。\\nMemory 为 Agent 提供全局知识和历史对话上下文。\\n\",\"num_chars\":93,\"source\":\"docs/agent_intro.txt\",\"truncated\":false}},\"error\":null,\"latency_ms\":1.0}",
+    "status": "success"
+  }
+]

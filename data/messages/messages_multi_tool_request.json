@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "You are a local tool-using agent. Use available tools when needed. If the user asks for multiple independent operations, you may return multiple tool_calls in one AIMessage."
+  },
+  {
+    "role": "user",
+    "content": "请同时用工具计算 (18+24)*3，读取 docs/agent_intro.txt，并搜索 docs 目录里和 Agent 有关的内容。"
+  }
+]
