@@ -11,6 +11,7 @@ from common.io_utils import append_jsonl, read_json, write_json
 from common.logging_utils import now_iso
 from common.path_utils import DEFAULT_DATA_ROOT, bootstrap_project_root, resolve_cli_path
 from common.schemas import make_skill_result
+from common.error_codes import classify_error
 
 
 bootstrap_project_root()
@@ -22,6 +23,9 @@ SKILL_MODULES = {
     "local_file_search": "skills.local_file_search",
     "table_analyzer": "skills.table_analyzer",
     "format_converter": "skills.format_converter",
+    "code_executor": "skills.code_executor",
+    "list_ops": "skills.list_ops",
+    "text_stats": "skills.text_stats",
 }
 
 
@@ -43,10 +47,10 @@ def run_skill(skill_name: str, input_data: dict, data_root: str | None = None, o
         output = function(**kwargs)
         status = "success"
         error = None
-    except Exception as exc:  # Skill exceptions are a structured business result.
+    except Exception as exc:
         output = None
         status = "error"
-        error = {"type": type(exc).__name__, "message": str(exc)}
+        error = classify_error(exc)
     latency_ms = round((perf_counter() - start) * 1000, 3)
     return make_skill_result(skill_name, status, input_data, output, error, latency_ms)
 
