@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -204,6 +205,119 @@ def _fixture_tool_messages(tool_calls: list[dict], preset_messages: dict) -> lis
     return results
 
 
+def _run_batch_tasks(
+    batch_path: str,
+    tools_config: str,
+    memory_config: str,
+    model_config: str,
+    outdir: str,
+    llm_mode: str | None = None,
+    system_prompt_path: str = "",
+    toolset: str = "basic_tools",
+    max_turns: int = 5,
+    save_memory: str = "none",
+    selected_memory_ids: list[str] | None = None,
+    use_global_memory: bool = False,
+) -> dict:
+    """Read a JSONL batch file and run each task via run_agent()."""
+    batch_file = Path(batch_path).resolve()
+    if not batch_file.exists():
+        raise FileNotFoundError(f"batch file not found: {batch_path}")
+
+    tasks: list[dict] = []
+    with open(batch_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                tasks.append(json.loads(line))
+    if not tasks:
+        raise ValueError("batch file contains no tasks")
+
+    base_dir = Path(outdir).resolve()
+    base_dir.mkdir(parents=True, exist_ok=True)
+    progress_file = base_dir / "batch_progress.json"
+
+    # resume support: skip completed tasks
+    completed: set[int] = set()
+    if progress_file.exists():
+        try:
+            prev = read_json(progress_file)
+            if isinstance(prev, dict) and isinstance(prev.get("completed"), list):
+                completed = set(prev["completed"])
+                print(f"[批量] 从断点恢复：已完成 {len(completed)}/{len(tasks)} 个任务")
+        except Exception:
+            pass
+
+    results: list[dict] = []
+    for idx, task in enumerate(tasks):
+        if idx in completed:
+            continue
+
+        user_input = task.get("user_input", "")
+        if not user_input:
+            print(f"[批量] 跳过 task_{idx:03d}：缺少 user_input")
+            continue
+
+        cid = task.get("conversation_id", f"task_{idx:03d}")
+        mt = task.get("max_turns", max_turns)
+        sm = task.get("save_memory", save_memory)
+
+        # write a temp runtime.json for this task
+        tmp_runtime = base_dir / f".tmp_task_{idx:03d}.json"
+        runtime_dict = {
+            "conversation_id": cid,
+            "user_input": user_input,
+            "system_prompt_path": str(Path(system_prompt_path or "../prompts/local_tool_agent.txt").resolve()),
+            "toolset": task.get("toolset", toolset),
+            "max_turns": mt,
+            "save_memory": sm,
+            "execution_mode": "integrated",
+            "selected_memory_ids": task.get("selected_memory_ids", selected_memory_ids or []),
+            "use_global_memory": task.get("use_global_memory", use_global_memory),
+        }
+        write_json(runtime_dict, tmp_runtime)
+
+        task_outdir = base_dir / cid
+        print(f"\n[批量 {idx+1}/{len(tasks)}] {cid}: {user_input[:60]}")
+
+        try:
+            task_result = run_agent(
+                input_path=str(tmp_runtime),
+                tools_config=tools_config,
+                memory_config=memory_config,
+                model_config=model_config,
+                outdir=str(task_outdir),
+                llm_mode=llm_mode,
+                interactive=False,
+            )
+            results.append(task_result)
+            completed.add(idx)
+        except Exception as exc:
+            print(f"[批量] {cid} 失败: {type(exc).__name__}: {exc}")
+            results.append({"conversation_id": cid, "status": "error", "error": str(exc)})
+        finally:
+            tmp_runtime.unlink(missing_ok=True)
+
+        # save progress after each task
+        write_json(
+            {"completed": sorted(completed), "total": len(tasks), "last_idx": idx},
+            progress_file,
+        )
+
+    # final summary
+    summary = {
+        "total": len(tasks),
+        "completed": len(completed),
+        "failed": len(tasks) - len(completed),
+        "results": results,
+    }
+    write_json(summary, base_dir / "batch_summary.json")
+    print(f"\n[批量完成] {len(completed)}/{len(tasks)} 成功，{len(tasks)-len(completed)} 失败")
+    if progress_file.exists():
+        progress_file.unlink()
+    return summary
+
+
 def run_agent(
     input_path: str | None = None,
     tools_config: str | None = None,
@@ -235,6 +349,7 @@ def run_agent(
         output_dir = base_dir
 
     # ── resolve which init path we are on ──────────────────────────
+    _original_system_prompt = ""  # may be overwritten during init
     if resume_path:
         init_mode = "resume"
     elif input_path:
@@ -270,27 +385,44 @@ def run_agent(
 
     if init_mode == "resume":
         resume_file = Path(resume_path).resolve()  # type: ignore[arg-type]
-        resume_messages = read_json(resume_file)
-        if not isinstance(resume_messages, list) or not resume_messages:
-            raise ValueError("resume file must contain a non-empty messages array")
-        if resume_messages[0].get("role") != "system":
+        resume_raw = read_json(resume_file)
+
+        # support both old format (messages array) and new checkpoint format
+        if isinstance(resume_raw, dict) and isinstance(resume_raw.get("messages"), list):
+            # new checkpoint format
+            ck = resume_raw
+            resume_messages = ck["messages"]
+            runtime["conversation_id"] = ck.get("conversation_id", "")
+            runtime["execution_mode"] = ck.get("runtime", {}).get("execution_mode", "integrated")
+            runtime["toolset"] = ck.get("runtime", {}).get("toolset", "basic_tools")
+            runtime["max_turns"] = ck.get("runtime", {}).get("max_turns", 5)
+            runtime["save_memory"] = ck.get("runtime", {}).get("save_memory", "none")
+            runtime["system_prompt_path"] = "n/a (resumed)"
+            runtime["selected_memory_ids"] = ck.get("runtime", {}).get("selected_memory_ids", [])
+            runtime["use_global_memory"] = ck.get("runtime", {}).get("use_global_memory", False)
+            selected_memory = ck.get("selected_memory", {})
+            # restore counters for continuity
+            original_turn_idx = ck.get("turn_idx", 0)
+            _original_sp = ck.get("original_system_prompt", "")
+        elif isinstance(resume_raw, list):
+            # old format: plain messages array
+            resume_messages = resume_raw
+            runtime["conversation_id"] = resume_file.parent.name or "resumed"
+            runtime["execution_mode"] = "integrated"
+            runtime["system_prompt_path"] = "n/a (resumed)"
+            runtime["toolset"] = "basic_tools"
+            original_turn_idx = 0
+            _original_sp = ""
+            selected_memory = {}
+        else:
+            raise ValueError("resume file must be a messages array or checkpoint object")
+        if not resume_messages or resume_messages[0].get("role") != "system":
             raise ValueError("resume messages must start with a system message")
         system_prompt = resume_messages[0]["content"]
-        runtime["conversation_id"] = resume_file.parent.name or "resumed"
-        # try to read trace.json for the real conversation_id
-        trace_file = resume_file.with_name("trace.json")
-        if trace_file.exists():
-            try:
-                prev_trace = read_json(trace_file)
-                if isinstance(prev_trace, dict) and prev_trace.get("conversation_id"):
-                    runtime["conversation_id"] = prev_trace["conversation_id"]
-            except Exception:
-                pass
+        if _original_sp:
+            _original_system_prompt = _original_sp
         execution_mode = "integrated"
         runtime["execution_mode"] = "integrated"
-        runtime["system_prompt_path"] = "n/a (resumed)"
-        runtime["toolset"] = "basic_tools"
-        # extract last non-system role for user_text_first fallback
         user_text_first = ""
     elif init_mode == "standalone":
         if not interactive:
@@ -354,7 +486,8 @@ def run_agent(
         if memory_context:
             system_prompt = f"{system_prompt}\n\n{memory_context}"
     system_msg = {"role": "system", "content": system_prompt}
-    _original_system_prompt = system_prompt  # frozen at startup, for /system - reset
+    if init_mode != "resume" or not _original_system_prompt:
+        _original_system_prompt = system_prompt  # frozen at startup, for /system - reset
 
     # ── cross-turn accumulators ─────────────────────────────────────
     if init_mode == "resume":
@@ -424,10 +557,23 @@ def run_agent(
                 output_dir=output_dir,
                 call_index=llm_calls,
             )
-            saved = max(old_count - len(messages), 0)
-            saved_tokens = _estimate_tokens(
-                [{"role": "x", "content": "x" * 2 * saved * 30}]  # rough
-            ) if saved else 0
+            all_messages = messages  # keep disk writes in sync
+            # persist immediately — compress skips the end-of-turn checkpoint
+            write_json(
+                {
+                    "version": 1,
+                    "conversation_id": runtime.get("conversation_id", ""),
+                    "turn_idx": turn_idx,
+                    "llm_calls": llm_calls,
+                    "tool_rounds_total": tool_rounds_total,
+                    "mode": mode,
+                    "runtime": runtime,
+                    "original_system_prompt": _original_system_prompt,
+                    "messages": all_messages,
+                    "selected_memory": selected_memory,
+                },
+                output_dir / "checkpoint.json",
+            )
             print(f"[压缩完成] {old_count} 条 → {len(messages)} 条，保留最近 {keep_n} 轮")
             turn_idx += 1
             continue
@@ -594,6 +740,24 @@ def run_agent(
 
         turn_idx += 1
 
+        # checkpoint: save after every turn so a crash doesn't lose history
+        if interactive and model_file:
+            write_json(
+                {
+                    "version": 1,
+                    "conversation_id": runtime.get("conversation_id", ""),
+                    "turn_idx": turn_idx,
+                    "llm_calls": llm_calls,
+                    "tool_rounds_total": tool_rounds_total,
+                    "mode": mode,
+                    "runtime": runtime,
+                    "original_system_prompt": _original_system_prompt,
+                    "messages": all_messages,
+                    "selected_memory": selected_memory,
+                },
+                output_dir / "checkpoint.json",
+            )
+
     write_json(all_messages, output_dir / "messages.json")
     if execution_mode == "integrated":
         write_json(all_tool_messages, output_dir / "tool_messages.json")
@@ -701,6 +865,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="启用全局记忆加载")
     parser.add_argument("--resume",
                         help="从 messages.json 恢复对话，跳过初始化直接进入交互模式。")
+    parser.add_argument("--batch",
+                        help="批量任务 JSONL 文件路径，每行一个任务（与 --input/--interactive 互斥）")
     return parser
 
 
@@ -708,6 +874,31 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         # Validate arg combinations
+        if args.batch:
+            if args.input or args.interactive or args.resume:
+                print("error: --batch is mutually exclusive with --input/--interactive/--resume", file=sys.stderr)
+                return 1
+            if not args.tools_config or not args.memory_config or not args.model_config:
+                print("error: --batch requires --tools_config, --memory_config, --model_config", file=sys.stderr)
+                return 1
+
+            result = _run_batch_tasks(
+                batch_path=str(resolve_cli_path(args.batch)),
+                tools_config=str(resolve_cli_path(args.tools_config)),
+                memory_config=str(resolve_cli_path(args.memory_config)),
+                model_config=str(resolve_cli_path(args.model_config)),
+                outdir=str(resolve_cli_path(args.outdir)),
+                llm_mode=args.llm_mode,
+                system_prompt_path=args.system_prompt,
+                toolset=args.toolset,
+                max_turns=args.max_turns,
+                save_memory=args.save_memory,
+                selected_memory_ids=args.selected_memory_ids,
+                use_global_memory=args.use_global_memory,
+            )
+            print(f"batch_summary: {args.outdir}/batch_summary.json")
+            return 0
+
         if args.resume and args.input:
             print("error: --resume and --input are mutually exclusive", file=sys.stderr)
             return 1
